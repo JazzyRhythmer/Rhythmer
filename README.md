@@ -6,11 +6,31 @@
 
 Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhythmer). Optional support: [Ko-fi](https://ko-fi.com/jazzyrhythmer).
 
+**Built on [JIANT](https://github.com/juanjiant-bit/JIANT).** Rhythmer keeps its sequencing, project management and system foundation, with a new monochrome interface and additional machines. The Acid engine/generator comes from X0X; Break manipulation comes from Amenity. Original authors and licenses remain credited.
+
 ## Start here
 
 [Play in your browser](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Guide](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
 
 For a first install, **official V15 is the recommended starting point**. Back up the music you want to keep before changing firmware. The installer requires a final V15 recommendation acknowledgement, backup/risk acknowledgements and a separate audio-rights acknowledgement. Use Chrome or Edge and keep USB/power connected until verification finishes. A matching Rhythmer can be updated directly after backup.
+
+## Acid generation and Break performance
+
+| Acid / NEW + MUTATE | Break / chops + repeats |
+| --- | --- |
+| ![Acid generation](docs/motion/acid-generate.gif) | ![Break performance](docs/motion/break-perform.gif) |
+| ACID track → EDIT → ACID tab → 303 GEN 1 / 2. OCT+ generates a new line; OCT− mutates it. SCL supplies the root and scale. [Acid guide](docs/ACID.md) | BREAK track → EDIT → BREAK tab. Play slices and repeat/up/down commands; SEQ edits the actual events. Hold SEQ for STRAIGHT / MUTATE / RANDOM. [Break guide](docs/BREAK.md) |
+
+## The machines in motion
+
+Host-rendered firmware UI driven by note, envelope and preset input; silent previews, not physical-device footage. FM6 cycles patches to show its operator networks. [Try the actual firmware with sound](https://jazzyrhythmer.github.io/Rhythmer/#play).
+
+| | | |
+| --- | --- | --- |
+| **DRUM**<br><img src="docs/motion/drum.gif" alt="DRUM firmware UI animation" width="240"><br>Synthesized percussion | **SERUM**<br><img src="docs/motion/serum.gif" alt="SERUM firmware UI animation" width="240"><br>Wavetable morphing | **PHASE**<br><img src="docs/motion/phase.gif" alt="PHASE firmware UI animation" width="240"><br>Phase distortion |
+| **LOFI**<br><img src="docs/motion/lofi.gif" alt="LOFI firmware UI animation" width="240"><br>Digital textures | **ANALOG**<br><img src="docs/motion/analog.gif" alt="ANALOG firmware UI animation" width="240"><br>Classic waveforms | **FM6**<br><img src="docs/motion/fm6.gif" alt="FM6 firmware UI animation" width="240"><br>Six-operator patch networks |
+| **WHEEL**<br><img src="docs/motion/wheel.gif" alt="WHEEL firmware UI animation" width="240"><br>Harmonic organ layers | **FM+STAT**<br><img src="docs/motion/fmstat.gif" alt="FM+STAT firmware UI animation" width="240"><br>Compact FM | **SWAV-SAW**<br><img src="docs/motion/swavsaw.gif" alt="SWAV-SAW firmware UI animation" width="240"><br>Layered saws |
+| **SID-6581**<br><img src="docs/motion/sid.gif" alt="SID-6581 firmware UI animation" width="240"><br>Chip-style synthesis | **ACID**<br><img src="docs/motion/acid.gif" alt="ACID firmware UI animation" width="240"><br>303-style bass | **BREAK**<br><img src="docs/motion/break.gif" alt="BREAK firmware UI animation" width="240"><br>Sequenced chops |
 
 ## Machines and sequencing
 
