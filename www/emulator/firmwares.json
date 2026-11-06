@@ -1,0 +1,15 @@
+{
+  "default": "rhythmer",
+  "firmwares": [
+    {
+      "id": "rhythmer",
+      "name": "Rhythmer",
+      "version": "0.1.0-beta.1",
+      "author": "Jazzy Rhythmer",
+      "license": "GPL-3.0",
+      "repo": "../#releases",
+      "package": "../downloads/Rhythmer.fwsc",
+      "about": "Six-track groovebox firmware. Public beta candidate; see release-specific test scope."
+    }
+  ]
+}

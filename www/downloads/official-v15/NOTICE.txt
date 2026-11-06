@@ -1,0 +1,5 @@
+Official M-VAVE FM-1 V15 recovery firmware
+Copyright (c) 2026 珠海笙科智能科技有限公司 (M-VAVE).
+FM-1_015.fwsc is unmodified. SHA-256: db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a
+The recovery image is distributed by M-VAVE under Apache-2.0 as stated in THIRD_PARTY.md, Boot/update resources and recovery firmware.
+This is a Rhythmer recovery copy; no manufacturer endorsement is implied. Retain all accompanying license and attribution documents.

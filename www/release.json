@@ -1,0 +1,107 @@
+{
+  "version": "0.1.0-beta.1",
+  "product": "FM-1_748001",
+  "sha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
+  "physicalHardwareTested": false,
+  "ownerTest": {
+    "date": "2026-11-06",
+    "firmwareSha256": "e705abe330aa80191d1470ccee5a891716e3d60db8450c9ba306c675454d3677",
+    "method": "Owner-reported manual FM-1 test",
+    "result": "Owner reported all functions working after installation",
+    "migrationAndRecoveryMatrixVerified": false,
+    "reportedPaths": [
+      "Official V15 to Rhythmer installed and running",
+      "Rhythmer to official V15 or another firmware confirmed"
+    ],
+    "notConfirmed": [
+      "Distinct other-custom-firmware to Rhythmer installation",
+      "Deliberately interrupted physical update recovery"
+    ]
+  },
+  "localOnly": false,
+  "files": [
+    {
+      "name": "FM-1-V15-recovery.zip",
+      "bytes": 709532,
+      "sha256": "728587067d6c28193f1384ef0dcdcf71c40afbc1df54db2afc6d0beb6aa9a265"
+    },
+    {
+      "name": "Rhythmer-0.1.0-beta.1-install.zip",
+      "bytes": 3132857,
+      "sha256": "4fc723d5e29f502648a9bb76a7a77a6cbea4e457ac6a1a57d806c6e0a45ce354"
+    },
+    {
+      "name": "Rhythmer-six-track-test.fm1save",
+      "bytes": 1120751,
+      "sha256": "d2ada70c5d3f7014e5d3f068fbc3fd02a120dfbef4a547b3e89cf276b538ae15"
+    },
+    {
+      "name": "Rhythmer-with-breaks.rhythmer",
+      "bytes": 2260708,
+      "sha256": "ecfef9965b8782d0cde7e3e1fd942dd8244c756f1c990114ebedd1c53adc027e"
+    },
+    {
+      "name": "Rhythmer.fwsc",
+      "bytes": 828065,
+      "sha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a"
+    },
+    {
+      "name": "THIRD-PARTY-AUDIO.txt",
+      "bytes": 1427,
+      "sha256": "a72599d118ffb517c6924600ed79f6c07361a871417dbe0260ff1fb45ce1adfd"
+    },
+    {
+      "name": "amen-160.slot",
+      "bytes": 81920,
+      "sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0"
+    },
+    {
+      "name": "official-v15/APACHE-2.0.txt",
+      "bytes": 10140,
+      "sha256": "bb28c48e3e078166e91cfc2b6db7ffebb8a0973b9e23b3df060561292d8d69ec"
+    },
+    {
+      "name": "official-v15/FM-1_015.fwsc",
+      "bytes": 699956,
+      "sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a"
+    },
+    {
+      "name": "official-v15/LICENSE.md",
+      "bytes": 38431,
+      "sha256": "fe7344af68a6e65d0cf623e3eca1ff4a4d751ba538bffbc5248134b79d02f1fd"
+    },
+    {
+      "name": "official-v15/NOTICE.txt",
+      "bytes": 480,
+      "sha256": "526f6cd1fb762805506a478fbd8061d4bf23bac348db9a3fa97165ad84fd85ab"
+    },
+    {
+      "name": "official-v15/THIRD_PARTY.md",
+      "bytes": 142314,
+      "sha256": "c10451a1c0b368ec926e86b9296eb0c96c790d4d4768ad07e91b09ca9ea4bfa5"
+    },
+    {
+      "name": "official-v15/UPSTREAM.json",
+      "bytes": 995,
+      "sha256": "a9551cd8c056b216ac6d090854f68a5463f5f75a993ed5a6b2e846b9181d90ee"
+    },
+    {
+      "name": "think-160-preview.wav",
+      "bytes": 96044,
+      "sha256": "c056096cb7a8d8cc8841f308631512ed89ff61e880a60a8a48162ca07cf4d303"
+    },
+    {
+      "name": "think-160-repeat.wav",
+      "bytes": 384044,
+      "sha256": "456dde8853e12d20e39259fb0c4b21e3a42095b14f37152c799444737cb0d136"
+    },
+    {
+      "name": "think-160.slot",
+      "bytes": 81920,
+      "sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d"
+    }
+  ],
+  "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
+  "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
+  "audioPublicRedistributionCleared": false
+}

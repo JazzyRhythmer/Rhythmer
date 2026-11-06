@@ -1,0 +1,54 @@
+{
+  "project": "fm1-emu",
+  "author": "Joakim Eriksson",
+  "license": "MIT",
+  "source": "https://github.com/joakimeriksson/fm1-emu",
+  "retrieved": "2026-11-06",
+  "files": {
+    "index.html": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/index.html",
+      "bytes": 23264,
+      "sha256": "cabb58be90a1f35af3e9d4570982f1d45541e5ed3d81606de9dc91548f864e34"
+    },
+    "style.css": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/style.css",
+      "bytes": 16297,
+      "sha256": "52e2004d51a1a53c2e0baa8f66b663b5b1ce2680566d1fd5e221b0231bfb9834"
+    },
+    "main.js": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/main.js",
+      "bytes": 54893,
+      "sha256": "7195aa827abb9f894cbf6963a61f58874cbbb9d2b30c9a9010c750977c110259"
+    },
+    "fwsc.js": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/fwsc.js",
+      "bytes": 9363,
+      "sha256": "1834be925fe656e06111312551c5b0e56f4382e424faf512ecf711b8a49b8112"
+    },
+    "persistence.js": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/persistence.js",
+      "bytes": 8033,
+      "sha256": "8f104e713f5ba6230a61e36a0e44b2711c6cb5d111e58410de3e163d4104aae4"
+    },
+    "tryout.js": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/tryout.js",
+      "bytes": 3859,
+      "sha256": "0bc16e4d31203caa838e8c800ae1e523e31713264eb7b38c23c5a187ddad4a15"
+    },
+    "worklet.js": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/worklet.js",
+      "bytes": 13777,
+      "sha256": "d2e950a8e721877480389d2707886b0c376587f5dd9c8f841413f457f5d7799c"
+    },
+    "jit.js": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/jit.js",
+      "bytes": 1819,
+      "sha256": "0ed468667f668f3c471038ce6ba5cb4ac10bff51cb05b3b459552210e5d531d1"
+    },
+    "fm1_web.wasm": {
+      "url": "https://joakimeriksson.github.io/fm1-emu/fm1_web.wasm",
+      "bytes": 3358200,
+      "sha256": "5e9cea87026f03672380cacfd4b198dad6c74a975a7d307826d3330f86bedd41"
+    }
+  }
+}

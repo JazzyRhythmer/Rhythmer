@@ -1,0 +1,23 @@
+RHYTHMER / THIRD-PARTY AUDIO — BUNDLED THIRD-PARTY RECORDINGS
+
+A / AMEN — "Amen, Brother", The Winstons (1969).
+Drums: Gregory C. Coleman. Amenity credits composition to Richard L. Spencer.
+Source: https://github.com/ejtb76/amenity/tree/main/assets/third-party/amen
+B / THINK — "Think (About It)", Lyn Collins.
+Source: user-supplied Classic Break Pack, lyncollins_think_1.wav and
+lyncollins_think_2.wav. Drum intervals assembled into two complementary bars;
+pitched tail/carry-in intervals excluded. Original files retained by the owner.
+
+Both: mono PCM12 / 16 kHz / two bars at 160 BPM / 3 seconds. Prepared
+with cropping, repitch/resampling, level adjustment and endpoint fades.
+These recordings are NOT covered by Rhythmer's software license. Rights
+remain with the respective recording and composition rights holders.
+No permission for public firmware/sample redistribution or musical releases
+has been documented for these copies. Credits and notices do not grant it.
+The project owner directs public distribution with these credits. This
+decision is not rights-holder permission, and does not clear any user use.
+
+Recording/composition permissions may be needed for distributing
+these recordings as firmware/sample assets, or replace/omit them. A license
+allowing samples in a finished song may not allow a redistributable sample bank.
+See audio-rights.json for source URLs, exact slot hashes and clearance status.

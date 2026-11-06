@@ -1,0 +1,34 @@
+{
+  "name": "Rhythmer",
+  "creator": "Jazzy Rhythmer",
+  "localOnly": false,
+  "links": {
+    "youtube": "https://www.youtube.com/@jazzyrhythmer",
+    "instagram": "https://www.instagram.com/jazzyrhythmer/",
+    "soundcloud": "https://soundcloud.com/jazzyrhythmer/",
+    "spotify": "https://open.spotify.com/intl-ko/artist/13ld5f2zK1RckuR4Z7qbtY",
+    "kofi": "https://ko-fi.com/jazzyrhythmer",
+    "bandcamp": "https://jazzyrhythmer.bandcamp.com/"
+  },
+  "linkEvidence": "YouTube @jazzyrhythmer About links verified 2026-11-06. Spotify artist verified by matching I'm Not, Hangang Highway, The Angel, Flying and the I Saw The Heaven Yesterday EP to the official YouTube discography. Spotify artist URL confirmed by owner on 2026-11-06. Ko-fi URL provided by owner on 2026-11-06.",
+  "emulator": "https://joakimeriksson.github.io/fm1-emu/?fw=local&mhz=240",
+  "language": "en",
+  "ownerTest": {
+    "date": "2026-11-06",
+    "firmwareSha256": "e705abe330aa80191d1470ccee5a891716e3d60db8450c9ba306c675454d3677",
+    "method": "Owner-reported manual FM-1 test",
+    "result": "Owner reported all functions working after installation",
+    "migrationAndRecoveryMatrixVerified": false,
+    "reportedPaths": [
+      "Official V15 to Rhythmer installed and running",
+      "Rhythmer to official V15 or another firmware confirmed"
+    ],
+    "notConfirmed": [
+      "Distinct other-custom-firmware to Rhythmer installation",
+      "Deliberately interrupted physical update recovery"
+    ]
+  },
+  "version": "0.1.0-beta.1",
+  "product": "FM-1_748001",
+  "githubRepository": "JazzyRhythmer/Rhythmer"
+}

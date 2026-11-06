@@ -1,0 +1,27 @@
+RHYTHMER / EXPERIMENTAL FIRMWARE NOTICE
+
+Rhythmer is an independent community project. It is not affiliated with,
+sponsored by, endorsed by or an official product of M-VAVE. The M-VAVE name
+and FM-1 product name identify compatible hardware; their use does not imply
+an affiliation. Other names and marks remain with their respective owners.
+
+This is experimental development firmware. Physical-device installation,
+power-loss recovery, sustained playback and compatibility with every hardware
+revision have not been validated. Firmware or audio-bank writes can cause
+loss of music, presets or samples, failed updates, device malfunction or damage,
+and a device may require recovery outside this browser. Keep independent
+backups and stable power/USB during writes.
+
+Rhythmer is provided without warranty, to the extent permitted by applicable
+law. To that same extent, its authors and contributors disclaim liability for
+device damage or malfunction, data loss and resulting losses arising from use
+or attempted installation. This notice does not exclude liability or rights
+that cannot lawfully be excluded, and does not override mandatory statutory
+rights or separately agreed written warranties. The applicable open-source
+licenses retain their own warranty/liability provisions.
+
+The installation checkbox records that this risk and independence notice was
+read. It is not a claim that every possible liability can be waived, nor a
+waiver of non-excludable legal rights. No manufacturer warranty outcome is
+promised. Rights in the third-party Break recordings are a separate issue;
+read THIRD-PARTY-AUDIO.txt. Credits and notices do not grant recording rights.

@@ -1,0 +1,72 @@
+{
+  "SERUM": [
+    "MONO GIANT",
+    "ACID LADDER",
+    "WT PAD",
+    "WT LEAD",
+    "PLUCK",
+    "BELL",
+    "KEYS",
+    "SWEEP FX"
+  ],
+  "PHASE": [
+    "BRASS",
+    "ORGAN",
+    "STRING",
+    "RESO",
+    "BELL",
+    "WIRE",
+    "GROWL",
+    "FB BASS",
+    "CZ PIANO",
+    "GLASS PAD",
+    "DIGI STAB",
+    "SYN BASS",
+    "VOX PAD",
+    "HARP",
+    "PD LEAD",
+    "RING KEYS"
+  ],
+  "LOFI": [
+    "BYTEBEAT",
+    "BYTE VAR",
+    "BYTE BENT",
+    "PULSE LD",
+    "WAVE BASS",
+    "8BIT KEYS",
+    "WAVE LEAD",
+    "STEP LEAD",
+    "BYTE TONE",
+    "FLOAT FM",
+    "FLOAT ARP",
+    "FLOAT PAD",
+    "CHIP PAD",
+    "GB ARP",
+    "TRI BASS",
+    "SOFT CHIP",
+    "SAW CHIP"
+  ],
+  "FM+STAT": [
+    "INIT STAT",
+    "FM KEYS",
+    "DX BASS",
+    "FM BELL",
+    "FM PAD"
+  ],
+  "SWAV-SAW": [
+    "INIT SAW",
+    "REESE",
+    "MOOG",
+    "SUPER LEAD",
+    "BRASS",
+    "STRINGS"
+  ],
+  "SID-6581": [
+    "INIT SID",
+    "CHIP SQR",
+    "DUB TRI",
+    "SID LEAD",
+    "SYNC BASS",
+    "RING HIT"
+  ]
+}

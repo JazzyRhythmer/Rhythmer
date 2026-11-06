@@ -1,0 +1,9 @@
+{
+  "repository": "JazzyRhythmer/Rhythmer",
+  "site": "https://jazzyrhythmer.github.io/Rhythmer/",
+  "version": "0.1.0-beta.1",
+  "product": "FM-1_748001",
+  "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
+  "ownerDistributionDecision": true,
+  "rightsHolderClearanceDocumented": false
+}

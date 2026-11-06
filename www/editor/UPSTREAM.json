@@ -1,0 +1,27 @@
+{
+  "source": "https://github.com/juanjiant-bit/JIANT",
+  "commit": "3206468966856c98d4712c9f366621ae897246b8",
+  "license": "GPL-3.0-only",
+  "files": {
+    "editor.html": {
+      "bytes": 293427,
+      "sha256": "0f5f440365769e6871cc3bfbf6c1de408edbf1debd6f72783ba1e767805d50f5"
+    },
+    "fm1backup.js": {
+      "bytes": 11377,
+      "sha256": "28641c73ff5b3859ca207394a7ef94ea4e5b7a17a1ed9cb844df2fb9db9ee241"
+    },
+    "fukiai.ttf": {
+      "bytes": 82696,
+      "sha256": "312bc6abd697ba7783e3ce36250b819659998b0a778bcab259941856472be37a"
+    },
+    "FUKIAI-LICENSE.txt": {
+      "bytes": 1166,
+      "sha256": "fddeab17d69ab85a8e9c593beb0e93c279a9d74ff9504e1804bba123cb63e08e"
+    },
+    "EDITOR_PROTOCOL.md": {
+      "bytes": 86893,
+      "sha256": "853be764744b2cf78d81f56501b15a08242f9c9fa19d29806fd5f1fb79bf0b6f"
+    }
+  }
+}

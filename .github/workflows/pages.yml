@@ -1,0 +1,35 @@
+name: Deploy Rhythmer website
+on:
+  push:
+    branches: [main]
+    paths: ['www/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rhythmer-pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - name: Check reviewed static release files
+        run: python3 scripts/check_public.py
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: www
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

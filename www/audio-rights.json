@@ -1,0 +1,66 @@
+{
+  "format": "rhythmer-audio-rights",
+  "version": 1,
+  "publicRedistributionCleared": false,
+  "notice": "These recordings are separate from the firmware code license. Attribution, free access, processing and a non-commercial label do not grant recording or composition rights. No blanket permission for redistribution or musical releases is supplied.",
+  "samples": [
+    {
+      "id": "amen",
+      "slot": "A",
+      "title": "Amen",
+      "recording": "Amen, Brother",
+      "artist": "The Winstons",
+      "credit": "Drums: Gregory C. Coleman. Amenity credits composition to Richard L. Spencer.",
+      "source": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/README.md",
+      "sourceAudio": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
+      "slotSHA256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
+      "status": "clearance-not-documented",
+      "firmwareRedistributionPermission": null,
+      "licenseDocument": null
+    },
+    {
+      "id": "think",
+      "slot": "B",
+      "title": "Think",
+      "recording": "Think (About It)",
+      "artist": "Lyn Collins",
+      "credit": "Drum interval edit from user-supplied Classic Break Pack files. Recording and composition rights remain with their respective rights holders.",
+      "source": "User-supplied Classic Break Pack",
+      "sourceAudio": null,
+      "slotSHA256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+      "status": "clearance-not-documented",
+      "firmwareRedistributionPermission": null,
+      "licenseDocument": null,
+      "sourceFiles": [
+        {
+          "name": "lyncollins_think_1.wav",
+          "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
+          "rate": 44100,
+          "frames": 93761,
+          "source_beats": 4
+        },
+        {
+          "name": "lyncollins_think_2.wav",
+          "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
+          "rate": 44100,
+          "frames": 92698,
+          "source_beats": 4
+        }
+      ],
+      "edit": "Think drums / two complementary assembled bars"
+    }
+  ],
+  "references": [
+    "https://github.com/ejtb76/amenity#third-party-audio",
+    "https://rhythm-lab.com/breakbeats/",
+    "https://www.copyright.gov/music-modernization/educational-materials/Sampling-Interpolations-Beat-Stores-and-More-An-Introduction-for-Musicians-Using-Preexisting.pdf"
+  ],
+  "distributionDecision": {
+    "requestedBy": "Jazzy Rhythmer",
+    "date": "2026-11-06",
+    "includeOriginalRecordings": true,
+    "ownerDirectedPublicDistribution": true,
+    "permissionEvidenceProvided": false,
+    "reason": "Owner explicitly requests redistribution of Amen and Think with credits, a rights acknowledgement and user-replaceable sample banks. The request is not a rights-holder license."
+  }
+}

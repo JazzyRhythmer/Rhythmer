@@ -1,0 +1,1 @@
+Rhythmer integration: local-only catalog, exact-hash initial sample/project seed, existing-save preservation, accessible panel buttons, pause/resume, PCM output meter. Runtime: Joakim Eriksson, MIT. Original files: site/vendor/fm1-emu.

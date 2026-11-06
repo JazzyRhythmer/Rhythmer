@@ -1,0 +1,12 @@
+{
+  "what": "A six-track groovebox with synthesized drums, nine synth models, 303-style acid and playable breakbeats. Generate and mutate patterns, sequence chops and repeats, switch two sample banks, and keep four projects with a browser editor.",
+  "author": "Jazzy Rhythmer",
+  "kinds": [
+    "groove"
+  ],
+  "image": "docs/launch/card.png",
+  "color": "#EDEDDD",
+  "play": "https://jazzyrhythmer.github.io/Rhythmer/#play",
+  "editor": "https://jazzyrhythmer.github.io/Rhythmer/editor/",
+  "cheat": "https://jazzyrhythmer.github.io/Rhythmer/#guide"
+}
