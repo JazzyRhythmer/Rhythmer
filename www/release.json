@@ -1,8 +1,8 @@
 {
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "product": "FM-1_748001",
-  "sha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
-  "physicalHardwareTested": true,
+  "sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+  "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-06",
     "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
@@ -33,24 +33,24 @@
       "sha256": "728587067d6c28193f1384ef0dcdcf71c40afbc1df54db2afc6d0beb6aa9a265"
     },
     {
-      "name": "Rhythmer-0.1.0-beta.1-install.zip",
-      "bytes": 3132857,
-      "sha256": "4fc723d5e29f502648a9bb76a7a77a6cbea4e457ac6a1a57d806c6e0a45ce354"
+      "name": "Rhythmer-0.1.0-beta.2-install.zip",
+      "bytes": 3134536,
+      "sha256": "301c89637ce4396a553db177eec91b6c7ce63df362251b412fcedc5a8d666fd1"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
       "bytes": 1120751,
-      "sha256": "d2ada70c5d3f7014e5d3f068fbc3fd02a120dfbef4a547b3e89cf276b538ae15"
+      "sha256": "193cd6c0a4fb918d9d0c218ff7a5cf68e2bba4ed6c8cf18c1f9fe0a3ba790c68"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2260708,
-      "sha256": "ecfef9965b8782d0cde7e3e1fd942dd8244c756f1c990114ebedd1c53adc027e"
+      "sha256": "412d0620c96ed869815425711d420d4c81886df4ce5464b5d74a537bad155624"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828065,
-      "sha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a"
+      "sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",

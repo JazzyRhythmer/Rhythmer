@@ -8,9 +8,15 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 
 **Built on [JIANT](https://github.com/juanjiant-bit/JIANT).** Rhythmer keeps its sequencing, project management and system foundation, with a new monochrome interface and additional machines. The Acid engine/generator comes from X0X; Break manipulation comes from Amenity. Original authors and licenses remain credited.
 
+## Watch Rhythmer
+
+[![Watch the Rhythmer OS opening — Acid Generator and Breakbeat Manipulator](site/media/video/rhythmer-opening-poster.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
+
+[Watch the 36-second opening with sound](https://jazzyrhythmer.github.io/Rhythmer/#opening) · [Download the Amen mix MP4](https://github.com/JazzyRhythmer/Rhythmer/releases/download/v0.1.0-beta.2/Rhythmer-OS-Opening-36s-1080p-Amen.mp4). Original opening sound plus an Amen Break section; sample credits below. The film shows host-rendered firmware UI, not physical-device footage.
+
 ## Start here
 
-[Play](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Guide](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
+[Play in your browser](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Guide](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
 
 **Use official V15 when moving from another custom firmware to Rhythmer, or from Rhythmer to another custom firmware.** Direct foreign-custom transitions are unsupported. For a first install, official V15 is the recommended starting point. Back up the music you want to keep before changing firmware. The installer requires a final V15 recommendation acknowledgement, backup/risk acknowledgements and a separate audio-rights acknowledgement. Use Chrome or Edge and keep USB/power connected until verification finishes. A matching Rhythmer can be updated directly after backup.
 
@@ -48,7 +54,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 The public beta candidate uses `FM-1_748001`; the legacy local development build used shared identity `FM-1_900`. The package includes its update loader and both fixed A/B sample banks. Installing replaces factory audio in those banks; the loader protects project/settings sectors outside its explicit ranges. A/B write and CRC checks do not make foreign firmware projects compatible.
 
-The owner confirmed playback, installation from official V15 and return to official V15 on the public package (`3d4e8655…`). This is a limited, owner-reported hardware test; read `HARDWARE-TEST-STATUS.json`. Direct foreign-custom transitions are unsupported: use V15 in between. A separate unit became non-responsive after the owner powered it off during an update; recovery is unconfirmed. Cold power-loss recovery is not established. The original release validation record describes the automated checks at package preparation. CPU measurements from an emulator are not real-device CPU measurements. Support for UC25HQ80 is implemented but has not been tested on that physical flash part.
+Beta.2 fixes SEQ piano-roll visibility: the displayed octave follows the current notes after track/bar changes and note edits. Seven host viewport checks and eleven actual-firmware emulator scenarios passed. The exact beta.2 binary has not been physically tested. The owner confirmed playback, installation from official V15 and return to official V15 on the earlier beta.1 package (`3d4e8655…`). This is a limited, owner-reported hardware test; read `HARDWARE-TEST-STATUS.json`. Direct foreign-custom transitions are unsupported: use V15 in between. A separate unit became non-responsive after the owner powered it off during an update; recovery is unconfirmed. Cold power-loss recovery is not established. The original release validation record describes the automated checks at package preparation. CPU measurements from an emulator are not real-device CPU measurements. Support for UC25HQ80 is implemented but has not been tested on that physical flash part.
 
 The normal synthesis ceiling is twelve shared voices, with a measured-load relief ceiling of ten and the existing overload protections. Monophonic machines and MD models have their own constraints. No guarantee of unlimited polyphony is made.
 

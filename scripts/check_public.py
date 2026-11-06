@@ -11,6 +11,16 @@ assert v['ownerDistributionDecision'] is True and v['rightsHolderClearanceDocume
 M=json.loads((R/'www/installer/manifest.json').read_text())
 assert M['localOnly'] is False and M['firmware']['product']==v['product']
 assert M['firmware']['sha256']==v['firmwareSha256']
+assert M['version']==v['version']
+release=json.loads((R/'www/release.json').read_text())
+assert release['version']==v['version'] and release['sha256']==v['firmwareSha256']
+validation=json.loads((R/'RELEASE-VALIDATION.json').read_text())
+assert validation['version']==v['version'] and validation['firmwareSha256']==v['firmwareSha256']
+for name,digest in validation['sourceFiles'].items():
+ assert hashlib.sha256((R/name).read_bytes()).hexdigest()==digest, 'Source differs from reviewed package: '+name
+if v.get('introVideoSha256'):
+ video=R/'www/assets/video/rhythmer-opening-36s-amen.mp4'
+ assert hashlib.sha256(video.read_bytes()).hexdigest()==v['introVideoSha256']
 for m in (M['firmware'],M['bundle'],M['archive'],M['recovery'],M['recoveryArchive'],*M['loops']):
  p=R/'www/installer'/m['url'];b=p.read_bytes();assert len(b)==m['bytes'] and hashlib.sha256(b).hexdigest()==m['sha256']
 hub=json.loads((R/'fmhub.json').read_text());assert 20<=len(hub['what'])<=300

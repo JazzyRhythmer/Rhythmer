@@ -1,22 +1,29 @@
 {
-  "date": "2026-11-06",
-  "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
-  "method": "Owner-reported manual FM-1 test on the functioning unit",
-  "result": "Owner confirmed playback and return to official V15 for the public package",
-  "reportedPaths": [
-    "Official V15 to Rhythmer FM-1_748001 installed and playing",
-    "Rhythmer FM-1_748001 to official V15 confirmed"
-  ],
-  "migrationAndRecoveryMatrixVerified": false,
-  "transitionPolicy": "Use official V15 when switching between Rhythmer and another custom firmware. Direct foreign-custom transitions are unsupported.",
-  "notConfirmed": [
-    "Direct installation from another custom firmware is intentionally unsupported",
-    "Physical validation on UC25HQ80 flash",
-    "Cold power-loss recovery or sustained-load reliability"
-  ],
-  "separateInterruptionReport": {
-    "description": "Owner reported powering off a separate FM-1 during an update, followed by a dark screen and no USB response. Exact interrupted stage and recovery remain unconfirmed.",
-    "recovered": false,
-    "hardwareDamageDiagnosed": false
-  }
+  "version": "0.1.0-beta.2",
+  "firmwareSha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+  "physicalCurrentCandidateTested": false,
+  "currentCandidateScope": "Seven host viewport assertions and eleven actual-firmware emulator scenarios; no device was flashed by the agent.",
+  "previousOwnerTest": {
+    "date": "2026-11-06",
+    "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
+    "method": "Owner-reported manual FM-1 test on the functioning unit",
+    "result": "Owner confirmed playback and return to official V15 for the public package",
+    "reportedPaths": [
+      "Official V15 to Rhythmer FM-1_748001 installed and playing",
+      "Rhythmer FM-1_748001 to official V15 confirmed"
+    ],
+    "migrationAndRecoveryMatrixVerified": false,
+    "transitionPolicy": "Use official V15 when switching between Rhythmer and another custom firmware. Direct foreign-custom transitions are unsupported.",
+    "notConfirmed": [
+      "Direct installation from another custom firmware is intentionally unsupported",
+      "Physical validation on UC25HQ80 flash",
+      "Cold power-loss recovery or sustained-load reliability"
+    ],
+    "separateInterruptionReport": {
+      "description": "Owner reported powering off a separate FM-1 during an update, followed by a dark screen and no USB response. Exact interrupted stage and recovery remain unconfirmed.",
+      "recovered": false,
+      "hardwareDamageDiagnosed": false
+    }
+  },
+  "transitionPolicy": "Use official V15 when switching between Rhythmer and another custom firmware. Direct foreign-custom transitions are unsupported."
 }

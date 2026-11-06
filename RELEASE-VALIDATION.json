@@ -1,521 +1,723 @@
 {
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "product": "FM-1_748001",
-  "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
-  "appSha256": "e482af5751906b1a052fd922d77eca6acdb52a419f7986e81e4e33e932e47e01",
-  "nativeScenarios": 27,
+  "firmwareSha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+  "appSha256": "feba23a1b64de7be900f0cfcd53d9ee903fccf03437b547b3ef79c32c531f456",
   "physicalCurrentCandidateTested": false,
+  "hostViewportChecks": 7,
+  "nativeScenarios": 11,
+  "webModelChecks": 130,
+  "emulatorCacheRegressions": 6,
+  "changedFirmwareSources": [
+    "jiant/firmware/src/ui_graph.c"
+  ],
+  "loaderBinaryUnchangedFromBeta1": true,
   "previousOwnerTest": {
     "date": "2026-11-06",
-    "firmwareSha256": "e705abe330aa80191d1470ccee5a891716e3d60db8450c9ba306c675454d3677",
-    "method": "Owner-reported manual FM-1 test",
-    "result": "Owner reported all functions working after installation",
-    "migrationAndRecoveryMatrixVerified": false,
+    "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
+    "method": "Owner-reported manual FM-1 test on the functioning unit",
+    "result": "Owner confirmed playback and return to official V15 for the public package",
     "reportedPaths": [
-      "Official V15 to Rhythmer installed and running",
-      "Rhythmer to official V15 or another firmware confirmed"
-    ]
-  },
-  "samples": {
-    "format": "rhythmer-audio-rights",
-    "version": 1,
-    "publicRedistributionCleared": false,
-    "notice": "These recordings are separate from the firmware code license. Attribution, free access, processing and a non-commercial label do not grant recording or composition rights. No blanket permission for redistribution or musical releases is supplied.",
-    "samples": [
-      {
-        "id": "amen",
-        "slot": "A",
-        "title": "Amen",
-        "recording": "Amen, Brother",
-        "artist": "The Winstons",
-        "credit": "Drums: Gregory C. Coleman. Amenity credits composition to Richard L. Spencer.",
-        "source": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/README.md",
-        "sourceAudio": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
-        "slotSHA256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
-        "status": "clearance-not-documented",
-        "firmwareRedistributionPermission": null,
-        "licenseDocument": null
-      },
-      {
-        "id": "think",
-        "slot": "B",
-        "title": "Think",
-        "recording": "Think (About It)",
-        "artist": "Lyn Collins",
-        "credit": "Drum interval edit from user-supplied Classic Break Pack files. Recording and composition rights remain with their respective rights holders.",
-        "source": "User-supplied Classic Break Pack",
-        "sourceAudio": null,
-        "slotSHA256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
-        "status": "clearance-not-documented",
-        "firmwareRedistributionPermission": null,
-        "licenseDocument": null,
-        "sourceFiles": [
-          {
-            "name": "lyncollins_think_1.wav",
-            "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
-            "rate": 44100,
-            "frames": 93761,
-            "source_beats": 4
-          },
-          {
-            "name": "lyncollins_think_2.wav",
-            "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
-            "rate": 44100,
-            "frames": 92698,
-            "source_beats": 4
-          }
-        ],
-        "edit": "Think drums / two complementary assembled bars"
-      }
+      "Official V15 to Rhythmer FM-1_748001 installed and playing",
+      "Rhythmer FM-1_748001 to official V15 confirmed"
     ],
-    "references": [
-      "https://github.com/ejtb76/amenity#third-party-audio",
-      "https://rhythm-lab.com/breakbeats/",
-      "https://www.copyright.gov/music-modernization/educational-materials/Sampling-Interpolations-Beat-Stores-and-More-An-Introduction-for-Musicians-Using-Preexisting.pdf"
+    "migrationAndRecoveryMatrixVerified": false,
+    "transitionPolicy": "Use official V15 when switching between Rhythmer and another custom firmware. Direct foreign-custom transitions are unsupported.",
+    "notConfirmed": [
+      "Direct installation from another custom firmware is intentionally unsupported",
+      "Physical validation on UC25HQ80 flash",
+      "Cold power-loss recovery or sustained-load reliability"
     ],
-    "distributionDecision": {
-      "requestedBy": "Jazzy Rhythmer",
-      "date": "2026-11-06",
-      "includeOriginalRecordings": true,
-      "ownerDirectedPublicDistribution": true,
-      "permissionEvidenceProvided": false,
-      "reason": "Owner explicitly requests redistribution of Amen and Think with credits, a rights acknowledgement and user-replaceable sample banks. The request is not a rights-holder license."
+    "separateInterruptionReport": {
+      "description": "Owner reported powering off a separate FM-1 during an update, followed by a dark screen and no USB response. Exact interrupted stage and recovery remain unconfirmed.",
+      "recovered": false,
+      "hardwareDamageDiagnosed": false
     }
   },
-  "publicRepository": null,
-  "pagesURL": null,
-  "githubReleasePublished": false,
-  "hubSubmitted": false,
-  "hubListed": false,
-  "publicUploadPerformed": false,
-  "breakModulation": {
-    "half_frames": 512,
-    "sample_manifest": [
-      {
-        "name": "amen-160",
-        "source_url": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
-        "source_sha256": "6a750fc1722773749fa2f6783c85f3a17b1291a54c4b033ed5636884ba2e0025",
-        "source_rate": 48000,
-        "source_frames": 144000,
-        "crop_frames": [
-          0,
-          144000
-        ],
-        "crop_seconds": 3.0,
-        "bars": 2,
-        "beats": 8,
-        "bpm": 160,
-        "output_rate": 16000,
-        "output_frames": 48000,
-        "bits": 12,
-        "payload_bytes": 72000,
-        "slot_bytes": 81920,
-        "slot_sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
-        "processing": "mono, DC removal, Kaiser polyphase anti-alias repitch, 0.5ms/3ms endpoint fades, -1dBFS peak, PCM12",
-        "pitch_semitones": 0.0,
-        "seam_jump_pcm16": 0,
-        "peak_pcm16": 29200,
-        "rms_pcm16": 6280.791897417607,
-        "quantization_max_error": 8.0
+  "automated": {
+    "navigationAndLoad": {
+      "half_frames": 512,
+      "sample_manifest": [
+        {
+          "name": "amen-160",
+          "source_url": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
+          "source_sha256": "6a750fc1722773749fa2f6783c85f3a17b1291a54c4b033ed5636884ba2e0025",
+          "source_rate": 48000,
+          "source_frames": 144000,
+          "crop_frames": [
+            0,
+            144000
+          ],
+          "crop_seconds": 3.0,
+          "bars": 2,
+          "beats": 8,
+          "bpm": 160,
+          "output_rate": 16000,
+          "output_frames": 48000,
+          "bits": 12,
+          "payload_bytes": 72000,
+          "slot_bytes": 81920,
+          "slot_sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
+          "processing": "mono, DC removal, Kaiser polyphase anti-alias repitch, 0.5ms/3ms endpoint fades, -1dBFS peak, PCM12",
+          "pitch_semitones": 0.0,
+          "seam_jump_pcm16": 0,
+          "peak_pcm16": 29200,
+          "rms_pcm16": 6280.791897417607,
+          "quantization_max_error": 8.0
+        },
+        {
+          "name": "think-160",
+          "edit": "Think drums / two complementary assembled bars",
+          "source": "user-supplied Classic Break Pack",
+          "sources": [
+            {
+              "name": "lyncollins_think_1.wav",
+              "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
+              "rate": 44100,
+              "frames": 93761,
+              "source_beats": 4
+            },
+            {
+              "name": "lyncollins_think_2.wav",
+              "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
+              "rate": 44100,
+              "frames": 92698,
+              "source_beats": 4
+            }
+          ],
+          "edit_segments": [
+            {
+              "source": 1,
+              "beats": [
+                0,
+                3
+              ]
+            },
+            {
+              "source": 2,
+              "beats": [
+                3,
+                4
+              ]
+            },
+            {
+              "source": 1,
+              "beats": [
+                0,
+                1
+              ]
+            },
+            {
+              "source": 2,
+              "beats": [
+                1,
+                4
+              ]
+            }
+          ],
+          "excluded_segments": [
+            {
+              "source": 1,
+              "beats": [
+                3,
+                4
+              ],
+              "reason": "pitched tail"
+            },
+            {
+              "source": 2,
+              "beats": [
+                0,
+                1
+              ],
+              "reason": "pitched carry-in"
+            }
+          ],
+          "bars": 2,
+          "beats": 8,
+          "bpm": 160,
+          "output_rate": 16000,
+          "output_frames": 48000,
+          "bits": 12,
+          "payload_bytes": 72000,
+          "slot_bytes": 81920,
+          "slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+          "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12",
+          "boundaries": [
+            0,
+            18000,
+            24000,
+            30000,
+            48000
+          ],
+          "seam_jump_pcm16": 0,
+          "peak_pcm16": 29200,
+          "rms_pcm16": 2769.22593083338
+        }
+      ],
+      "firmware_sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+      "physical_hardware_tested": false,
+      "runs": {
+        "six-nav-boot": {
+          "magic": 1145194289,
+          "halves": 177,
+          "max_us": 1923,
+          "nested": 1839,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 20422,
+          "ui_frames": 21,
+          "last_us": 333,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 0,
+          "home": 1,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 0,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0
+        },
+        "six-nav-strict": {
+          "magic": 1145194289,
+          "halves": 645,
+          "max_us": 9470,
+          "nested": 42198,
+          "in_audio": 1,
+          "late": 0,
+          "timer_irqs": 74776,
+          "ui_frames": 299,
+          "last_us": 7013,
+          "cpu_q8": 144,
+          "boots": 1,
+          "stage": 9,
+          "page": 0,
+          "home": 1,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 5,
+          "selected_track": 4,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 1,
+          "usb_packets": 7324,
+          "usb_frames": 323128,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "usb_capture_frames": 323347,
+          "usb_peak_pcm16": 19079,
+          "usb_rate": 44100,
+          "audio_lost": 0,
+          "peak_pcm16": 9540
+        },
+        "six-nav-sixacid": {
+          "magic": 1145194289,
+          "halves": 473,
+          "max_us": 6781,
+          "nested": 23075,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 54777,
+          "ui_frames": 198,
+          "last_us": 6104,
+          "cpu_q8": 133,
+          "boots": 1,
+          "stage": 9,
+          "page": 0,
+          "home": 1,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 14,
+          "selected_track": 5,
+          "track_engines": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "usb_starts": 1,
+          "usb_packets": 5324,
+          "usb_frames": 234890,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "usb_capture_frames": 235242,
+          "usb_peak_pcm16": 19817,
+          "usb_rate": 44100,
+          "audio_lost": 0,
+          "peak_pcm16": 9909
+        },
+        "six-nav-fiveacid-break": {
+          "magic": 1145194289,
+          "halves": 473,
+          "max_us": 7673,
+          "nested": 26369,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 54769,
+          "ui_frames": 198,
+          "last_us": 6679,
+          "cpu_q8": 147,
+          "boots": 1,
+          "stage": 9,
+          "page": 0,
+          "home": 1,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 21,
+          "selected_track": 0,
+          "track_engines": [
+            15,
+            16,
+            16,
+            16,
+            16,
+            16
+          ],
+          "usb_starts": 1,
+          "usb_packets": 5323,
+          "usb_frames": 234845,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "usb_capture_frames": 235109,
+          "usb_peak_pcm16": 19112,
+          "usb_rate": 44100,
+          "audio_lost": 0,
+          "peak_pcm16": 9556
+        },
+        "six-nav-acid-1": {
+          "magic": 1145194289,
+          "halves": 380,
+          "max_us": 1923,
+          "nested": 2599,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 43885,
+          "ui_frames": 177,
+          "last_us": 334,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 27,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 4,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0
+        },
+        "six-nav-acid-2": {
+          "magic": 1145194289,
+          "halves": 414,
+          "max_us": 1923,
+          "nested": 2715,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 47885,
+          "ui_frames": 204,
+          "last_us": 334,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 28,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 4,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0
+        },
+        "six-nav-break-1": {
+          "magic": 1145194289,
+          "halves": 405,
+          "max_us": 1923,
+          "nested": 2684,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 46886,
+          "ui_frames": 197,
+          "last_us": 333,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 29,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 5,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0
+        },
+        "six-nav-break-2": {
+          "magic": 1145194289,
+          "halves": 440,
+          "max_us": 1923,
+          "nested": 2807,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 50886,
+          "ui_frames": 224,
+          "last_us": 334,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 30,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 5,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0
+        },
+        "six-nav-break-3": {
+          "magic": 1145194289,
+          "halves": 474,
+          "max_us": 1923,
+          "nested": 2925,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 54886,
+          "ui_frames": 250,
+          "last_us": 334,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 34,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 5,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0
+        }
       },
-      {
-        "name": "think-160",
-        "edit": "Think drums / two complementary assembled bars",
-        "source": "user-supplied Classic Break Pack",
-        "sources": [
-          {
-            "name": "lyncollins_think_1.wav",
-            "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
-            "rate": 44100,
-            "frames": 93761,
-            "source_beats": 4
-          },
-          {
-            "name": "lyncollins_think_2.wav",
-            "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
-            "rate": 44100,
-            "frames": 92698,
-            "source_beats": 4
-          }
-        ],
-        "edit_segments": [
-          {
-            "source": 1,
-            "beats": [
-              0,
-              3
-            ]
-          },
-          {
-            "source": 2,
-            "beats": [
-              3,
-              4
-            ]
-          },
-          {
-            "source": 1,
-            "beats": [
-              0,
-              1
-            ]
-          },
-          {
-            "source": 2,
-            "beats": [
-              1,
-              4
-            ]
-          }
-        ],
-        "excluded_segments": [
-          {
-            "source": 1,
-            "beats": [
-              3,
-              4
-            ],
-            "reason": "pitched tail"
-          },
-          {
-            "source": 2,
-            "beats": [
-              0,
-              1
-            ],
-            "reason": "pitched carry-in"
-          }
-        ],
-        "bars": 2,
-        "beats": 8,
-        "bpm": 160,
-        "output_rate": 16000,
-        "output_frames": 48000,
-        "bits": 12,
-        "payload_bytes": 72000,
-        "slot_bytes": 81920,
-        "slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
-        "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12",
-        "boundaries": [
-          0,
-          18000,
-          24000,
-          30000,
-          48000
-        ],
-        "seam_jump_pcm16": 0,
-        "peak_pcm16": 29200,
-        "rms_pcm16": 2769.22593083338
-      }
-    ],
-    "firmware_sha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
-    "physical_hardware_tested": false,
-    "runs": {
-      "break-mod-dry": {
-        "magic": 1145194289,
-        "halves": 818,
-        "max_us": 3946,
-        "nested": 26488,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 94772,
-        "ui_frames": 487,
-        "last_us": 3315,
-        "cpu_q8": 68,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 32,
-        "selected_track": 5,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411365,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411584,
-        "usb_peak_pcm16": 9221,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 4611,
-        "pcmSha256": "c5a277c272bdcb9eea15856c6b5e86f1fc87cbce149e452e82e6a2636cc9a503",
-        "pcmEnergy": 510066960198
-      },
-      "break-mod-lp": {
-        "magic": 1145194289,
-        "halves": 818,
-        "max_us": 4195,
-        "nested": 28168,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 94776,
-        "ui_frames": 487,
-        "last_us": 3472,
-        "cpu_q8": 73,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 32,
-        "selected_track": 5,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411365,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411584,
-        "usb_peak_pcm16": 4369,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 2185,
-        "pcmSha256": "16f0e20a2b6022331c3af8ed3a7f967e91518aa309082616453f68c0553e78b4",
-        "pcmEnergy": 67551698806
-      },
-      "break-mod-lfo2": {
-        "magic": 1145194289,
-        "halves": 818,
-        "max_us": 4189,
-        "nested": 27945,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 94776,
-        "ui_frames": 487,
-        "last_us": 3431,
-        "cpu_q8": 72,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 32,
-        "selected_track": 5,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411365,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411584,
-        "usb_peak_pcm16": 6851,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 3425,
-        "pcmSha256": "19fd0508b563ff181e4e6a976563b126e551cebdd67a583fbbc7acc82d4af8bc",
-        "pcmEnergy": 169669822208
-      },
-      "break-mod-lfo1": {
-        "magic": 1145194289,
-        "halves": 818,
-        "max_us": 4197,
-        "nested": 27898,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 94776,
-        "ui_frames": 487,
-        "last_us": 3427,
-        "cpu_q8": 72,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 32,
-        "selected_track": 5,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411365,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411584,
-        "usb_peak_pcm16": 6567,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 3284,
-        "pcmSha256": "05b4b56c303d3440647db54cc01a015bbe9b75f20bc39f6338901690af898cb7",
-        "pcmEnergy": 184950648464
-      },
-      "break-mod-ensemble": {
-        "magic": 1145194289,
-        "halves": 817,
-        "max_us": 9181,
-        "nested": 50613,
-        "in_audio": 1,
-        "late": 0,
-        "timer_irqs": 94772,
-        "ui_frames": 420,
-        "last_us": 4468,
-        "cpu_q8": 132,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 36,
-        "selected_track": 0,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411352,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411528,
-        "usb_peak_pcm16": 19199,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 9600,
-        "pcmSha256": "335b6b632f3153be36fb6beb188574ad314d50e8f9077f10557eee0d167866a2",
-        "pcmEnergy": 6145545420367
-      },
-      "break-mod-env": {
-        "magic": 1145194289,
-        "halves": 818,
-        "max_us": 4197,
-        "nested": 27847,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 94770,
-        "ui_frames": 487,
-        "last_us": 3454,
-        "cpu_q8": 72,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 32,
-        "selected_track": 5,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411365,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411584,
-        "usb_peak_pcm16": 5197,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 2599,
-        "pcmSha256": "332e15ca25c41f8a34efd3d7cacce5b24658bdff092e6427461f58e18caa22b0",
-        "pcmEnergy": 35690200888
-      },
-      "break-mod-comb-ensemble": {
-        "magic": 1145194289,
-        "halves": 817,
-        "max_us": 9120,
-        "nested": 49736,
-        "in_audio": 1,
-        "late": 0,
-        "timer_irqs": 94771,
-        "ui_frames": 421,
-        "last_us": 4555,
-        "cpu_q8": 131,
-        "boots": 1,
-        "stage": 9,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 3,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 36,
-        "selected_track": 0,
-        "track_engines": [
-          10,
-          17,
-          2,
-          3,
-          16,
-          15
-        ],
-        "usb_starts": 1,
-        "usb_packets": 9324,
-        "usb_frames": 411355,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 411574,
-        "usb_peak_pcm16": 19068,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 9534,
-        "pcmSha256": "20126dec91b1f44adc979e4c755d940906cab5d733e096b98c99acb5c3933305",
-        "pcmEnergy": 6043767045987
-      }
+      "scope": "navigation and flexible-machine focused validation; earlier DSP sweep is archived separately"
     },
-    "freshAmenStraightDefaultVerified": true,
-    "physicalCandidateTested": false
+    "lowAndHighSeqScreens": {
+      "half_frames": 512,
+      "sample_manifest": [
+        {
+          "name": "amen-160",
+          "source_url": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
+          "source_sha256": "6a750fc1722773749fa2f6783c85f3a17b1291a54c4b033ed5636884ba2e0025",
+          "source_rate": 48000,
+          "source_frames": 144000,
+          "crop_frames": [
+            0,
+            144000
+          ],
+          "crop_seconds": 3.0,
+          "bars": 2,
+          "beats": 8,
+          "bpm": 160,
+          "output_rate": 16000,
+          "output_frames": 48000,
+          "bits": 12,
+          "payload_bytes": 72000,
+          "slot_bytes": 81920,
+          "slot_sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
+          "processing": "mono, DC removal, Kaiser polyphase anti-alias repitch, 0.5ms/3ms endpoint fades, -1dBFS peak, PCM12",
+          "pitch_semitones": 0.0,
+          "seam_jump_pcm16": 0,
+          "peak_pcm16": 29200,
+          "rms_pcm16": 6280.791897417607,
+          "quantization_max_error": 8.0
+        },
+        {
+          "name": "think-160",
+          "edit": "Think drums / two complementary assembled bars",
+          "source": "user-supplied Classic Break Pack",
+          "sources": [
+            {
+              "name": "lyncollins_think_1.wav",
+              "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
+              "rate": 44100,
+              "frames": 93761,
+              "source_beats": 4
+            },
+            {
+              "name": "lyncollins_think_2.wav",
+              "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
+              "rate": 44100,
+              "frames": 92698,
+              "source_beats": 4
+            }
+          ],
+          "edit_segments": [
+            {
+              "source": 1,
+              "beats": [
+                0,
+                3
+              ]
+            },
+            {
+              "source": 2,
+              "beats": [
+                3,
+                4
+              ]
+            },
+            {
+              "source": 1,
+              "beats": [
+                0,
+                1
+              ]
+            },
+            {
+              "source": 2,
+              "beats": [
+                1,
+                4
+              ]
+            }
+          ],
+          "excluded_segments": [
+            {
+              "source": 1,
+              "beats": [
+                3,
+                4
+              ],
+              "reason": "pitched tail"
+            },
+            {
+              "source": 2,
+              "beats": [
+                0,
+                1
+              ],
+              "reason": "pitched carry-in"
+            }
+          ],
+          "bars": 2,
+          "beats": 8,
+          "bpm": 160,
+          "output_rate": 16000,
+          "output_frames": 48000,
+          "bits": 12,
+          "payload_bytes": 72000,
+          "slot_bytes": 81920,
+          "slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+          "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12",
+          "boundaries": [
+            0,
+            18000,
+            24000,
+            30000,
+            48000
+          ],
+          "seam_jump_pcm16": 0,
+          "peak_pcm16": 29200,
+          "rms_pcm16": 2769.22593083338
+        }
+      ],
+      "firmware_sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+      "physical_hardware_tested": false,
+      "runs": {
+        "seq-acid-low": {
+          "magic": 1145194289,
+          "halves": 315,
+          "max_us": 1923,
+          "nested": 2327,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 36384,
+          "ui_frames": 127,
+          "last_us": 334,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 68,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 4,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0,
+          "visibleNotePixels": 156
+        },
+        "seq-synth-high": {
+          "magic": 1145194289,
+          "halves": 315,
+          "max_us": 1923,
+          "nested": 2328,
+          "in_audio": 0,
+          "late": 0,
+          "timer_irqs": 36383,
+          "ui_frames": 127,
+          "last_us": 334,
+          "cpu_q8": 7,
+          "boots": 1,
+          "stage": 9,
+          "page": 68,
+          "home": 0,
+          "six_loop_mask": 3,
+          "six_machine_mask": 3,
+          "fm1_mc_on": 1,
+          "fm1_mc_lost": 0,
+          "core1_track_mask": 0,
+          "selected_track": 1,
+          "track_engines": [
+            10,
+            17,
+            2,
+            3,
+            16,
+            15
+          ],
+          "usb_starts": 0,
+          "usb_packets": 0,
+          "usb_frames": 0,
+          "usb_underruns": 0,
+          "usb_overruns": 0,
+          "usb_missed": 0,
+          "audio_lost": 0,
+          "peak_pcm16": 0,
+          "visibleNotePixels": 156
+        }
+      },
+      "scope": "Actual firmware low Acid and high synth SEQ screen checks"
+    }
   },
+  "previousDspAndLoaderValidation": "https://github.com/JazzyRhythmer/Rhythmer/blob/v0.1.0-beta.1/RELEASE-VALIDATION.json",
   "sourceFiles": {
     "jiant/firmware/app.ld": "cb0590254587446c71fad883f9fd924109a5527e631fb6091ddeaca047fd19d3",
     "jiant/firmware/crt0.S": "5234fc8af0afbd6e04a646f76f326fee451b51be4ba768fc2784daec0e3b1ea9",
@@ -658,7 +860,7 @@
     "jiant/firmware/src/ui_events.c": "7f836347f1e97318c7dd406eacaa2bd3b330d9112bd09d23cda4232ef1be31c3",
     "jiant/firmware/src/ui_fm6op.c": "b824865e7f82abdff1ee63094d4604da299093f2b87e92e4097ae0e0f9dc255a",
     "jiant/firmware/src/ui_geometry.c": "cf102380852e7b106ceff2ff4475c26ca12073d49fe65bc61ecb5986602d5167",
-    "jiant/firmware/src/ui_graph.c": "f20ef0f818500d298593de12f2b74289f8e0d295b2292fdfdec5a9ad1541c4dd",
+    "jiant/firmware/src/ui_graph.c": "4d058913d6c0e9c07d01d95a9ab5ecc287e722de0791ed8a5b572123bfad11ea",
     "jiant/firmware/src/ui_input.c": "22f17111ec67a0514ea02e8af0de403d43ea0e613b9ee3b927b9a97530034c25",
     "jiant/firmware/src/ui_layer.c": "3fb3608cd87ad6ff5b1a8dfc918c4b03f076711d0fb58779705444f7d9c93cbb",
     "jiant/firmware/src/ui_lens.c": "21b290d8ffd5cd41d79b79c0280f0608e40873f23974348c7c97e4bdc9997c6b",

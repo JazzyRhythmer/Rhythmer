@@ -1901,7 +1901,13 @@ static void draw_graph(void)
       * Use the existing low-bandwidth cadence for that HOME overview as well. */
      if(!ui.force&&fm1_ms-at<((song.cpu_q8>176u||(ui.home&&song.playing&&six_machine_mask==3u))?200u:80u))return;
      at=fm1_ms;}
+    /* The monochrome surface bypasses the legacy graph_sig(), which also
+     * advanced the piano-roll register. Follow before caching, and include
+     * its position so a stopped sequence can finish a smooth register move. */
+    int follow_roll=!ui.home&&!drum_track(t)&&(seq_roll_view(pg)||roll_view(pg)||pg->graph==GR_CHANCE);
+    if(follow_roll)pr_follow(t);
     sig = ui.page*131u+song.sel*7u+ui.home*11u+ui.confirm*17u+ui.cursor*19u+ux.gen+six_machine_mask*65537u;
+    if(follow_roll)sig^=((uint32_t)proll.lo+1u)*104729u;
     if(!(ui_prefs&PREF_ANIM_OFF)&&(pg->graph==GR_LFO||pg->graph==GR_MOD))
         sig^=(TSEL->lfo_ph>>24)*977u+(TSEL->lfo2_ph>>24)*7919u;
     if(pg->scope==SC_GLOBAL){for(unsigned k=0;k<4u;k++)if(pg->id[k]<G_COUNT)sig=sig*33u+(uint16_t)song.g[pg->id[k]];

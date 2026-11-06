@@ -1,7 +1,7 @@
 {
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "channel": "public-beta",
-  "physicalHardwareTested": true,
+  "physicalHardwareTested": false,
   "localOnly": false,
   "ownerTest": {
     "date": "2026-11-06",
@@ -28,7 +28,7 @@
   "firmware": {
     "url": "../downloads/Rhythmer.fwsc",
     "product": "FM-1_748001",
-    "sha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
+    "sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
     "bytes": 828065,
     "embeddedBreaks": true
   },
@@ -64,12 +64,12 @@
   "bundle": {
     "url": "../downloads/Rhythmer-with-breaks.rhythmer",
     "bytes": 2260708,
-    "sha256": "ecfef9965b8782d0cde7e3e1fd942dd8244c756f1c990114ebedd1c53adc027e"
+    "sha256": "412d0620c96ed869815425711d420d4c81886df4ce5464b5d74a537bad155624"
   },
   "archive": {
-    "url": "../downloads/Rhythmer-0.1.0-beta.1-install.zip",
-    "bytes": 3132857,
-    "sha256": "4fc723d5e29f502648a9bb76a7a77a6cbea4e457ac6a1a57d806c6e0a45ce354"
+    "url": "../downloads/Rhythmer-0.1.0-beta.2-install.zip",
+    "bytes": 3134536,
+    "sha256": "301c89637ce4396a553db177eec91b6c7ce63df362251b412fcedc5a8d666fd1"
   },
   "audioRightsURL": "../audio-rights.json",
   "publicRedistributionCleared": false
