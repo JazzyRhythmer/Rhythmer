@@ -24,6 +24,9 @@ static inline int32_t m2_PK(const m2k_voice_t *t,int id,int k){return (m2_P8(t,i
 static inline uint32_t m2_tq_u32(const uint32_t *a,int v){int i=v>>8,f=v&255;return !f?a[i]:a[i+1]>=a[i]?a[i]+(((a[i+1]-a[i])*(unsigned)f)>>8):a[i]-(((a[i]-a[i+1])*(unsigned)f)>>8);}
 static inline int32_t m2_tq_u16(const uint16_t *a,int v){int i=v>>8,f=v&255;return !f?a[i]:a[i]+(((int32_t)a[i+1]-a[i])*f>>8);}
 static __attribute__((noinline)) int64_t m2_mul_sh(int32_t a,int32_t b,int sh){return ((int64_t)a*b)>>sh;}
+/* Positive Q15 coefficient: split the signed sample at bit 15. Both products
+ * fit in 32 bits, exactly matching the former wide multiply/shift. */
+static inline int32_t m2_hp_q15(int32_t a,int32_t b){return (b>>15)*a+(((b&32767)*a)>>15);}
 static __attribute__((noinline)) uint32_t m2_mulu_hi(uint32_t a,uint32_t b,int sh){return (uint32_t)(((uint64_t)a*b)>>sh);}
 static __attribute__((noinline)) uint64_t m2_mul2_q15(int32_t s,int32_t a,int32_t b){return (uint64_t)(uint32_t)(((int64_t)s*b)>>15)<<32|(uint32_t)(((int64_t)s*a)>>15);}
 static inline int32_t m2_sat16(int32_t x){return clamp(x,-32767,32767);}
@@ -199,7 +202,7 @@ static void m2k_kernel(m2k_voice_t *t,int m,int32_t pitch,int ti,uint32_t previo
             if (gx) s += ((m2_blep_saw(t->ph[5], ih, invh) - m2_blep_saw(t->ph[5] + 0x80000000u, ih, invh)) * gx) >> 15;
             for (int k = 0; k < nv; k++) t->ph[k] += inc[k];
             /* the highpass: y = a (y + x - x') */
-            t->ms[0] = (int32_t)m2_mul_sh(a, t->ms[0] + s - t->ms[1], 15);
+            t->ms[0] = m2_hp_q15(a, t->ms[0] + s - t->ms[1]);
             t->ms[1] = s;
             int32_t y = t->ms[0];
             if (gs1) y += (m2_sinp(t->ph[5]) * gs1) >> 15;

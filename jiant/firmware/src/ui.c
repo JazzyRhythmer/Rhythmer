@@ -720,6 +720,24 @@ static void ui_say(const char *a, const char *b)
 }
 
 static void ui_message(const char *s) { ui_say(s, ""); }
+/* Main-loop notice only: no LCD/text work in the audio ISR, and no modal or
+ * transport changes. Require sustained high load/repeated deadline misses. */
+static struct {uint32_t since,last,last_late,late_at,until;uint8_t hot,warned;} cpu_notice;
+static const char CPU_NOTICE[]="CPU HIGH: REDUCE INSTRUMENTS";
+static void ui_cpu_notice(void){
+ uint32_t now=fm1_ms,late=load_diag.late;
+ if(cpu_notice.until&&(int32_t)(now-cpu_notice.until)>=0){
+  if(str_eq(ui.msg,CPU_NOTICE)){ui.msg_t=0;ui.force=1;}
+  cpu_notice.until=0;
+ }
+ if(late!=cpu_notice.last_late){cpu_notice.last_late=late;cpu_notice.late_at=now;}
+ int high=song.playing&&(song.cpu_q8>=210u||(cpu_notice.late_at&&now-cpu_notice.late_at<1000u));
+ if(!high){cpu_notice.hot=0;return;}
+ if(!cpu_notice.hot){cpu_notice.hot=1;cpu_notice.since=now;return;}
+ if(now-cpu_notice.since<1200u||(cpu_notice.warned&&now-cpu_notice.last<30000u)||ui.menu||ui.confirm||ui.layer||ui.msg_t)return;
+ ui_message(CPU_NOTICE);ui.msg_t=255;ui.force=1;
+ cpu_notice.until=now+2500u;cpu_notice.last=now;cpu_notice.warned=1;
+}
 /* a message led by an icon: its first byte (ui_draw.c draw_head draws the icon, then the words) */
 #define MSG_NOFILE "\x01"                      /* the no-file icon (ICON_X_NOFILE) */
 #include "midi_learn.c"                       /* (0.9.12) MIDI LEARN's UI (the map: midi_control.c) */

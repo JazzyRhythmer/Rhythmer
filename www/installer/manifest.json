@@ -28,7 +28,7 @@
   "firmware": {
     "url": "../downloads/Rhythmer.fwsc",
     "product": "FM-1_748001",
-    "sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+    "sha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6",
     "bytes": 828065,
     "embeddedBreaks": true
   },
@@ -64,14 +64,13 @@
   "bundle": {
     "url": "../downloads/Rhythmer-with-breaks.rhythmer",
     "bytes": 2260708,
-    "sha256": "412d0620c96ed869815425711d420d4c81886df4ce5464b5d74a537bad155624"
+    "sha256": "ed69c041824109220665c0252e3fd9abda60a0484d7914a7144cc74fd65a4fba"
   },
   "archive": {
     "url": "../downloads/Rhythmer-0.1.0-beta.2-install.zip",
-    "bytes": 3134536,
-    "sha256": "7c502fbc2b83d4516ffc5c4ed2763261d3f07a741fd7ce7b820ea423509bb5fc"
+    "bytes": 3135310,
+    "sha256": "3348acb66b0a35e1b751bb132e5fb051d2db5352c5249d4da74ddf4e3dee85ec"
   },
   "audioRightsURL": "../audio-rights.json",
-  "publicRedistributionCleared": false,
-  "releaseHold": "Rhythmer installations are temporarily paused while a reported hardware audio-load issue is investigated. Official V15 recovery remains available."
+  "publicRedistributionCleared": false
 }

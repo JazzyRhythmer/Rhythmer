@@ -1366,6 +1366,11 @@ static const uint8_t GENVF[RL_N][2] = {{0, 0}, {6, 20}, {4, 14}, {6, 18}, {8, 24
  * recipe's (no range); their weights */
 static const uint8_t GENV[3][8] = {{0, 6, 55, 76, 12, 58, 55, 72}, {38, 62, 70, 88, 55, 90, 66, 90}, {2, 14, 62, 84, 60, 88, 64, 86}};
 static const uint8_t GENV_LW[4] = {45, 15, 25, 15}, GENV_AW[4] = {60, 8, 17, 15};
+/* Automatic song creation uses the light musical pool. Manual model/preset
+ * selection stays unrestricted. One automatic Serum is allowed, including
+ * any Serum already kept on the untouched tracks. */
+static int gen_auto_synth_ok(unsigned e){return e==ENGI_ANALOG||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_WHEEL||e==ENGI_M2SID||e==ENGI_SERUM;}
+static int gen_serum_free(const track_t *t){for(unsigned k=0;k<NTRK;k++)if(&trk[k]!=t&&trk[k].eng_req==ENGI_SERUM)return 0;return 1;}
 static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
 {
     const grecipe_t *r = &RECIPE[ri];
@@ -1374,10 +1379,11 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
     uint8_t m[32], w[32], any[32];
     const engine_t *en;
     if (gx.eng >= 0) e = (uint32_t)gx.eng;              /* (0.8.6) EXPLORE: any engine (gx_engine) */
-    else if(t>trk&&t<trk+SIX_GEN_TRACKS){
-        static const uint8_t engines[9]={ENGI_SERUM,ENGI_PHASE,ENGI_LOFI,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID,ENGI_ANALOG,ENGI_FM6,ENGI_WHEEL};
-        static const uint8_t weight[9]={28,18,14,8,8,8,8,4,4};
-        e=engines[gpickw(weight,9)];
+    if(t>trk&&t<trk+SIX_GEN_TRACKS&&(gx.eng<0||!gen_auto_synth_ok(e)||(e==ENGI_SERUM&&!gen_serum_free(t)))){
+        static const uint8_t engines[6]={ENGI_ANALOG,ENGI_PHASE,ENGI_LOFI,ENGI_WHEEL,ENGI_M2SID,ENGI_SERUM};
+        uint8_t weight[6]={18,22,22,10,10,18};
+        if(!gen_serum_free(t))weight[5]=0;
+        e=engines[gpickw(weight,6)];
     }
     if (e == ENGI_FM6 && gs.fm6 >= 2u) e = r->eng[0] == ENGI_FM6 ? EG_A : r->eng[0];
     gs.fm6 += e == ENGI_FM6;

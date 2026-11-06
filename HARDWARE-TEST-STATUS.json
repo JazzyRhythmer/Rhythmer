@@ -1,8 +1,9 @@
 {
   "version": "0.1.0-beta.2",
-  "firmwareSha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+  "firmwareSha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6",
   "physicalCurrentCandidateTested": false,
-  "currentCandidateScope": "Seven host viewport assertions and eleven actual-firmware emulator scenarios; no device was flashed by the agent.",
+  "currentCandidateScope": "Host/ASan/UBSan tests and ten actual-firmware native emulator scenarios passed. Physical revalidation deferred by owner; agent has not flashed a device.",
+  "knownIssue": "A real FM-1 running the previous beta.1 reported audible artifacts and peak CPU above the audio deadline. These mitigations have not yet been confirmed to resolve it on hardware.",
   "previousOwnerTest": {
     "date": "2026-11-06",
     "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
@@ -25,5 +26,5 @@
       "hardwareDamageDiagnosed": false
     }
   },
-  "transitionPolicy": "Use official V15 when switching between Rhythmer and another custom firmware. Direct foreign-custom transitions are unsupported."
+  "transitionPolicy": "Use official V15 between Rhythmer and foreign custom firmware. A matching Rhythmer may update directly after backup."
 }

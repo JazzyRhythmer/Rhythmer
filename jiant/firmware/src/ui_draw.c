@@ -2183,6 +2183,7 @@ static void ui_draw(void)
 {
     static uint8_t counting;
     style_apply();
+    ui_cpu_notice();
     ui.frame++;
     if (counting != (uint8_t)seq_counting()) {          /* a count-in began or ended: the page drawn again after it */
         counting = (uint8_t)seq_counting();

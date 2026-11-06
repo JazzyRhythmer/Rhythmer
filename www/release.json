@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-beta.2",
   "product": "FM-1_748001",
-  "sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+  "sha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6",
   "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-06",
@@ -34,28 +34,28 @@
     },
     {
       "name": "Rhythmer-0.1.0-beta.2-install.zip",
-      "bytes": 3134536,
-      "sha256": "7c502fbc2b83d4516ffc5c4ed2763261d3f07a741fd7ce7b820ea423509bb5fc"
+      "bytes": 3135310,
+      "sha256": "3348acb66b0a35e1b751bb132e5fb051d2db5352c5249d4da74ddf4e3dee85ec"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
       "bytes": 1120751,
-      "sha256": "193cd6c0a4fb918d9d0c218ff7a5cf68e2bba4ed6c8cf18c1f9fe0a3ba790c68"
+      "sha256": "5a2f9981523620f5912c043d98ffc65a423823a22c44cf8c8e3bb234b0d8a683"
     },
     {
       "name": "Rhythmer-start.fm1save",
       "bytes": 1120878,
-      "sha256": "8327611b3e207930348ca025be7f842bfa93caca5149f3167748e44099662e1c"
+      "sha256": "b501bd2a67b545452f6ffb2e17c5cc407e8c6db794d49020b2ed3d972e204910"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2260708,
-      "sha256": "412d0620c96ed869815425711d420d4c81886df4ce5464b5d74a537bad155624"
+      "sha256": "ed69c041824109220665c0252e3fd9abda60a0484d7914a7144cc74fd65a4fba"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828065,
-      "sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5"
+      "sha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -114,7 +114,8 @@
     }
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
-  "releaseHold": "Rhythmer installations are temporarily paused while a reported hardware audio-load issue is investigated. Official V15 recovery remains available.",
+  "releaseHold": null,
+  "releaseCaution": "Optimized beta: host and emulator checks passed. This exact binary awaits physical FM-1 revalidation; reduction of the reported hardware audio artifacts is not yet confirmed.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

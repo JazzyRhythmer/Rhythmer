@@ -53,5 +53,5 @@
       "Deliberately interrupted physical update recovery"
     ]
   },
-  "releaseHold": "Rhythmer installations are temporarily paused while a reported hardware audio-load issue is investigated. Official V15 recovery remains available."
+  "releaseCaution": "Optimized beta: host and emulator checks passed. This exact binary awaits physical FM-1 revalidation; reduction of the reported hardware audio artifacts is not yet confirmed."
 }

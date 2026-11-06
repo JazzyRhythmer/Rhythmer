@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {validateBreakSlot,slotPCM,previewWav,uploadBreakBank} from './break-audio.mjs?v=fdec6e77ab9e';
+import {validateBreakSlot,slotPCM,previewWav,uploadBreakBank} from './break-audio.mjs?v=0a2290bf0f41';
 const create=(tag,attrs={},text='')=>{const e=document.createElement(tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);e.textContent=text;return e;};
 export function initBreakSamples({container,mode,getWorkspace,getDevice,request,operation,downloadEmulator}){
  container.innerHTML='<h2>BREAK / YOUR TWO-BAR LOOPS</h2><p>Choose a complete two-bar audio file for A or B. The entire file is treated as eight beats: it is repitched to exactly 3 seconds at 160 BPM, mixed to mono, anti-alias resampled and packed to 12-bit / 16 kHz. Repitching changes pitch as well as tempo. Audio stays in this browser.</p><p class="dim">Each slot uses 72,000 audio bytes in an 80 KiB device bank. A/B are shared by all tracks and projects. Musical archives exclude audio; SAVE FOR PLAY includes both banks. Use audio you have the rights to use; uploading does not grant recording/composition or redistribution rights. <a href="../#samples" target="_top">Bundled sample credits & rights →</a></p>';
@@ -31,7 +31,7 @@ export function initBreakSamples({container,mode,getWorkspace,getDevice,request,
       const context=new Context(1,48000,16000);const decoded=await context.decodeAudioData(await selected.arrayBuffer());
       if(job!==item.job)return;if(decoded.duration<.5||decoded.duration>16||decoded.numberOfChannels>8)throw Error('Use a two-bar loop between 0.5 and 16 seconds, up to 8 channels.');sourceDuration=decoded.duration;
       const mono=new Float32Array(decoded.length);for(let c=0;c<decoded.numberOfChannels;c++){const ch=decoded.getChannelData(c);for(let i=0;i<mono.length;i++)mono[i]+=ch[i]/decoded.numberOfChannels;}
-      const worker=new Worker('./break-convert-worker.mjs?v=fdec6e77ab9e',{type:'module'});
+      const worker=new Worker('./break-convert-worker.mjs?v=0a2290bf0f41',{type:'module'});
       converted=await new Promise((resolve,reject)=>{worker.onmessage=e=>{const d=e.data;if(d.type==='progress'){if(job===item.job)status.textContent='Anti-alias conversion: '+Math.round(d.value*100)+'%';}else if(d.type==='done'){worker.terminate();resolve(d);}else{worker.terminate();reject(Error(d.message));}};worker.onerror=e=>{worker.terminate();reject(Error(e.message||'Conversion worker failed'));};worker.postMessage({mono,name:selected.name},[mono.buffer]);});
     }
     if(job!==item.job)return;validateBreakSlot(converted.bytes);const pitch=12*Math.log2(sourceDuration/3),meta={name:selected.name,sourceDuration,pitchSemitones:pitch};item.prepared={bytes:converted.bytes,meta};

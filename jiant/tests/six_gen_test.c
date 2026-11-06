@@ -6,18 +6,40 @@ int main(void){
  ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trk_live=NTRK;
  int bad=0;
  trks_put(1);dice_seq(&trk[4]);dice_seq(&trk[5]);
+ /* Project storage canonicalizes unused note bytes on rests/ties. Keep the
+  * fixture canonical before asserting byte-for-byte preservation by GEN. */
+ for(unsigned t=4;t<6;t++)for(unsigned i=0;i<NSTEP;i++)if(!trk[t].step[i].n)memset(trk[t].step[i].note,0,sizeof trk[t].step[i].note);
  const unsigned ac_saved=steps_sig(&trk[4]),br_saved=steps_sig(&trk[5]);
  for(unsigned f=0;f<3;f++)for(unsigned n=0;n<4;n++){
   memset(proj_slot,0,sizeof proj_slot);dice_secs=0;
   gp.form=f;gp.seed=117*n+23;gp.genre=n&1?GEN_EXPLORE:1;
   ui.home=1;ui.confirm=CF_DICE_ALL;gp.page=f;gen_go();
   bad+=check("GEN remains open after generating sections",gen_on()&&ui.home&&gp.page==f);
-  bad+=check("GEN keeps T1 drum, T5/6 patterns and six-track mode",trk[0].eng_req==ENGI_DRUM&&steps_sig(&trk[4])==ac_saved&&steps_sig(&trk[5])==br_saved&&six_machine_mask==3);
+  bad+=check("GEN keeps T1 drum",trk[0].eng_req==ENGI_DRUM);
+  bad+=check("GEN keeps T5 pattern",steps_sig(&trk[4])==ac_saved);
+  bad+=check("GEN keeps T6 pattern",steps_sig(&trk[5])==br_saved);
+  bad+=check("GEN keeps six-track mode",six_machine_mask==3);
+  unsigned serum=0;for(unsigned k=1;k<SIX_GEN_TRACKS;k++){bad+=check("GEN excludes heavy automatic synths",gen_auto_synth_ok(trk[k].eng_req));serum+=trk[k].eng_req==ENGI_SERUM;}
+  bad+=check("GEN allocates at most one Serum",serum<=1);
   for(unsigned k=0;k<4;k++)if(proj_import(&proj_scratch,&proj_slot[k],sizeof proj_slot[k])){
    int ok=!memcmp(proj_scratch.t[4].step,trk[4].step,sizeof trk[4].step)&&!memcmp(proj_scratch.t[5].step,trk[5].step,sizeof trk[5].step);
    bad+=check("generated section preserves T5/6 patterns",ok);
+   for(unsigned t=1;t<SIX_GEN_TRACKS;t++)bad+=check("stored GEN sections keep the safe synth pool",gen_auto_synth_ok(proj_scratch.t[t].engine));
   }
  }
+ /* The final sound-admission fence also covers EXPLORE's forced candidates. */
+ for(unsigned k=1;k<4;k++)set_engine_of(&trk[k],ENGI_ANALOG);
+ gx.eng=ENGI_SERUM;gen_sound(&trk[1],RL_LEAD,gsnd(RL_LEAD));
+ bad+=check("Serum remains available to GEN",trk[1].eng_req==ENGI_SERUM);
+ gen_sound(&trk[2],RL_LEAD,gsnd(RL_LEAD));
+ bad+=check("GEN prevents duplicate automatic Serum",trk[2].eng_req!=ENGI_SERUM);
+ static const unsigned heavy[]={ENGI_M2SAW,ENGI_M2STAT,ENGI_FM6};
+ for(unsigned j=0;j<3;j++){
+  gx.eng=(int8_t)heavy[j];gen_sound(&trk[2],RL_LEAD,gsnd(RL_LEAD));
+  bad+=check("EXPLORE cannot bypass the heavy-model guard",gen_auto_synth_ok(trk[2].eng_req));
+  set_engine_of(&trk[3],heavy[j]);bad+=check("manual heavy-model selection remains available",trk[3].eng_req==heavy[j]);
+ }
+ gx.eng=-1;
  /* UI reads boundary pitches and all break command classes without altering music. */
  static uint8_t sample[72000];static uint16_t pixels[240*150];
  six_loops[0]=six_loops[1]=sample;six_loop_mask=3;six_loop_now=0;

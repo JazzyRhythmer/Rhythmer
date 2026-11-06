@@ -696,7 +696,9 @@ static JUNGLE_AUDIO_CODE void on_tick(void)
 static JUNGLE_AUDIO_CODE int32_t fetch(struct reader *r, const uint8_t *data, uint32_t frame)
 {
     (void)r;
-    frame %= 48000U;
+    /* read_step already bounds ordinary reads to the two-bar bank. Avoid a
+     * wide constant-modulo calculation for both interpolated samples. */
+    if (frame >= 48000U) frame %= 48000U;
     unsigned off=(frame/2U)*3U, u;
     if(frame&1U) u=(data[off+1]>>4)|((unsigned)data[off+2]<<4);
     else u=data[off]|((unsigned)(data[off+1]&15U)<<8);
@@ -898,6 +900,9 @@ JUNGLE_AUDIO_CODE void jungle_render(int32_t *out, unsigned frames)
     /* Glide the cutoff a quarter of the way per block: no zipper steps. */
     unsigned filter = ctl_filter;
     int32_t filter_damp = ctl_filter_damp;
+    unsigned filter_start = filter_was_open && filter != FILTER_OPEN;
+    unsigned filter_fade_step = filter_start && frames ? 32768U / frames : 0;
+    if (filter_start) filter_low = filter_band = 0;
     if (filter != FILTER_OPEN)
         filter_coefficient = filter_was_open ? (int32_t)filter_f[filter] :
             filter_coefficient + ((int32_t)filter_f[filter] - filter_coefficient) / 4;
@@ -973,12 +978,18 @@ JUNGLE_AUDIO_CODE void jungle_render(int32_t *out, unsigned frames)
         /* Half level inside the filter; 64-bit products, since EQ boosts,
          * feedback and resonance can all lift the band state. */
         int32_t x = mix >> 1;
-        for (unsigned k = 0; k < 2; ++k) {
+        /* OPEN is a true bypass. The track's separate filter/ENV/LFO still
+         * runs downstream; six wide multiplies per frame here did no audible
+         * work when this Amenity performance filter was open. */
+        for (unsigned k = 0; filter != FILTER_OPEN && k < 2; ++k) {
             filter_low += (int32_t)(((int64_t)filter_coefficient * filter_band + 16384) >> 15);
             int32_t high = x - filter_low - (int32_t)(((int64_t)filter_damp * filter_band + 8192) >> 14);
             filter_band += (int32_t)(((int64_t)filter_coefficient * high + 16384) >> 15);
             if (k) x = filter < FILTER_OPEN ? filter_low : filter > FILTER_OPEN ? high : x;
         }
+        /* Start a newly closed filter gently instead of using stale state.
+         * First block fades from dry to the newly initialized filter. */
+        if (filter_start) x = (mix >> 1) + (int32_t)(((int64_t)(x - (mix >> 1)) * ((i + 1U) * filter_fade_step)) >> 15);
         mix = x << 1;
         out[2 * i] += mix << 7;
         out[2 * i + 1] += mix << 7;

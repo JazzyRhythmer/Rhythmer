@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Browser transport for the real Rhythmer C data engine. No audio or device I/O.
-import {readBackup,restoreBackup} from './fm1backup.js?v=fdec6e77ab9e';
-import {validateBreakSlot} from './break-audio.mjs?v=fdec6e77ab9e';
+import {readBackup,restoreBackup} from './fm1backup.js?v=0a2290bf0f41';
+import {validateBreakSlot} from './break-audio.mjs?v=0a2290bf0f41';
 // Web MIDI delivers one complete SysEx message per event. The C USB drain can
 // contain a RELOAD push followed by a reply: preserve that same boundary here.
 export function splitEditorFrames(bytes){
