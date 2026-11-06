@@ -41,7 +41,7 @@ async function openWorkspace(onStatus,releaseLease) {
   api=(await WebAssembly.instantiate(mod,{wasi_snapshot_preview1:wasi})).exports;
   api._initialize?.();api.ws_init();
   const release=await (await fetch('../release.json',{cache:'no-store'})).json();
-  const seed=await (await fetch('../downloads/Rhythmer-six-track-test.fm1save',{cache:'no-store'})).json();
+  const seed=await (await fetch('../downloads/Rhythmer-start.fm1save',{cache:'no-store'})).json();
   if(seed.format!=='fm1-emulator-save'||seed.hash!==release.sha256)throw Error('Workspace seed does not match firmware ('+seed.hash?.slice(0,8)+' / '+release.sha256?.slice(0,8)+')');
   const flash=new Uint8Array(api.memory.buffer,api.ws_flash(),1048576), seen=new Set();
   for(const s of seed.sectors){

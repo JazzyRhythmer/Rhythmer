@@ -146,7 +146,7 @@
 
 
 <style id="jiant-brand">/*JIANT_UI*/</style>
-<link rel="stylesheet" href="rhythmer.css?v=45963ff270f5"></head>
+<link rel="stylesheet" href="rhythmer.css?v=fdec6e77ab9e"></head>
 <body class="jiant-editor">
 <main><section id="rhythmer-mode"><a href="../#editor" target="_top" class="rhy-title">RHYTHMER / EDITOR</a><div class="bar"><a id="mode-browser" href="?target=browser">BROWSER WORKSPACE</a><a id="mode-usb" href="?target=usb">USB FM-1</a></div><p id="workspace-status" role="status"></p><p id="mode-note"></p></section>
   <button class="lang" id="lang"></button>
@@ -2907,7 +2907,7 @@ async function connect() {
   sayK("connecting");
   try {
     if (!access) {
-      if (WORKSPACE) { const w = await import("./workspace.mjs?v=45963ff270f5"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }
+      if (WORKSPACE) { const w = await import("./workspace.mjs?v=fdec6e77ab9e"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }
       else {
         try { access = await navigator.requestMIDIAccess({ sysex: true }); }
         catch (e) { sayK("denied"); return; }
@@ -4810,7 +4810,7 @@ download=function(name,obj){
 };
 // Audio is intentionally separate from the musical archive protocol.
 const samplePanel=document.getElementById('p-samples');
-import('./break-samples.mjs?v=45963ff270f5').then(({initBreakSamples})=>initBreakSamples({
+import('./break-samples.mjs?v=fdec6e77ab9e').then(({initBreakSamples})=>initBreakSamples({
  container:samplePanel,mode:WORKSPACE?'browser':'usb',getWorkspace:()=>workspace,getDevice:()=>dev,
  request:(d,r,o)=>sessionRequest(d,r,o),
  operation:async fn=>{if(!dev)throw Error('Connect Rhythmer first');const release=beginBusy();try{return await fn();}finally{release();}},

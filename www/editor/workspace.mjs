@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Browser transport for the real Rhythmer C data engine. No audio or device I/O.
-import {readBackup,restoreBackup} from './fm1backup.js?v=45963ff270f5';
-import {validateBreakSlot} from './break-audio.mjs?v=45963ff270f5';
+import {readBackup,restoreBackup} from './fm1backup.js?v=fdec6e77ab9e';
+import {validateBreakSlot} from './break-audio.mjs?v=fdec6e77ab9e';
 // Web MIDI delivers one complete SysEx message per event. The C USB drain can
 // contain a RELOAD push followed by a reply: preserve that same boundary here.
 export function splitEditorFrames(bytes){
@@ -41,7 +41,7 @@ async function openWorkspace(onStatus,releaseLease) {
   api=(await WebAssembly.instantiate(mod,{wasi_snapshot_preview1:wasi})).exports;
   api._initialize?.();api.ws_init();
   const release=await (await fetch('../release.json',{cache:'no-store'})).json();
-  const seed=await (await fetch('../downloads/Rhythmer-six-track-test.fm1save',{cache:'no-store'})).json();
+  const seed=await (await fetch('../downloads/Rhythmer-start.fm1save',{cache:'no-store'})).json();
   if(seed.format!=='fm1-emulator-save'||seed.hash!==release.sha256)throw Error('Workspace seed does not match firmware ('+seed.hash?.slice(0,8)+' / '+release.sha256?.slice(0,8)+')');
   const flash=new Uint8Array(api.memory.buffer,api.ws_flash(),1048576), seen=new Set();
   for(const s of seed.sectors){

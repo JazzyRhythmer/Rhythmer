@@ -43,6 +43,11 @@
       "sha256": "193cd6c0a4fb918d9d0c218ff7a5cf68e2bba4ed6c8cf18c1f9fe0a3ba790c68"
     },
     {
+      "name": "Rhythmer-start.fm1save",
+      "bytes": 1120878,
+      "sha256": "8327611b3e207930348ca025be7f842bfa93caca5149f3167748e44099662e1c"
+    },
+    {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2260708,
       "sha256": "412d0620c96ed869815425711d420d4c81886df4ce5464b5d74a537bad155624"

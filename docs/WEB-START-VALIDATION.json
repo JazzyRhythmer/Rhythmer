@@ -1,0 +1,174 @@
+{
+  "half_frames": 512,
+  "sample_manifest": [
+    {
+      "name": "amen-160",
+      "source_url": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
+      "source_sha256": "6a750fc1722773749fa2f6783c85f3a17b1291a54c4b033ed5636884ba2e0025",
+      "source_rate": 48000,
+      "source_frames": 144000,
+      "crop_frames": [
+        0,
+        144000
+      ],
+      "crop_seconds": 3.0,
+      "bars": 2,
+      "beats": 8,
+      "bpm": 160,
+      "output_rate": 16000,
+      "output_frames": 48000,
+      "bits": 12,
+      "payload_bytes": 72000,
+      "slot_bytes": 81920,
+      "slot_sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
+      "processing": "mono, DC removal, Kaiser polyphase anti-alias repitch, 0.5ms/3ms endpoint fades, -1dBFS peak, PCM12",
+      "pitch_semitones": 0.0,
+      "seam_jump_pcm16": 0,
+      "peak_pcm16": 29200,
+      "rms_pcm16": 6280.791897417607,
+      "quantization_max_error": 8.0
+    },
+    {
+      "name": "think-160",
+      "edit": "Think drums / two complementary assembled bars",
+      "source": "user-supplied Classic Break Pack",
+      "sources": [
+        {
+          "name": "lyncollins_think_1.wav",
+          "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
+          "rate": 44100,
+          "frames": 93761,
+          "source_beats": 4
+        },
+        {
+          "name": "lyncollins_think_2.wav",
+          "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
+          "rate": 44100,
+          "frames": 92698,
+          "source_beats": 4
+        }
+      ],
+      "edit_segments": [
+        {
+          "source": 1,
+          "beats": [
+            0,
+            3
+          ]
+        },
+        {
+          "source": 2,
+          "beats": [
+            3,
+            4
+          ]
+        },
+        {
+          "source": 1,
+          "beats": [
+            0,
+            1
+          ]
+        },
+        {
+          "source": 2,
+          "beats": [
+            1,
+            4
+          ]
+        }
+      ],
+      "excluded_segments": [
+        {
+          "source": 1,
+          "beats": [
+            3,
+            4
+          ],
+          "reason": "pitched tail"
+        },
+        {
+          "source": 2,
+          "beats": [
+            0,
+            1
+          ],
+          "reason": "pitched carry-in"
+        }
+      ],
+      "bars": 2,
+      "beats": 8,
+      "bpm": 160,
+      "output_rate": 16000,
+      "output_frames": 48000,
+      "bits": 12,
+      "payload_bytes": 72000,
+      "slot_bytes": 81920,
+      "slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+      "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12",
+      "boundaries": [
+        0,
+        18000,
+        24000,
+        30000,
+        48000
+      ],
+      "seam_jump_pcm16": 0,
+      "peak_pcm16": 29200,
+      "rms_pcm16": 2769.22593083338
+    }
+  ],
+  "firmware_sha256": "6723335fcd196b90c519a89b29f1a8600f74d82b7a99afd165aae6cb040492d5",
+  "physical_hardware_tested": false,
+  "runs": {
+    "web-start": {
+      "magic": 1145194289,
+      "halves": 688,
+      "max_us": 3932,
+      "nested": 21868,
+      "in_audio": 1,
+      "late": 0,
+      "timer_irqs": 79770,
+      "ui_frames": 390,
+      "last_us": 3008,
+      "cpu_q8": 67,
+      "boots": 1,
+      "stage": 9,
+      "page": 0,
+      "home": 1,
+      "six_loop_mask": 3,
+      "six_machine_mask": 3,
+      "fm1_mc_on": 1,
+      "fm1_mc_lost": 0,
+      "core1_track_mask": 32,
+      "selected_track": 0,
+      "track_engines": [
+        10,
+        17,
+        2,
+        3,
+        16,
+        15
+      ],
+      "usb_starts": 1,
+      "usb_packets": 7823,
+      "usb_frames": 345144,
+      "usb_underruns": 0,
+      "usb_overruns": 0,
+      "usb_missed": 0,
+      "usb_capture_frames": 345408,
+      "usb_peak_pcm16": 9003,
+      "usb_rate": 44100,
+      "audio_lost": 0,
+      "peak_pcm16": 4502
+    }
+  },
+  "note_counts": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    16
+  ]
+}

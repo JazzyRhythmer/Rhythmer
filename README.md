@@ -29,6 +29,8 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 | ![Acid generation](docs/motion/acid-generate.gif) | ![Break performance](docs/motion/break-perform.gif) |
 | ACID track → EDIT → ACID tab → 303 GEN 1 / 2. OCT+ generates a new line; OCT− mutates it. SCL supplies the root and scale. [Acid guide](docs/ACID.md) | BREAK track → EDIT → BREAK tab. Play slices and repeat/up/down commands; SEQ edits the actual events. Hold SEQ for STRAIGHT / MUTATE / RANDOM. [Break guide](docs/BREAK.md) |
 
+The browser starts with empty T1–T5 and a two-bar Amen A sequence on T6. Existing browser saves are kept; export a backup before using **RESET / BREAK ONLY**.
+
 ## The machines in motion
 
 Host-rendered firmware UI driven by note, envelope and preset input; silent previews, not physical-device footage. FM6 cycles patches to show its operator networks. [Try the actual firmware with sound](https://jazzyrhythmer.github.io/Rhythmer/#play).

@@ -10,6 +10,17 @@ document.querySelectorAll('[data-key]').forEach(button=>{
 document.querySelectorAll('[data-enc]').forEach(button=>button.addEventListener('click',()=>{if(node)turn(2,Number(button.dataset.enc));canvas.focus({preventScroll:true});}));
 // turn() takes panel encoder index: ALGORITHM is index 2 (hardware encoder 1).
 canvas.tabIndex=0;
+document.getElementById('rhy-fresh').addEventListener('click',action(async()=>{
+  if(!running)throw Error('Start Rhythmer first.');
+  if(!confirm('Replace this browser session with empty tracks and the Amen Break sequence? Prepare and download a backup first to keep your music. This does not change a physical FM-1.'))return;
+  const response=await fetch('../downloads/Rhythmer-start.fm1save?build='+RHYTHMER_HASH,{cache:'no-store'});
+  if(!response.ok)throw Error('Starting session could not be loaded.');
+  const record=await importSave(await response.text());
+  if(record.hash!==RHYTHMER_HASH||running.record.hash!==record.hash)throw Error('Starting session/package mismatch.');
+  bank=null;
+  await boot({imported:record});
+  saveMessage('Fresh session: T1–T5 empty. T6 Amen A / two-bar sequence. Press PLAY.');
+}));
 const audioButton=document.getElementById('rhy-audio');
 audioButton.addEventListener('click',async()=>{
   if(!ac)return;
