@@ -84,7 +84,7 @@ function wireGuide(){
 }
 function render(){stop();if(emulatorBackupURL){URL.revokeObjectURL(emulatorBackupURL);emulatorBackupURL=null;}const route=location.hash.slice(1)||'home';const pages={home,play,guide,install,recover,samples,editor,drafts:legacyEditor,creator,support:creator,releases};const selected=Object.hasOwn(pages,route)?route:'home';$('#main').innerHTML=pages[selected]();window.scrollTo({top:0,left:0,behavior:'instant'});document.documentElement.lang=lang;document.title=`Rhythmer — ${selected==='home'?'Six tracks. One pulse.':selected.toUpperCase()}`;document.querySelectorAll('.topbar nav a').forEach(a=>{if(a.hash==='#'+selected)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  if(selected==='home')wireLanding();
- if(route==='opening')requestAnimationFrame(()=>document.getElementById('opening')?.scrollIntoView({block:'start'}));
+ if(route==='opening'||route==='instrument')requestAnimationFrame(()=>document.getElementById(route)?.scrollIntoView({block:'start'}));
  if(selected==='home')document.querySelectorAll('[data-screen]').forEach(b=>b.onclick=()=>{screen=b.dataset.screen;const sources={home:'home.png',acid:'acid-1.png',break:'break-1.png'};$('.lcd').src='assets/'+sources[screen];$('.lcd').alt='Rhythmer '+screen.toUpperCase()+' firmware screen';document.querySelectorAll('[data-screen]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
  if(selected==='editor')$('#open-editor-full').addEventListener('click',()=>$('#rhythmer-editor')?.contentWindow?.postMessage({source:'rhythmer-shell',type:'release-editor'},location.origin));
  if(selected==='guide')wireGuide();if(selected==='drafts')wireEditor();

@@ -25,6 +25,7 @@ async function preload(){
  bundleReady=false;refresh();
  const r=await fetch('manifest.json',{cache:'no-store'});if(!r.ok)throw Error('Installer manifest unavailable.');manifest=await r.json();
  if(typeof manifest.localOnly!=='boolean'||!['local-development','public-beta'].includes(manifest.channel||'local-development')||manifest.physicalHardwareTested!==false)throw Error('Unsupported installer channel.');
+ if(mode==='rhythmer'&&manifest.releaseHold){$('#build-status').textContent='ON HOLD / '+manifest.releaseHold;throw Error(manifest.releaseHold);}
  const b=await validateInstallBundle(await loadBytes(manifest.bundle.url),manifest);
  recovery=b.recovery;target=mode==='stock'?recovery:b.firmware;bundleReady=true;
  $('#stock-status').textContent='READY / Official V15: exact size, SHA-256 and package layout verified automatically.';

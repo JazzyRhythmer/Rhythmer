@@ -14,6 +14,8 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 
 [Watch the 36-second opening with sound](https://jazzyrhythmer.github.io/Rhythmer/#opening) · [Download the Amen mix MP4](https://github.com/JazzyRhythmer/Rhythmer/releases/download/v0.1.0-beta.2/Rhythmer-OS-Opening-36s-1080p-Amen.mp4). Original opening sound plus an Amen Break section; sample credits below. The film shows host-rendered firmware UI, not physical-device footage.
 
+**Installation status:** New Rhythmer installations are temporarily paused while a real-device audio-load report is investigated. Beta.2 remains a draft; V15 recovery and browser exploration remain available.
+
 ## Start here
 
 [Play in your browser](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Guide](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)

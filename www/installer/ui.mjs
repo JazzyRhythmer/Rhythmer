@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=74740c1dd4a6';
-import {mountProgress} from './progress.mjs?v=74740c1dd4a6';
+import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=833cc29d1299';
+import {mountProgress} from './progress.mjs?v=833cc29d1299';
 const $=s=>document.querySelector(s),mode=new URLSearchParams(location.search).get('mode')==='stock'?'stock':'rhythmer';
 let manifest,target,recovery,source,up,access,working=false,writing=false,backupReady=false,bundleReady=false,releaseLock,heartbeat,channel;
 document.body.dataset.mode=mode;
@@ -25,6 +25,7 @@ async function preload(){
  bundleReady=false;refresh();
  const r=await fetch('manifest.json',{cache:'no-store'});if(!r.ok)throw Error('Installer manifest unavailable.');manifest=await r.json();
  if(typeof manifest.localOnly!=='boolean'||!['local-development','public-beta'].includes(manifest.channel||'local-development')||manifest.physicalHardwareTested!==false)throw Error('Unsupported installer channel.');
+ if(mode==='rhythmer'&&manifest.releaseHold){$('#build-status').textContent='ON HOLD / '+manifest.releaseHold;throw Error(manifest.releaseHold);}
  const b=await validateInstallBundle(await loadBytes(manifest.bundle.url),manifest);
  recovery=b.recovery;target=mode==='stock'?recovery:b.firmware;bundleReady=true;
  $('#stock-status').textContent='READY / Official V15: exact size, SHA-256 and package layout verified automatically.';

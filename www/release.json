@@ -35,7 +35,7 @@
     {
       "name": "Rhythmer-0.1.0-beta.2-install.zip",
       "bytes": 3134536,
-      "sha256": "301c89637ce4396a553db177eec91b6c7ce63df362251b412fcedc5a8d666fd1"
+      "sha256": "1cbed6a5ea4df189b771c14d28e845d67f9b4942eb6bf9ca5684b0e6a45911d2"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
@@ -109,6 +109,7 @@
     }
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
+  "releaseHold": "Rhythmer installations are temporarily paused while a reported hardware audio-load issue is investigated. Official V15 recovery remains available.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

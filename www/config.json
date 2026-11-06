@@ -52,5 +52,6 @@
       "Distinct other-custom-firmware to Rhythmer installation",
       "Deliberately interrupted physical update recovery"
     ]
-  }
+  },
+  "releaseHold": "Rhythmer installations are temporarily paused while a reported hardware audio-load issue is investigated. Official V15 recovery remains available."
 }

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=74740c1dd4a6';
-import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=74740c1dd4a6';
-import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=74740c1dd4a6';
-import {parseInfo} from './midi.mjs?v=74740c1dd4a6';
+import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=833cc29d1299';
+import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=833cc29d1299';
+import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=833cc29d1299';
+import {parseInfo} from './midi.mjs?v=833cc29d1299';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
 const RHYTHMER_PRODUCTS=['FM-1_900','FM-1_748001'];
