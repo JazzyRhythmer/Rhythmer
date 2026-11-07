@@ -18,7 +18,7 @@
   "firmware": {
     "url": "../downloads/Rhythmer.fwsc",
     "product": "FM-1_748005",
-    "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "sha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
     "bytes": 828061,
     "embeddedBreaks": true
   },
@@ -54,14 +54,14 @@
   "bundle": {
     "url": "../downloads/Rhythmer-with-breaks.rhythmer",
     "bytes": 2261425,
-    "sha256": "5a9bb77a6dda19ad0cf3d41400b8f9ef523ab9124d2c53ec7378c3ceef13fcc2"
+    "sha256": "b25eb71e5ac36a125de3fdcbcc4487ab1b55a38ca099c76995fc247ca641c74e"
   },
   "archive": {
     "url": "../downloads/Rhythmer-0.1.1-beta3-install.zip",
-    "bytes": 3158911,
-    "sha256": "c5c595169e42e36dbc66b06067e08bc82df90c8d5726d6382e70dc39aec4258c"
+    "bytes": 3158959,
+    "sha256": "0e1f128ddbb429a0a90ff961517377ad3e26acafcc6ffd68f30386bc90823f5d"
   },
   "audioRightsURL": "../audio-rights.json",
   "publicRedistributionCleared": false,
-  "buildRevision": "20261108.7"
+  "buildRevision": "20261108.8"
 }

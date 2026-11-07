@@ -36,10 +36,11 @@ ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_drum_core_test 0 ${RHYTHMER_BUILD_DIR:
 ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_drum_core_test 1 ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-drum-core-two.pcm
 cmp ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-drum-core-one.pcm ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-drum-core-two.pcm
 
-for case in six_display six_governor six_break_core six_ensemble six_lfo six_empty six_activation six_gen_policy six_efficiency six_native_acid six_break_idle audio; do
+for case in six_display six_boot six_governor six_break_core six_ensemble six_lfo six_empty six_activation six_gen_policy six_efficiency six_native_acid six_break_idle audio; do
  clang -w -O1 -g -fwrapv -DJUNGLE_AUDIO_CODE= -fsanitize=address,undefined -I"${RHYTHMER_BUILD_DIR:-rhythmer/build}/gen" -Irhythmer/firmware/src "rhythmer/tests/${case}_test.c" rhythmer/firmware/six/jungle.c rhythmer/firmware/six/tb3po.c rhythmer/firmware/six/acid_generate.c -lm -o "${RHYTHMER_BUILD_DIR:-rhythmer/build}/${case}_test"
 done
 "${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_display_test" "${RHYTHMER_BUILD_DIR:-rhythmer/build}"
+"$RHYTHMER_BUILD_DIR/six_boot_test" "$RHYTHMER_BUILD_DIR"
 "$RHYTHMER_BUILD_DIR/six_lfo_test" "$RHYTHMER_BUILD_DIR"
 "${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_governor_test"
 "$RHYTHMER_BUILD_DIR/six_efficiency_test"

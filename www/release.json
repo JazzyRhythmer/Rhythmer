@@ -1,7 +1,7 @@
 {
   "version": "0.1.1-beta3",
   "product": "FM-1_748005",
-  "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+  "sha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
   "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-08",
@@ -24,28 +24,28 @@
     },
     {
       "name": "Rhythmer-0.1.1-beta3-install.zip",
-      "bytes": 3158911,
-      "sha256": "c5c595169e42e36dbc66b06067e08bc82df90c8d5726d6382e70dc39aec4258c"
+      "bytes": 3158959,
+      "sha256": "0e1f128ddbb429a0a90ff961517377ad3e26acafcc6ffd68f30386bc90823f5d"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
       "bytes": 1351502,
-      "sha256": "5996517b926112f865c71589a425af06bd21ac53543ad09b0cd41d4f4a4da0ce"
+      "sha256": "1f478d285165e0f33614a7dabf632064662e7029edf94a1c7524c2579ae33f7a"
     },
     {
       "name": "Rhythmer-start.fm1save",
       "bytes": 1351517,
-      "sha256": "2e2889a3d66646cc93a0bdd67cf2a8cbf628c90963bb9b6553c17df0c942c70c"
+      "sha256": "bffe09041162c4e3a27a2e50087a323ee32627910d65bc4f2c088d0dd332ce03"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2261425,
-      "sha256": "5a9bb77a6dda19ad0cf3d41400b8f9ef523ab9124d2c53ec7378c3ceef13fcc2"
+      "sha256": "b25eb71e5ac36a125de3fdcbcc4487ab1b55a38ca099c76995fc247ca641c74e"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e"
+      "sha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -105,19 +105,20 @@
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
   "releaseHold": null,
-  "buildRevision": "20261108.7",
+  "buildRevision": "20261108.8",
   "audioBaseTest": {
     "ownerConfirmed": true,
     "buildRevision": "20261108.6",
     "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.7",
+    "finalRevision": "20261108.8",
     "firmwareSourceDifferences": [
       "rhythmer/firmware/src/ui.c",
+      "rhythmer/firmware/src/ui_draw.c",
       "rhythmer/firmware/src/ui_input.c"
     ],
-    "change": "UI-only changes: confirmed optional-slot defaults, EMPTY excluded from sound carousel, fresh shared SCL defaults to CHR. Audio DSP, buffer, voice management and core algorithms unchanged."
+    "change": "UI-only maintenance including a fixed startup machine display. Audio DSP, buffer, voice management and core algorithms unchanged."
   },
-  "releaseCaution": "Native Hortator Acid, MIDI-only generation and restored buffer headroom. The creator confirmed stable playback on audio-base build 20261108.6. This revision fills empty T5/T6 with Acid/Break on confirmed six-track activation, skips EMPTY during preset browsing and starts fresh SCL in CHR. Existing assignments, notes and stored scales are preserved. Busy six-track arrangements still need CPU headroom. Back up before installation.",
+  "releaseCaution": "Startup-only maintenance: the boot screen always shows animated Acid and Break identities in slots 5/6, regardless of actual track assignments. Instruments, sequences, four/six-track behavior and the creator-tested native Hortator audio base are unchanged. Back up before installation.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

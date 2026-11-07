@@ -1,8 +1,8 @@
 {
   "version": "0.1.1-beta3",
-  "buildRevision": "20261108.7",
+  "buildRevision": "20261108.8",
   "product": "FM-1_748005",
-  "firmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+  "firmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
   "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-08",
@@ -20,29 +20,46 @@
     "ownerConfirmed": true,
     "buildRevision": "20261108.6",
     "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.7",
+    "finalRevision": "20261108.8",
     "firmwareSourceDifferences": [
       "rhythmer/firmware/src/ui.c",
+      "rhythmer/firmware/src/ui_draw.c",
       "rhythmer/firmware/src/ui_input.c"
     ],
-    "change": "UI-only changes: confirmed optional-slot defaults, EMPTY excluded from sound carousel, fresh shared SCL defaults to CHR. Audio DSP, buffer, voice management and core algorithms unchanged."
+    "change": "UI-only maintenance including a fixed startup machine display. Audio DSP, buffer, voice management and core algorithms unchanged."
   },
-  "defaultTracks": 4,
-  "sixTracksRequiresOctPlus": true,
-  "octMinusCancels": true,
-  "optionalDefaults": {
-    "T5": "ACID when EMPTY",
-    "T6": "BREAK when EMPTY and not assigned elsewhere",
-    "preserveSoundsAndMidi": true,
-    "generatePattern": false
+  "maintenanceDelta": {
+    "previousBuild": "20261108.7",
+    "previousFirmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "firmwareFilesChanged": [
+      "rhythmer/firmware/src/ui_draw.c"
+    ],
+    "scope": "Startup display only; no audio, sequencing or track-assignment changes."
   },
-  "presetCarouselExcludesEmpty": true,
-  "freshSharedScale": "CHR",
-  "storedScalesPreserved": true,
-  "hostRegression": "PASS (full ASan/UBSan suite; QA compile uses O0; real firmware built with production optimizations)",
+  "startup": {
+    "fixedMachines": [
+      10,
+      17,
+      2,
+      3,
+      16,
+      15
+    ],
+    "independentOfAssignmentsAndMode": true,
+    "bothSpecialGlyphsAnimate": true,
+    "animationOffRespected": true,
+    "trackSongMidiUnchanged": true,
+    "focusedAssertions": 14,
+    "hostSanitizers": "ASan + UBSan"
+  },
   "nativeScenarios": 2,
   "nativeResults": {
-    "fresh": {
+    "startupFrame": {
+      "emulatedMs": 1400,
+      "actualFwsc": true,
+      "visualInspection": "Acid and Break both visible"
+    },
+    "freshBoot": {
       "engines": [
         10,
         17,
@@ -58,44 +75,6 @@
       "coreLost": 0,
       "cores": 2,
       "peak": 0
-    },
-    "fiveAcidBreakUsb": {
-      "magic": 1145194289,
-      "halves": 2030,
-      "max_us": 5319,
-      "nested": 84508,
-      "in_audio": 0,
-      "late": 0,
-      "timer_irqs": 235413,
-      "ui_frames": 246,
-      "last_us": 2838,
-      "cpu_q8": 75,
-      "boots": 1,
-      "stage": 6,
-      "page": 0,
-      "home": 1,
-      "audio_lost": 0,
-      "shed_count": 0,
-      "voice_kills": 0,
-      "voice_trims": 0,
-      "fm1_mc_on": 1,
-      "fm1_mc_lost": 0,
-      "gov_cap": 12,
-      "gov_lite": 0,
-      "mc_mask_last": 0,
-      "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
-      "half_frames": 512,
-      "deadline_us": 11609.977324263038,
-      "cpu_pct": 29.296875,
-      "track_engines": [
-        15,
-        16,
-        16,
-        16,
-        16,
-        16
-      ],
-      "pcm_peak": 9873
     }
   },
   "editorActualCStorageChecks": 130,
@@ -103,8 +82,11 @@
   "installerSimulatedChecks": 49,
   "manualInteractions": 9,
   "emulatorCacheChecks": 6,
-  "hortatorExactPcmBlocks": 48000,
-  "midiTargetGenreTrackCases": 354,
+  "inheritedAudioValidation": {
+    "buildRevision": "20261108.7",
+    "firmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "scope": "Previous complete audio/GEN regression and USB stress retained; only startup renderer changed."
+  },
   "sourceFiles": {
     "rhythmer/firmware/app.ld": "93fe3f811a8c0badbd48f827e04d7a2da6fdbc5921be6537354a1af0525a23a6",
     "rhythmer/firmware/crt0.S": "5234fc8af0afbd6e04a646f76f326fee451b51be4ba768fc2784daec0e3b1ea9",
@@ -246,7 +228,7 @@
     "rhythmer/firmware/src/uac_fir.h": "10f3b8f54f175302c8bfa5503cb2bb99d252d214a37ee758a405837d6064c5a3",
     "rhythmer/firmware/src/ui.c": "5db0c0fa57af421020f3adf492815559f5171d16b30f52d3c69d74504d35871b",
     "rhythmer/firmware/src/ui_break_tools.c": "310e694b025091ba269847198c5a2d496d5def54de7bfde8976bb9ad6c541ad9",
-    "rhythmer/firmware/src/ui_draw.c": "1b3f7bcb0596562e6d51289c13e96a2cb2b72659e0c2c42215ffee6d1215b380",
+    "rhythmer/firmware/src/ui_draw.c": "ba1597f813fb9adfa888b7ed4ecb10b0eb684b311db47dbb992b9950ade220d6",
     "rhythmer/firmware/src/ui_dx.c": "9889c850a9b709ae2f89514109f065cf190e2cc2b9204d330a153e0d509ab5e9",
     "rhythmer/firmware/src/ui_events.c": "7f836347f1e97318c7dd406eacaa2bd3b330d9112bd09d23cda4232ef1be31c3",
     "rhythmer/firmware/src/ui_fm6op.c": "b824865e7f82abdff1ee63094d4604da299093f2b87e92e4097ae0e0f9dc255a",
@@ -271,11 +253,13 @@
     "rhythmer/firmware/src/voice.c": "d0115ddc190f819355c2148dabddfbb16dc2deb4029e69a34524715cc95473c1"
   },
   "testEvidence": {
-    "tests-final.log": "05832e71d6d16881b1bbb4bb7505d919f1d1acc0813310149d02556fb72b8578",
-    "site-editor-final.log": "dfb66072d29a470ef6b060ae8de0d634bd687eb8aa9969aa0da2c39d691b4efb",
-    "site-installer-final.log": "ca0f74928dee6fdf21f91241d876200b9b39823a6d5439995eea836d8f403fdf",
-    "site-break_upload-final.log": "020fb6240f3da53997564854a895fa67cb7050764558858e1b635d4315e74dfd",
-    "site-manual-final.log": "c6c1a54f700fb1fd78387d7171644ee1dda958421f6abf5d57576cffa63d1eb4",
-    "site-emulator_cache-final.log": "ad4d0d3c593a99dab8f60c2ffe51a32434a965705bfe7e51a155b601270184f0"
+    "startup-test.log": "bba3eaf797df831e5864c58e836e41e9ed8fa64c02e7e3bc764c98d5c6c0e80b",
+    "native-startup.log": "19a2229fbdd5055499ea14f610322a74b091f6ddba5bc4dc51232abb3e90edd2",
+    "native-boot.log": "adb48505d879bf28e1f62d44a956290f82a45129cf533fd03ca5383e11170027",
+    "site-editor.log": "dfb66072d29a470ef6b060ae8de0d634bd687eb8aa9969aa0da2c39d691b4efb",
+    "site-installer.log": "ca0f74928dee6fdf21f91241d876200b9b39823a6d5439995eea836d8f403fdf",
+    "site-break_upload.log": "020fb6240f3da53997564854a895fa67cb7050764558858e1b635d4315e74dfd",
+    "site-manual.log": "c6c1a54f700fb1fd78387d7171644ee1dda958421f6abf5d57576cffa63d1eb4",
+    "site-emulator_cache.log": "ad4d0d3c593a99dab8f60c2ffe51a32434a965705bfe7e51a155b601270184f0"
   }
 }

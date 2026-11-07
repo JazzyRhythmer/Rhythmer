@@ -12,19 +12,16 @@
     "migrationAndRecoveryMatrixVerified": false
   },
   "finalRevision": {
-    "buildRevision": "20261108.7",
-    "firmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "buildRevision": "20261108.8",
+    "firmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
     "exactBinaryHardwareClaimed": false,
-    "audioBase": {
-      "ownerConfirmed": true,
-      "buildRevision": "20261108.6",
-      "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-      "finalRevision": "20261108.7",
-      "firmwareSourceDifferences": [
-        "rhythmer/firmware/src/ui.c",
-        "rhythmer/firmware/src/ui_input.c"
+    "maintenanceDelta": {
+      "previousBuild": "20261108.7",
+      "previousFirmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+      "firmwareFilesChanged": [
+        "rhythmer/firmware/src/ui_draw.c"
       ],
-      "change": "UI-only changes: confirmed optional-slot defaults, EMPTY excluded from sound carousel, fresh shared SCL defaults to CHR. Audio DSP, buffer, voice management and core algorithms unchanged."
+      "scope": "Startup display only; no audio, sequencing or track-assignment changes."
     }
   }
 }

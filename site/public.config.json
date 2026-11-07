@@ -53,9 +53,9 @@
     }
   },
   "releaseHold": null,
-  "buildRevision": "20261108.7",
-  "releaseCaution": "Native Hortator Acid, MIDI-only generation and restored buffer headroom. The creator confirmed stable playback on audio-base build 20261108.6. This revision fills empty T5/T6 with Acid/Break on confirmed six-track activation, skips EMPTY during preset browsing and starts fresh SCL in CHR. Existing assignments, notes and stored scales are preserved. Busy six-track arrangements still need CPU headroom. Back up before installation.",
-  "buildDirectory": "/Volumes/SSD/Development/BuildCache/rhythmer/activation-release-20261108.7",
+  "buildRevision": "20261108.8",
+  "releaseCaution": "Startup-only maintenance: the boot screen always shows animated Acid and Break identities in slots 5/6, regardless of actual track assignments. Instruments, sequences, four/six-track behavior and the creator-tested native Hortator audio base are unchanged. Back up before installation.",
+  "buildDirectory": "/Volumes/SSD/Development/BuildCache/rhythmer/startup-identity-20261108.8",
   "previousOwnerTests": [
     {
       "date": "2026-11-08",
@@ -94,11 +94,20 @@
     "ownerConfirmed": true,
     "buildRevision": "20261108.6",
     "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.7",
+    "finalRevision": "20261108.8",
     "firmwareSourceDifferences": [
       "rhythmer/firmware/src/ui.c",
+      "rhythmer/firmware/src/ui_draw.c",
       "rhythmer/firmware/src/ui_input.c"
     ],
-    "change": "UI-only changes: confirmed optional-slot defaults, EMPTY excluded from sound carousel, fresh shared SCL defaults to CHR. Audio DSP, buffer, voice management and core algorithms unchanged."
+    "change": "UI-only maintenance including a fixed startup machine display. Audio DSP, buffer, voice management and core algorithms unchanged."
+  },
+  "maintenanceDelta": {
+    "previousBuild": "20261108.7",
+    "previousFirmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "firmwareFilesChanged": [
+      "rhythmer/firmware/src/ui_draw.c"
+    ],
+    "scope": "Startup display only; no audio, sequencing or track-assignment changes."
   }
 }

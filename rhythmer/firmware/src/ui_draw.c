@@ -1803,6 +1803,9 @@ static void draw_columns(void)
 #define SPL_WRITE 800u
 #define SPL_HOLD 900u
 static uint8_t spl_anim;
+/* Startup is a fixed six-machine identity, independent of track assignments.
+ * Keep EMPTY defaults and all live track rendering unchanged. */
+static unsigned splash_engine(unsigned k){return k==4u?ENGI_ACID:k==5u?ENGI_BREAK:trk_def_engine(k);}
 static void splash_sig(int32_t px,uint32_t ms){
  (void)px;unsigned progress=(ui_prefs&PREF_ANIM_OFF)?48u:clamp((int)(ms*48u/SPL_WRITE),0,48);
  static const uint8_t g[8][7]={{30,17,17,30,20,18,17},{17,17,17,31,17,17,17},{17,17,10,4,4,4,4},{31,4,4,4,4,4,4},{17,17,17,31,17,17,17},{17,27,21,21,17,17,17},{31,16,16,30,16,16,31},{30,17,17,30,20,18,17}};
@@ -1823,7 +1826,7 @@ static void splash_sig(int32_t px,uint32_t ms){
   if(ready){
    unsigned ph=(ui_prefs&PREF_ANIM_OFF)?0u:ms*0x300000u+k*0x2aaaaaaau;
    int en=(ui_prefs&PREF_ANIM_OFF)?0:64+(osc_sine(ph)>>10);
-   six_machine_glyph(0,trk_def_engine(k),en,ph,x+5,y+3,62,22,T_TEXT);
+   six_machine_glyph(0,splash_engine(k),en,ph,x+5,y+3,62,22,T_TEXT);
   }
   cv_text_in(x,y+28,72,&AF_X,part[k],ready?T_TEXT:T_DIM,T_BG);
  }
