@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {fm1Device} from './device.mjs';
-import {renderLanding,wireLanding} from './landing.mjs?v=2d08cafb25c9';
+import {renderLanding,wireLanding} from './landing.mjs?v=f9fba20b199b';
 import {renderManual,wireManual} from './manual.mjs?v=696434f7581d';
 import {mountStudioNotes,cleanupStudioNotes} from './newsletter.mjs?v=63d9555e7ac9';
 import {MODELS,SCALES,ROOTS,kind,makeProject,availableModels,setModel,validateProject,randomDraft} from './model.mjs';
