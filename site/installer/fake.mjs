@@ -4,7 +4,7 @@ import {pack7,unpack7} from './transport.mjs';
 import {bkU32,bkR32,bkPack,bkUnpack,bkCrc} from './fm1backup.js';
 const HS=[240,0,50,69,0,0,0,64,127,247],UPGRADE=[240,34,36,53,127,247];
 const eq=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
-export const infoOf=()=>[...new TextEncoder().encode('JIANT Rhythmer dev'),0,21,127,71,64,119,...Array.from({length:21},()=>[65,0]).flat(),6,16,0x42,1,3];
+export const infoOf=(name='Rhythmer v0.1.1-beta3')=>[...new TextEncoder().encode(name),0,21,127,71,64,119,...Array.from({length:21},()=>[65,0]).flat(),6,16,0x42,1,3];
 export class FakeFM1 {
   constructor(image, { unplugAfter = Infinity, ...o } = {}) {
     this.image = image; this.unplugAfter = unplugAfter; this.served = 0; this.bad = 0; this.o = o;

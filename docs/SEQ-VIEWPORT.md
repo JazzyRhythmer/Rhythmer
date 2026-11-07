@@ -6,4 +6,4 @@ Opening SEQ, switching tracks/bars and editing notes now show the relevant regis
 
 Seven host assertions pass through the actual frame/render path, including low Acid, high synth, MIDI 0/127, stopped edits and Break commands. Two actual-firmware screen cases and nine navigation/load cases passed in the community emulator. The exact beta.2 binary has not been physically tested. Beta.1 owner tests remain identified by their older hash.
 
-The source regression is jiant/tests/six_seq_viewport_test.c. RELEASE-VALIDATION.json binds the tested results and active source hashes to the package.
+The source regression is rhythmer/tests/six_seq_viewport_test.c. RELEASE-VALIDATION.json binds the tested results and active source hashes to the package.

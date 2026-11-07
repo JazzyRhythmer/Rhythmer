@@ -75,7 +75,7 @@ export function readBackup(file) {
   if (typeof file === "string") file = JSON.parse(file);
   const kept = file && Array.isArray(file.objects) ? file.objects.filter((o) => !BACKUP_RETIRED(o?.id)) : null;
   const ids = kept ? idsOf(kept.length) : null;
-  if (!file || file.format !== "felucca-backup" || file.version !== 1 || !ids || ids.length !== 27 || file.firmware !== "JIANT Rhythmer dev")
+  if (!file || file.format !== "felucca-backup" || file.version !== 1 || !ids || ids.length !== 27 || !["Rhythmer dev","Rhythmer v0.1.1-beta3","JIANT Rhythmer dev","JIANT v0.1.1-beta3"].includes(file.firmware))
     throw new Error("Not a complete Felucca backup");
   const objects = kept.map((o, i) => {
     if (!o || o.id !== ids[i] || !Number.isInteger(o.size) || o.size < 0 || o.size > 3840 ||

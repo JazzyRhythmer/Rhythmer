@@ -102,8 +102,8 @@
     "bits": 12,
     "payload_bytes": 72000,
     "slot_bytes": 81920,
-    "slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
-    "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12",
+    "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
+    "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12; offline 4x circular look-ahead level match, no hard clipping",
     "boundaries": [
       0,
       18000,
@@ -112,7 +112,22 @@
       48000
     ],
     "seam_jump_pcm16": 0,
-    "peak_pcm16": 29200,
-    "rms_pcm16": 2769.22593083338
+    "peak_pcm16": 27968,
+    "rms_pcm16": 4978.657262087172,
+    "level_match": {
+      "source_slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+      "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
+      "gain_db": 9.0,
+      "max_peak_attenuation_db": 9.674933884213901,
+      "amen_rms": 0.19167527341802548,
+      "think_before_rms": 0.08451214112044729,
+      "think_after_rms": 0.15193656195334387,
+      "rms_difference_db": -2.0180759309055034,
+      "true_peak_dbfs": -1.3702431050771096,
+      "clipped_samples": 0,
+      "frames": 48000,
+      "seam_jump_pcm16": 0,
+      "runtime_cpu_cost_added": 0
+    }
   }
 ]

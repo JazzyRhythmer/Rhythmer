@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-beta.2",
+  "version": "0.1.1-beta3",
   "channel": "public-beta",
   "physicalHardwareTested": false,
   "localOnly": false,
@@ -27,9 +27,9 @@
   },
   "firmware": {
     "url": "../downloads/Rhythmer.fwsc",
-    "product": "FM-1_748001",
-    "sha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6",
-    "bytes": 828065,
+    "product": "FM-1_748005",
+    "sha256": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0",
+    "bytes": 828061,
     "embeddedBreaks": true
   },
   "loops": [
@@ -45,7 +45,7 @@
       "slot": "B",
       "url": "../downloads/think-160.slot",
       "bytes": 81920,
-      "sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d"
+      "sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
     }
   ],
   "recovery": {
@@ -63,14 +63,15 @@
   },
   "bundle": {
     "url": "../downloads/Rhythmer-with-breaks.rhythmer",
-    "bytes": 2260708,
-    "sha256": "ed69c041824109220665c0252e3fd9abda60a0484d7914a7144cc74fd65a4fba"
+    "bytes": 2261425,
+    "sha256": "2c89a51bdc29fc349424699f4d1bca5850beb4f7edca56188ffc245398f7ce64"
   },
   "archive": {
-    "url": "../downloads/Rhythmer-0.1.0-beta.2-install.zip",
-    "bytes": 3135310,
-    "sha256": "3348acb66b0a35e1b751bb132e5fb051d2db5352c5249d4da74ddf4e3dee85ec"
+    "url": "../downloads/Rhythmer-0.1.1-beta3-install.zip",
+    "bytes": 3169570,
+    "sha256": "0fc54bd5b7d6a5ff11e1f66a92803bc19bc4c59a2d095f92d11910c017086069"
   },
   "audioRightsURL": "../audio-rights.json",
-  "publicRedistributionCleared": false
+  "publicRedistributionCleared": false,
+  "buildRevision": "20261107.2"
 }

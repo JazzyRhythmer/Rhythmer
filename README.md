@@ -14,11 +14,9 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 
 [Watch the 36-second opening with sound](https://jazzyrhythmer.github.io/Rhythmer/#opening) · [Download the Amen mix MP4](https://github.com/JazzyRhythmer/Rhythmer/releases/download/v0.1.0-beta.2/Rhythmer-OS-Opening-36s-1080p-Amen.mp4). Original opening sound plus an Amen Break section; sample credits below. The film shows host-rendered firmware UI, not physical-device footage.
 
-**Optimized beta.2:** Installation is available. Host/emulator validation passed; this exact binary awaits physical FM-1 revalidation. The reported hardware audio artifacts are not yet confirmed resolved. Back up your music before updating.
-
 ## Start here
 
-[Play in your browser](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Guide](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
+[Play](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Detailed manual](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Web editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install / official V15 return](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
 
 **Use official V15 when moving from another custom firmware to Rhythmer, or from Rhythmer to another custom firmware.** Direct foreign-custom transitions are unsupported. For a first install, official V15 is the recommended starting point. Back up the music you want to keep before changing firmware. The installer requires a final V15 recommendation acknowledgement, backup/risk acknowledgements and a separate audio-rights acknowledgement. Use Chrome or Edge and keep USB/power connected until verification finishes. A matching Rhythmer can be updated directly after backup.
 
@@ -28,8 +26,6 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 | --- | --- |
 | ![Acid generation](docs/motion/acid-generate.gif) | ![Break performance](docs/motion/break-perform.gif) |
 | ACID track → EDIT → ACID tab → 303 GEN 1 / 2. OCT+ generates a new line; OCT− mutates it. SCL supplies the root and scale. [Acid guide](docs/ACID.md) | BREAK track → EDIT → BREAK tab. Play slices and repeat/up/down commands; SEQ edits the actual events. Hold SEQ for STRAIGHT / MUTATE / RANDOM. [Break guide](docs/BREAK.md) |
-
-The browser starts with empty T1–T5 and a two-bar Amen A sequence on T6. Existing browser saves are kept; export a backup before using **RESET / BREAK ONLY**.
 
 ## The machines in motion
 
@@ -46,25 +42,29 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 - Six assignable tracks; fresh projects start DRUM / SERUM / PHASE / LOFI / ACID / BREAK.
 - Synths: Serum, Phase, LoFi, Analog, FM6, Wheel, FM+STAT, SWAV-SAW and SID-6581. All 41 selected Garden model presets remain; MONO2K-derived models add 17 starting sounds.
-- Drums include five additional kits using 21 Hortator-derived MD synthesis models. Their model-specific voice limits are separate from the normal synth voice pool.
+- Drums include the complete 55-preset Hortator MD bank (57 articulations / 21 kernels), 19 kits including two experimental MD LAB kits, and individual lane sound replacement. Their model-specific voice limits are separate from the normal synth voice pool.
 - Multiple Acid tracks; one Break machine per project, assignable anywhere. Machine-specific EDIT/SEQ pages follow the selected machine.
 - Acid NEW/MUTATE always follows the root/scale in SCL; untouched scale defaults to minor.
 - Break: 16 chops, 16 performance/repeat commands, source A/B and return commands in the real sequence. Hold SEQ for STRAIGHT / MUTATE / RANDOM, tail fills, beat shuffle, reverse order, shifts and A/B sequencing. Saved periodic mutation supports ORBIT/DRIFT.
-- Break follows the normal track filter, ADSR and both LFOs. Fresh Break tracks start on A / Amen with a straight 32-step two-bar pattern; existing saved edits remain intact.
+- Break follows the normal track filter, ADSR and both LFOs. Fresh Break tracks select A / Amen with an empty two-bar sequence. Hold SEQ + F3 for a straight loop; saved edits remain intact.
 - Four projects, A–D sections, two LFOs per track, modulation slots, shared distortion/phaser/delay/reverb and performance effects. Four-/six-track modes preserve inactive tracks.
 - Web editor for actual sounds/patterns, musical archive import/export and user-replaceable two-bar A/B loops. Conversion to 16 kHz mono packed PCM12 happens in the browser. Musical archives do not contain audio: retain your original samples separately.
 
 ## Release and compatibility
 
-The public beta candidate uses `FM-1_748001`; the legacy local development build used shared identity `FM-1_900`. The package includes its update loader and both fixed A/B sample banks. Installing replaces factory audio in those banks; the loader protects project/settings sectors outside its explicit ranges. A/B write and CRC checks do not make foreign firmware projects compatible.
+The current beta is **v0.1.1-beta3 / FM-1_748005**. This maintenance revision keeps the version label; use the installer SHA-256 to identify the exact binary. The package includes its update loader and both prepared A/B banks. Installing restores those factory loops. Project/settings protection applies only to the documented layout and does not make foreign firmware projects compatible.
 
-Beta.2 fixes SEQ piano-roll visibility: the displayed octave follows the current notes after track/bar changes and note edits. It also adds GEN load guards, a nonblocking CPU warning, and Break/SWAV arithmetic optimizations. Ten current actual-firmware native emulator scenarios plus focused host tests passed. GEN keeps SERUM (one automatic instance), PHASE, LOFI, ANALOG, WHEEL and SID-6581; SWAV-SAW, FM+STAT and FM6 remain available manually. The exact beta.2 binary has not been physically tested. The owner confirmed playback, installation from official V15 and return to official V15 on the earlier beta.1 package (`3d4e8655…`). This is a limited, owner-reported hardware test; read `HARDWARE-TEST-STATUS.json`. Direct foreign-custom transitions are unsupported: use V15 in between. A separate unit became non-responsive after the owner powered it off during an update; recovery is unconfirmed. Cold power-loss recovery is not established. The original release validation record describes the automated checks at package preparation. CPU measurements from an emulator are not real-device CPU measurements. Support for UC25HQ80 is implemented but has not been tested on that physical flash part.
+New in this release: 59 GEN genres; targeted MIDI and genre-aware BREAK GEN; all 55 Hortator MD presets and per-lane drum replacement; four Hortator Acid sounds; revised Think level matching; guided user-sample conversion/upload; empty initial sequences; and a detailed English manual. ALL generates only T1–T4 and leaves T5/T6 music and settings intact. Explicit T5 MIDI remains available. Curated genres keep preset tuning, use role-appropriate sounds and leave melodic space. CPU work replaces sample-rate phaser float math, streamlines packed Break reads and removes unused legacy Break processing. The normal voice budget, clocks, synchronization and memory guards remain.
+
+The owner tested the earlier same-version `aa90f340…` package and reported working functions as well as overload under a busy six-track ensemble. Read-only PROFILE confirmed missed deadlines; muting either Acid or Drum improved playback. That is not a test of the revised package. The current exact package's automated checks and physical-test scope are recorded in `RELEASE-VALIDATION.json`; real-device sustained-load listening must still be repeated. Native/community-emulator timing does not reproduce all physical flash-cache contention. Back up before installing.
+
+Use official V15 between different custom firmware families. A previous unit became unresponsive after power was interrupted during an update; its recovery remains unconfirmed. Cold power-loss recovery and UC25HQ80 hardware validation are not established.
 
 The normal synthesis ceiling is twelve shared voices, with a measured-load relief ceiling of ten and the existing overload protections. Monophonic machines and MD models have their own constraints. No guarantee of unlimited polyphony is made.
 
 ## Samples, credits and license
 
-Source is GPL-3.0-only; original component licenses and notices remain. The active firmware is in `jiant/`. See `docs/THIRD_PARTY.md`, `jiant/LICENSING.md` and the component license directories.
+Source is GPL-3.0-only; original component licenses and notices remain. The active firmware is in `rhythmer/`. See `docs/THIRD_PARTY.md`, `rhythmer/LICENSING.md` and the component license directories.
 
 Amen: The Winstons, *Amen, Brother*, Gregory C. Coleman on drums; source via Amenity. Think: Lyn Collins, *Think (About It)*; a two-bar drum edit from owner-supplied files. Each prepared loop is two bars at 160 BPM, mono 16 kHz / PCM12. **These recordings are separate from the code license.** The owner directs their inclusion with credits; recording/composition redistribution permission has not been documented. Credits, installation acknowledgements, free access and this repository do not grant a blanket sample license. Replace either loop through the web editor or obtain permission appropriate to your use. See `audio-rights.json` and `THIRD-PARTY-AUDIO.txt`.
 

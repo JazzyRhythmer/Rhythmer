@@ -1,10 +1,12 @@
 {
-  "version": "0.1.0-beta.2",
-  "firmwareSha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6",
-  "physicalCurrentCandidateTested": false,
-  "currentCandidateScope": "Host/ASan/UBSan tests and ten actual-firmware native emulator scenarios passed. Physical revalidation deferred by owner; agent has not flashed a device.",
-  "knownIssue": "A real FM-1 running the previous beta.1 reported audible artifacts and peak CPU above the audio deadline. These mitigations have not yet been confirmed to resolve it on hardware.",
-  "previousOwnerTest": {
+  "currentVersion": "0.1.1-beta3",
+  "currentBuild": "20261107.2",
+  "currentHash": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0",
+  "exactCurrentPhysicalTested": false,
+  "earlierSameVersionHash": "aa90f340561b3be7298b9ca0ac11124f17a947941013b3cafd064cbdedae42d6",
+  "earlierSameVersionResult": "Owner reported working musical functions. Read-only INFO and both bank flags matched. Busy six-track playback also showed missed audio deadlines; muting Acid or Drum helped.",
+  "recoveryPolicy": "Use official V15 between different custom firmware families.",
+  "previousRecoveryEvidence": {
     "date": "2026-11-06",
     "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
     "method": "Owner-reported manual FM-1 test on the functioning unit",
@@ -25,6 +27,5 @@
       "recovered": false,
       "hardwareDamageDiagnosed": false
     }
-  },
-  "transitionPolicy": "Use official V15 between Rhythmer and foreign custom firmware. A matching Rhythmer may update directly after backup."
+  }
 }

@@ -5,7 +5,7 @@ import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js';
 import {parseInfo} from './midi.mjs';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
-const RHYTHMER_PRODUCTS=['FM-1_900','FM-1_748001'];
+const RHYTHMER_PRODUCTS=['FM-1_900','FM-1_748001','FM-1_748005'];
 export function strictInfo(body){
  const v=parseInfo([240,125,70,76,1,...body,247]);
  if(!v?.isRhythmer)return null;

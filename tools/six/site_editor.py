@@ -1,10 +1,11 @@
 """Adapt the pinned GPL JIANT editor without modifying the reference sources."""
 from pathlib import Path
-import os,re,shutil,hashlib
+import os,re,shutil,hashlib,json,html
 
 def build_editor(root,dist):
-    site=root/'site';vendor=site/'vendor/jiant-editor';out=dist/'editor';out.mkdir(exist_ok=True)
+    site=root/'site';vendor=site/'vendor/upstream-editor';out=dist/'editor';out.mkdir(exist_ok=True)
     s=(vendor/'editor.html').read_text()
+    release=json.loads((dist/'release.json').read_text()) if (dist/'release.json').exists() else {}
     def change(a,b):
         nonlocal s
         if a not in s:raise ValueError('JIANT adaptation anchor missing: '+a[:80])
@@ -21,7 +22,7 @@ def build_editor(root,dist):
     change('const MOCK = QS.get("mock") === "1";','const MOCK = false;\nconst WORKSPACE = QS.get("target") !== "usb";\nlet workspace = null;')
     s=s.replace('if (!MOCK && !navigator.requestMIDIAccess)','if (!WORKSPACE && !navigator.requestMIDIAccess)')
     change('if (MOCK) { mock = makeMockDevice({ legacy: QS.get("legacy") === "1" }); access = mock.access; }','if (WORKSPACE) { const w = await import("./workspace.mjs"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }')
-    change('if (!/^(?:JIANT|FELUCCA)\\b/i.test(info.version || "")) throw new Error("Not a JIANT editor device");','if (info.version !== "JIANT Rhythmer dev" || info.nengines !== 21 || info.ntrk !== 6 || info.pe0 !== 119) throw new Error("This editor requires the matching Rhythmer firmware");')
+    change('if (!/^(?:JIANT|FELUCCA)\\b/i.test(info.version || "")) throw new Error("Not a JIANT editor device");','if (!["Rhythmer dev","Rhythmer v0.1.1-beta3","JIANT Rhythmer dev","JIANT v0.1.1-beta3"].includes(info.version) || info.nengines !== 21 || info.ntrk !== 6 || info.pcount !== 127 || info.gcount !== 71 || info.pe0 !== 119) throw new Error("This editor requires the matching Rhythmer firmware");')
     change('function replyMatches(cmd, args, a) {','function replyMatches(cmd, args, a) { if(cmd===80)return args.length?a[0]===args[0]&&a[1]===args[1]:a.length===6&&String.fromCharCode(...a.slice(0,5))===\"SIX3\\0\";')
     change('function engineOrder(names) {','function engineOrder(names) { return [10,17,2,3,18,19,20,0,12,7,16,15].filter(i => names[i] && names[i] !== "-"); }\nfunction upstreamEngineOrder(names) {')
     change('["LFO", 0, [9, 10, 11, 12]]','["LFO 1", 0, [9, 10, 11, 12]], ["LFO 2", 0, [pe0-4,pe0-3,pe0-2,pe0-1]]')
@@ -37,6 +38,7 @@ def build_editor(root,dist):
     change('await restoreBackup((r, o) => sessionRequest(d, r, o), archive, backupProgress);','await restoreBackup((r,o)=>{if(r[0]===CMD.BACKUP_PUT&&r[1][0]===2)selfLoad();return sessionRequest(d,r,o);},archive,backupProgress);')
     # Current data ABI has four projects; old JIANT archives must not be silently truncated.
     s=s.replace('JIANT-backup','Rhythmer-backup')
+    s=s.replace('$("version").textContent = d.info.version;', '$("version").textContent = d.info.version==="JIANT Rhythmer dev"?"Rhythmer dev":d.info.version.replace(/^JIANT /,"Rhythmer ");')
     s=s.replace('/felucca|jiant|skiff|fm[ _-]*1|','/rhythmer|felucca|jiant|skiff|fm[ _-]*1|')
     s=s.replace('backupDone: "Backup saved"','backupDone: "Backup ready — use DOWNLOAD above"')
     s=s.replace('backupTitle: "Complete backup"','backupTitle: "Musical archive"').replace('backupHelp: "Save the current music, A–D, sound banks and settings to this computer."','backupHelp: "Save all four projects, A–D sections, sounds and settings. Break sample audio is separate; use PLAY’s .fm1save for sample-inclusive backups."')
@@ -50,15 +52,17 @@ def build_editor(root,dist):
     s=s.replace('<section class="panel" id="p-settings"','<section class="panel" id="p-samples" data-tab="samples" hidden></section><section class="panel" id="p-settings"',1)
     s=s.replace('</head>','<link rel="stylesheet" href="rhythmer.css"></head>')
     s=s.replace('<main>','<main><section id="rhythmer-mode"><a href="../#editor" target="_top" class="rhy-title">RHYTHMER / EDITOR</a><div class="bar"><a id="mode-browser" href="?target=browser">BROWSER WORKSPACE</a><a id="mode-usb" href="?target=usb">USB FM-1</a></div><p id="workspace-status" role="status"></p><p id="mode-note"></p></section>',1)
-    codec=Path(os.environ.get("RHYTHMER_BUILD_DIR",root/"jiant/build-ssd"))/"workspace.wasm"
+    codec=Path(os.environ.get("RHYTHMER_BUILD_DIR",root/"rhythmer/build-ssd"))/"workspace.wasm"
     editor_version=hashlib.sha256(b''.join(p.read_bytes() for p in sorted((site/'editor').iterdir()) if p.is_file())+(codec.read_bytes() if codec.exists() else b'')).hexdigest()[:12]
     for entry in ['workspace.mjs','break-samples.mjs']:
         s=s.replace('./'+entry,'./'+entry+'?v='+editor_version)
     s=s.replace('href="rhythmer.css"','href="rhythmer.css?v='+editor_version+'"')
+    version=html.escape(release.get('version','development'))
+    s=s.replace('class="rhy-title">RHYTHMER / EDITOR</a>',f'class="rhy-title">RHYTHMER / EDITOR</a><span class="rhy-build">{version}</span>')
     (out/'index.html').write_text(s)
     b=(vendor/'fm1backup.js').read_text().replace('length: 32','length: 16')
     # Do not accept foreign ABI backups or allow unknown objects to be skipped during restore.
-    b=b.replace('if (!file || file.format !== "felucca-backup" || file.version !== 1 || !ids)','if (!file || file.format !== "felucca-backup" || file.version !== 1 || !ids || ids.length !== 27 || file.firmware !== "JIANT Rhythmer dev")')
+    b=b.replace('if (!file || file.format !== "felucca-backup" || file.version !== 1 || !ids)','if (!file || file.format !== "felucca-backup" || file.version !== 1 || !ids || ids.length !== 27 || !["Rhythmer dev","Rhythmer v0.1.1-beta3","JIANT Rhythmer dev","JIANT v0.1.1-beta3"].includes(file.firmware))')
     b=b.replace('if (a[2] === 1) { done += o.size; onProgress(done, total); continue; }','if (a[2] === 1) throw new Error("Rhythmer archive object rejected; restore stopped");')
     (out/'fm1backup.js').write_text(b)
     for name in ['fukiai.ttf','FUKIAI-LICENSE.txt','LICENSE.txt','UPSTREAM.json']:
@@ -72,5 +76,5 @@ def build_editor(root,dist):
         text=text.replace("'./break-convert-worker.mjs'","'./break-convert-worker.mjs?v="+editor_version+"'")
         p.write_text(text)
 
-    codec=Path(os.environ.get("RHYTHMER_BUILD_DIR",root/"jiant/build-ssd"))/"workspace.wasm"
+    codec=Path(os.environ.get("RHYTHMER_BUILD_DIR",root/"rhythmer/build-ssd"))/"workspace.wasm"
     if codec.exists():shutil.copy2(codec,out/"workspace.wasm")

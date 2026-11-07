@@ -8,7 +8,7 @@ ap=argparse.ArgumentParser();ap.add_argument('--output',required=True,type=Path)
 OUT=a.output;OUT.mkdir(parents=True,exist_ok=True)
 ROOT=Path(__file__).resolve().parents[2]
 FONTS=Path(__file__).parent/'fonts'
-if not FONTS.is_dir():FONTS=ROOT/'jiant/assets/fonts'
+if not FONTS.is_dir():FONTS=ROOT/'rhythmer/assets/fonts'
 MOTION=Path(__file__).parent/'motion'
 if not MOTION.is_dir():MOTION=ROOT/'site/media/motion'
 DEMO_NAMES=['drum','serum','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']

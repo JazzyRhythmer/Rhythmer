@@ -52,12 +52,26 @@ function renderRhythmer(){
     }
   }
   machine.querySelectorAll('[data-pid]').forEach(input=>{if(input!==document.activeElement)input.value=dev.dump.p[+input.dataset.pid];});
+  const projectSignature=workspace?[workspace.current(),workspace.section(),...[0,1,2,3].map(n=>workspace.mask(n))].join(':'):'usb';
+  if(projectsBox.dataset.signature===projectSignature)return;projectsBox.dataset.signature=projectSignature;
   projectsBox.replaceChildren(el('h2',{text:'PROJECT BANK / 01—04'}));
   if(WORKSPACE&&workspace){
-    const row=el('div',{class:'bar'});
-    for(let n=0;n<4;n++)row.append(el('button',{text:`0${n+1}${workspace.mask(n)?' ●':''}`,'aria-label':`Project ${n+1}`,'aria-pressed':workspace.current()===n,onclick:()=>op(async()=>{if(n===workspace.current())return;if(!confirm('Switch project? Save the current section to A–D first. Unsaved runtime edits will be replaced.'))return;await workspace.project(n);await load(dev);})}));
-    row.append(el('button',{text:'SAVE FOR PLAY ↓',onclick:()=>op(async()=>{const data=workspace.emulatorSave();download('Rhythmer-web-workspace.fm1save',data);sayK('backupDone');})}));
-    projectsBox.append(row,el('p',{class:'dim',text:'Four real firmware project slots. Each contains A–D sections. Empty slots start from the current music; save a section to keep it. Save a section before switching projects. Browser edits autosave as a recoverable musical archive; download a backup before clearing browser data. SAVE FOR PLAY includes your current edits and both Break samples; import the .fm1save in PLAY to hear it.'}));
+    const current=workspace.current(),section=workspace.section(),grid=el('div',{class:'rhy-project-grid'});
+    for(let n=0;n<4;n++){
+      const mask=workspace.mask(n),card=el('article',{class:'rhy-project-card'});
+      card.append(el('strong',{text:`PROJECT 0${n+1}${current===n?' / CURRENT':''}`}),el('p',{text:['A','B','C','D'].map((x,i)=>x+((mask>>i)&1?' ●':' ○')).join('  ')}));
+      card.append(el('button',{text:current===n?'SELECTED':'OPEN PROJECT','aria-label':`Open project ${n+1}`,disabled:current===n,onclick:()=>op(async()=>{
+        const dialog=el('dialog',{class:'rhy-project-confirm'}),form=el('form',{method:'dialog'}),select=el('select',{'aria-label':'Save current music to section'});
+        for(let k=0;k<4;k++)select.append(el('option',{value:k,text:'SECTION '+String.fromCharCode(65+k)+((workspace.mask(current)>>k)&1?' / REPLACE':' / EMPTY')}));select.value=section<4?section:0;
+        form.append(el('h2',{text:`Save & open project 0${n+1}`}),el('p',{text:`Save the current music into project 0${current+1} before switching. The selected section is replaced. The other sections are kept.`}),select,el('p',{class:'dim',text:mask?'The destination opens its saved section A when available; otherwise it keeps the current music.':'The destination is empty. Like JIANT, it starts with a copy of the current music; save A–D there to keep it.'}),el('div',{class:'bar'},el('button',{value:'cancel',text:'CANCEL'}),el('button',{value:'save',text:'SAVE & SWITCH'})));
+        dialog.append(form);document.body.append(dialog);dialog.showModal();await new Promise(r=>dialog.addEventListener('close',r,{once:true}));const ok=dialog.returnValue==='save',to=+select.value;dialog.remove();if(!ok)return;
+        await workspace.project(n,to);await load(dev);
+      })}));grid.append(card);
+    }
+    const row=el('div',{class:'bar'}),saveTo=el('select',{'aria-label':'Save current music to project section'});
+    for(let k=0;k<4;k++)saveTo.append(el('option',{value:k,text:'SECTION '+String.fromCharCode(65+k)+((workspace.mask(current)>>k)&1?' / REPLACE':' / EMPTY')}));saveTo.value=section<4?section:0;
+    row.append(saveTo,el('button',{text:'SAVE CURRENT MUSIC',onclick:()=>op(async()=>{const n=+saveTo.value;if((workspace.mask(current)>>n)&1&&!confirm('Replace section '+String.fromCharCode(65+n)+' with the current music?'))return;workspace.saveSection(n);await load(dev);})}),el('button',{text:'BACKUP ALL 4 PROJECTS ↓',onclick:()=>op(async()=>{download('Rhythmer-all-projects.json',workspace.snapshot());sayK('backupDone');})}),el('button',{text:'SAVE FOR PLAY + AUDIO ↓',onclick:()=>op(async()=>{download('Rhythmer-web-workspace.fm1save',workspace.emulatorSave());sayK('backupDone');})}));
+    projectsBox.append(grid,row,el('p',{class:'dim',text:'Browser autosave recovers your current edits and all four projects. A–D are explicit musical snapshots: save them before loading another section. Musical archives include all projects, sounds and settings; sample audio is separate. SAVE FOR PLAY includes current edits and both Break samples. Download backups before clearing browser data.'}));
   }else projectsBox.append(el('p',{class:'dim',text:'Select projects 01–04 on the FM-1 HOME / project library. A–D below belong to the currently selected project. Musical archive backs up all four projects together.'}));
 }
 // Keep the editor quiet in an inactive tab; JIANT already pauses its polling there.

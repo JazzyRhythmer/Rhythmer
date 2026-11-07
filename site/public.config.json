@@ -37,8 +37,8 @@
       "hardwareDamageDiagnosed": false
     }
   },
-  "version": "0.1.0-beta.2",
-  "product": "FM-1_748001",
+  "version": "0.1.1-beta3",
+  "product": "FM-1_748005",
   "githubRepository": "JazzyRhythmer/Rhythmer",
   "previousOwnerTest": {
     "date": "2026-11-06",
@@ -55,5 +55,6 @@
       "Deliberately interrupted physical update recovery"
     ]
   },
-  "releaseCaution": "Optimized beta: host and emulator checks passed. This exact binary awaits physical FM-1 revalidation; reduction of the reported hardware audio artifacts is not yet confirmed."
+  "releaseCaution": "Early beta: an earlier same-version device test revealed overload in a busy six-track ensemble. This revision optimizes shared Phaser and Break processing without changing clocks, synchronization or normal voice budgets. This exact binary still needs physical sustained-load listening. Back up and leave CPU headroom.",
+  "buildRevision": "20261107.2"
 }

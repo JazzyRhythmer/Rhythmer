@@ -8,10 +8,10 @@
 static unsigned char host_flash[0x100000];                 /* fl_erase4k / fl_write (OTA staging) over 0xE0000.. */
 #define FELUCCA_OTA 1
 #define FELUCCA_FLASH 1
-#define FELUCCA_VERSION "Rhythmer dev"
+#define FELUCCA_VERSION "dev"
 #define FELUCCA_CDC 1                                    /* (as the firmware: MENU > USB SERIAL switches the console) */
 #define main hostsim_main
-#include "../../jiant/tests/hostsim.c"
+#include "../../rhythmer/tests/hostsim.c"
 #undef main
 
 static uint32_t host_progress = 1, host_erases, host_writes;
@@ -41,10 +41,10 @@ static void lcd_power(uint32_t s) { (void)s; }   /* (MENU > SCREEN OFF: lcd.c) *
 static void lcd_wake_now(void) {}
 static void lcd_blit(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint16_t *p)
 { (void)x; (void)y; (void)w; (void)h; (void)p; }
-#include "../../jiant/firmware/src/gfx.c"
-#include "../../jiant/firmware/src/panel.c"
-#include "../../jiant/firmware/src/ui.c"
-#include "../../jiant/firmware/src/menu_items.c"
+#include "../../rhythmer/firmware/src/gfx.c"
+#include "../../rhythmer/firmware/src/panel.c"
+#include "../../rhythmer/firmware/src/ui.c"
+#include "../../rhythmer/firmware/src/menu_items.c"
 static void panel_setup(void) {}
 
 
@@ -68,13 +68,13 @@ static void irq_restore(uint32_t x){(void)x;}
 static uint32_t fl_jedec_ram(void){return 0x856014u;}
 static void fl_plain_window_init(void){}
 #define FL_FAR(fn) (fn)
-#include "../../jiant/firmware/src/storage.c"
-#include "../../jiant/firmware/src/upreset.c"
-#include "../../jiant/firmware/src/break_sequence.c"
-#include "../../jiant/firmware/src/project.c"
+#include "../../rhythmer/firmware/src/storage.c"
+#include "../../rhythmer/firmware/src/upreset.c"
+#include "../../rhythmer/firmware/src/break_sequence.c"
+#include "../../rhythmer/firmware/src/project.c"
 static const void *fm1_xip_ptr(uint32_t off){return host_flash_ptr(off);}
-#include "../../jiant/firmware/src/six_slots.c"
-#include "../../jiant/firmware/src/editor.c"
+#include "../../rhythmer/firmware/src/six_slots.c"
+#include "../../rhythmer/firmware/src/editor.c"
 
 static uint8_t ws_in[1024], ws_archive_data[120000];
 uint32_t ws_input(void){return (uint32_t)(uintptr_t)ws_in;}
@@ -110,8 +110,10 @@ uint32_t ws_archive(void){
   ws_u32(&pos,ED_BK_IDS[k]);ws_u32(&pos,len);ws_u32(&pos,st_crc32(body,len));memcpy(ws_archive_data+pos,body,len);pos+=len;}
  return pos;
 }
-uint32_t ws_project(uint32_t n){if(n>=4)return 1;song.playing=0;transport_req=0;return song_select(n)!=0;}
+uint32_t ws_project(uint32_t n){if(n>=4)return 1;if(n==song_cur)return 0;song.playing=0;transport_req=0;return song_select(n)!=0;}
 uint32_t ws_project_current(void){return song_cur;}
+uint32_t ws_section_current(void){return proj_cur<4?proj_cur:255;}
+uint32_t ws_section_save(uint32_t n){if(n>=4)return 1;song.playing=0;transport_req=0;return project_save(n);}
 uint32_t ws_project_mask(uint32_t n){
  if(n>=NSONG)return 0;char name[13];if(n==song_cur)return lib_scan(n,name);
  uint32_t mask=0;for(uint32_t k=0;k<4;k++){st_hdr_t h;if(st_current(ed_bk_song_obj(n,k),&h)>=0&&proj_store_len(h.len))mask|=1u<<k;}return mask;

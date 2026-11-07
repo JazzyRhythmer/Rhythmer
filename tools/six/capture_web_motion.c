@@ -2,7 +2,7 @@
  * Host-render the unchanged firmware UI with real note/envelope input.
  * These are UI demonstrations, not physical-device captures or CPU tests. */
 #define UI_TEST_NO_MAIN 1
-#include "../../jiant/tests/ui_test.c"
+#include "../../rhythmer/tests/ui_test.c"
 static unsigned char banks[2][81920];
 static void write_frame(FILE *f){
  for(unsigned i=0;i<240*240;i++){

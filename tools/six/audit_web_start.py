@@ -4,8 +4,8 @@ import base64,json,os,struct,sys
 from pathlib import Path
 root=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(root/'tools/six'))
-g={'__name__':'audit_web_start','__file__':str(root/'tools/six/test_jiant_emulator.py')}
-exec((root/'tools/six/test_jiant_emulator.py').read_text().split("if sys.argv[1:]==['--nav-flex']:")[0],g)
+g={'__name__':'audit_web_start','__file__':str(root/'tools/six/test_rhythmer_emulator.py')}
+exec((root/'tools/six/test_rhythmer_emulator.py').read_text().split("if sys.argv[1:]==['--nav-flex']:")[0],g)
 o=g['OUT'];saved=json.loads(Path(sys.argv[1]).read_text())
 assert saved['hash']==g['report']['firmware_sha256']
 f=bytearray((o/'six-nav-fixture.flash').read_bytes())

@@ -1,0 +1,15 @@
+{
+  "source_slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+  "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
+  "gain_db": 9.0,
+  "max_peak_attenuation_db": 9.674933884213901,
+  "amen_rms": 0.19167527341802548,
+  "think_before_rms": 0.08451214112044729,
+  "think_after_rms": 0.15193656195334387,
+  "rms_difference_db": -2.0180759309055034,
+  "true_peak_dbfs": -1.3702431050771096,
+  "clipped_samples": 0,
+  "frames": 48000,
+  "seam_jump_pcm16": 0,
+  "runtime_cpu_cost_added": 0
+}

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Browser transport for the real Rhythmer C data engine. No audio or device I/O.
-import {readBackup,restoreBackup} from './fm1backup.js?v=0a2290bf0f41';
-import {validateBreakSlot} from './break-audio.mjs?v=0a2290bf0f41';
+import {readBackup,restoreBackup} from './fm1backup.js?v=9bd5b4d878ac';
+import {validateBreakSlot} from './break-audio.mjs?v=9bd5b4d878ac';
 // Web MIDI delivers one complete SysEx message per event. The C USB drain can
 // contain a RELOAD push followed by a reply: preserve that same boundary here.
 export function splitEditorFrames(bytes){
@@ -20,7 +20,7 @@ export async function createWorkspace(onStatus=()=>{}) {
   try{return await openWorkspace(onStatus,releaseLease);}catch(error){releaseLease();throw error;}
 }
 async function openWorkspace(onStatus,releaseLease) {
-  let api, dirty=false, timer, restoring=false, closed=false, transferBusy=false, archiveReadAt=-10000;
+  let api, dirty=false, timer, restoring=false, closed=false, transferBusy=false, archiveReadAt=-10000, lastSaved=null, saveError=null;
   const mod=await WebAssembly.compileStreaming(fetch('./workspace.wasm',{cache:'no-store'}));
   const wasi={};
   for(const i of WebAssembly.Module.imports(mod)) {
@@ -87,20 +87,20 @@ async function openWorkspace(onStatus,releaseLease) {
       let s='';for(const b of data.subarray(p,p+size))s+=String.fromCharCode(b);p+=size;
       objects.push({id,size,crc,data:btoa(s)});
     }
-    const file={format:'felucca-backup',version:1,firmware:'JIANT Rhythmer dev',created:new Date().toISOString(),objects};
+    const file={format:'felucca-backup',version:1,firmware:'Rhythmer dev',created:new Date().toISOString(),objects};
     readBackup(file);return file;
   };
-  const save=()=>{
-    clearTimeout(timer);if(!dirty||restoring||closed)return;
-    if(transferBusy||performance.now()-archiveReadAt<750){timer=setTimeout(save,750);return;}
-    try{localStorage.setItem(KEY,JSON.stringify(snapshot()));dirty=false;onStatus('Saved in this browser · 4 projects / A–D');}
-    catch(e){onStatus('Save failed: '+e.message);}
+  const save=(force=false)=>{
+    clearTimeout(timer);if(!dirty)return true;if(restoring||closed)return false;
+    if(transferBusy||(!force&&performance.now()-archiveReadAt<750)){timer=setTimeout(()=>save(),750);return false;}
+    try{localStorage.setItem(KEY,JSON.stringify(snapshot()));dirty=false;saveError=null;lastSaved=new Date().toISOString();onStatus('Saved in this browser · 4 projects / A–D');return true;}
+    catch(e){saveError=e.message;onStatus('Save failed: '+e.message+' · download a musical archive before leaving.');return false;}
   };
-  const mark=()=>{dirty=true;clearTimeout(timer);onStatus('Saving browser workspace…');timer=setTimeout(save,500);};
+  const mark=()=>{dirty=true;clearTimeout(timer);onStatus('Saving browser workspace…');timer=setTimeout(()=>save(),500);};
   const currentStored=localStorage.getItem(KEY);
   const previousStored=currentStored?null:localStorage.getItem('rhythmer-workspace-v1');
   const stored=currentStored||previousStored;
-  if(stored){restoring=true;try{const file=readBackup(stored);if(file.firmware!=='JIANT Rhythmer dev')throw Error('Unsupported workspace firmware');await restoreBackup(request,file);if(previousStored)localStorage.setItem(KEY,stored);onStatus(previousStored?'Previous workspace copied into this editor · original browser data kept':'Browser workspace restored');}catch(e){throw Error('Stored workspace could not be restored; original data is kept. '+e.message);}finally{restoring=false;}}
+  if(stored){restoring=true;try{const file=readBackup(stored);if(!['Rhythmer dev','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(file.firmware))throw Error('Unsupported workspace firmware');await restoreBackup(request,file);if(previousStored)localStorage.setItem(KEY,stored);onStatus(previousStored?'Previous workspace copied into this editor · original browser data kept':'Browser workspace restored');}catch(e){throw Error('Stored workspace could not be restored; original data is kept. '+e.message);}finally{restoring=false;}}
   else onStatus('Browser workspace ready · edits autosave locally');
   const input={id:'rhythmer-workspace-in',name:'Rhythmer Browser Workspace',manufacturer:'Rhythmer',type:'input',state:'connected',connection:'open',onmidimessage:null,open:async()=>input,close:async()=>{}};
   const reads=new Set([1,2,4,5,6,10,16,17,25,29,34,36,37,65,66,68,70,77]);
@@ -116,10 +116,12 @@ async function openWorkspace(onStatus,releaseLease) {
     queueMicrotask(()=>{for(const data of messages)input.onmidimessage?.({data,timeStamp:performance.now()});});
   }};
   const access={inputs:new Map([[input.id,input]]),outputs:new Map([[output.id,output]]),onstatechange:null};
-  const flush=()=>{if(dirty)save();};
+  const flush=()=>save(true);
   const leave=()=>{flush();releaseLease();closed=true;};
+  const unload=e=>{if(!flush()){e.preventDefault();e.returnValue='The musical workspace has unsaved edits.';}};
+  window.addEventListener('beforeunload',unload);
   window.addEventListener('pagehide',leave);
-  return {access,snapshot,flush,
+  return {access,snapshot,flush,status:()=>({dirty,busy:transferBusy,saveError,lastSaved}),section:()=>api.ws_section_current(),saveSection:n=>{if(transferBusy||restoring||closed)throw Error('Workspace is busy or closed');if(api.ws_section_save(n))throw Error('Section could not be saved. Check device capacity.');mark();if(!flush())throw Error('Section saved in memory, but browser persistence failed. Download a musical archive before leaving.');},
   breakInfo:slot=>audioState.slots[slot]?{...audioState.slots[slot],data:undefined}:null,
   breakSlot:slot=>{if(slot!==0&&slot!==1)throw Error('Invalid audio slot');return flash.slice(0xA0000+slot*0x14000,0xA0000+(slot+1)*0x14000);},
   resetBreak:slot=>{
@@ -129,12 +131,12 @@ async function openWorkspace(onStatus,releaseLease) {
   },
   replaceBreak:(slot,bytes,meta={})=>{
     if(closed||transferBusy||restoring)throw Error('Workspace is closed or busy');if(slot!==0&&slot!==1)throw Error('Invalid audio slot');validateBreakSlot(bytes);
-    const next={version:1,slots:[...audioState.slots]};next.slots[slot]={name:String(meta.name||'User break').slice(0,120),sourceDuration:Number(meta.sourceDuration)||3,pitchSemitones:Number(meta.pitchSemitones)||0,updated:new Date().toISOString(),data:encodeAudio(bytes)};
+    const next={version:1,slots:[...audioState.slots]};next.slots[slot]={name:String(meta.name||'User break').slice(0,120),sourceBpm:Number(meta.sourceBpm)||160,sourceStart:Number(meta.sourceStart)||0,quality:meta.quality||null,sourceDuration:Number(meta.sourceDuration)||3,pitchSemitones:Number(meta.pitchSemitones)||0,updated:new Date().toISOString(),data:encodeAudio(bytes)};
     localStorage.setItem(audioKey,JSON.stringify(next));flash.set(bytes,0xA0000+slot*0x14000);audioState=next;onStatus('User Break '+(slot?'B':'A')+' saved locally · included in SAVE FOR PLAY');
   },emulatorSave:()=>{
     if(api.ws_runtime_flash())throw Error('Current pattern cannot fit the firmware section capacity');
     const flash=new Uint8Array(api.memory.buffer,api.ws_flash(),1048576),sectors=[];
     for(let at=0;at<flash.length;at+=4096){const b=flash.subarray(at,at+4096);if(b.every(v=>v===255))continue;let text='';for(const v of b)text+=String.fromCharCode(v);sectors.push({at,data:btoa(text)});}
     return {format:'fm1-emulator-save',version:1,hash:release.sha256,name:'Rhythmer web workspace',audioNotice:'Recordings are separate from the firmware code license. Bundled Amen/Think public redistribution clearance is not documented; user audio rights are not assessed. Credits are not a license.',sampleSources:audioState.slots.map((x,i)=>x?{slot:i?'B':'A',source:'user-provided',name:x.name,rights:'not-assessed'}:{slot:i?'B':'A',source:i?'Lyn Collins / Think (About It) / Rhythm Lab':'The Winstons / Amen, Brother / Amenity',rights:'public-redistribution-clearance-not-documented'}),package:seed.package,sectors};
-  },project:async n=>{if(api.ws_project(n))throw Error('Save the current section before switching projects.');mark();},current:()=>api.ws_project_current(),mask:n=>api.ws_project_mask(n),generate:(track,mutate)=>{if(api.ws_acid(track,mutate))throw Error('Select an Acid track first');mark();},close(){flush();closed=true;clearTimeout(timer);releaseLease();window.removeEventListener('pagehide',leave);}};
+  },project:async(n,saveTo)=>{if(transferBusy||restoring||closed)throw Error('Workspace is busy or closed');if(!Number.isInteger(n)||n<0||n>3)throw Error('Invalid project');if(saveTo!==undefined&&api.ws_section_save(saveTo))throw Error('Current section could not be saved; project was not switched.');mark();if(!flush())throw Error('Browser save failed; project was not switched. Download a musical archive.');if(api.ws_project(n))throw Error('Project switch failed; previous project was saved.');mark();flush();},current:()=>api.ws_project_current(),mask:n=>api.ws_project_mask(n),generate:(track,mutate)=>{if(api.ws_acid(track,mutate))throw Error('Select an Acid track first');mark();},close(){flush();closed=true;clearTimeout(timer);releaseLease();window.removeEventListener('pagehide',leave);window.removeEventListener('beforeunload',unload);}};
 }

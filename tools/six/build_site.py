@@ -32,7 +32,8 @@ def build():
     app=dist/'app.js'
     landing_version=hashlib.sha256((dist/'landing.mjs').read_bytes()).hexdigest()[:12]
     newsletter_version=hashlib.sha256((dist/'newsletter.mjs').read_bytes()).hexdigest()[:12]
-    app.write_text(app.read_text().replace("'./landing.mjs'","'./landing.mjs?v="+landing_version+"'").replace("'./newsletter.mjs'","'./newsletter.mjs?v="+newsletter_version+"'"))
+    manual_version=hashlib.sha256((dist/'manual.mjs').read_bytes()).hexdigest()[:12]
+    app.write_text(app.read_text().replace("'./landing.mjs'","'./landing.mjs?v="+landing_version+"'").replace("'./newsletter.mjs'","'./newsletter.mjs?v="+newsletter_version+"'").replace("'./manual.mjs'","'./manual.mjs?v="+manual_version+"'"))
     # Preserve browser cache efficiency without showing a stale UI after local rebuilds.
     document=(dist/'index.html').read_text()
     if config.get('localOnly') is False:
@@ -44,7 +45,7 @@ def build():
     assets = dist/'assets'; assets.mkdir(exist_ok=True)
     if (SITE/'media').exists():shutil.copytree(SITE/'media',assets,dirs_exist_ok=True)
     downloads = dist/'downloads'; downloads.mkdir(exist_ok=True)
-    b = Path(os.environ.get('RHYTHMER_BUILD_DIR',config.get('buildDirectory',ROOT/('jiant/build-ssd' if (ROOT/'jiant/build-ssd').exists() else 'jiant/build'))))
+    b = Path(os.environ.get('RHYTHMER_BUILD_DIR',config.get('buildDirectory',ROOT/('rhythmer/build-ssd' if (ROOT/'rhythmer/build-ssd').exists() else 'rhythmer/build'))))
     os.environ['RHYTHMER_BUILD_DIR']=str(b)
     manifest = json.loads((b/'Rhythmer-artifacts.json').read_text())
     fw = b/'Rhythmer.fwsc'
@@ -63,19 +64,20 @@ def build():
         shutil.copy2(b/name, downloads/name)
     build_web_start(ROOT,b,downloads,digest)
     shutil.copy2(ROOT/'LICENSE', assets/'LICENSE.txt')
-    shutil.copy2(ROOT/'jiant/firmware/hortator/MIT-Mutable-Instruments.txt', assets/'Hortator-MIT-Mutable-Instruments.txt')
+    shutil.copy2(ROOT/'rhythmer/firmware/hortator/MIT-Mutable-Instruments.txt', assets/'Hortator-MIT-Mutable-Instruments.txt')
     (assets/'favicon.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#111"/><path d="M12 50V14h11v36m10 0V14h8v36m10 0V14h3v36" stroke="#eee" stroke-width="4"/></svg>')
     files = []
     for f in downloads.iterdir():
         if f.is_file(): files.append({'name':f.name,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
     release = {'version':config.get('version','Rhythmer dev'),'product':config.get('product','FM-1_900'),'sha256':digest,'physicalHardwareTested':config.get('ownerTest',{}).get('firmwareSha256')==digest,'ownerTest':config.get('ownerTest'),'localOnly':config.get('localOnly',True),'files':files,'sampleNotice':'Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.'}
     release['releaseHold']=config.get('releaseHold')
+    release['buildRevision']=config.get('buildRevision')
     release['releaseCaution']=config.get('releaseCaution')
     (dist/'release.json').write_text(json.dumps(release,indent=2)+'\n')
     (dist/'config.json').write_text(json.dumps({k:v for k,v in config.items() if k!='buildDirectory'},ensure_ascii=False,indent=2)+'\n')
     presets = {}
     for filename,symbol,model in [('eng_serum.c','SERUM','SERUM'),('eng_phase.c','PHASE','PHASE'),('eng_lofi.c','LOFI','LOFI'),('eng_mono2k.c','M2STAT','FM+STAT'),('eng_mono2k.c','M2SAW','SWAV-SAW'),('eng_mono2k.c','M2SID','SID-6581')]:
-        text = (ROOT/'jiant/firmware/src'/filename).read_text()
+        text = (ROOT/'rhythmer/firmware/src'/filename).read_text()
         block = re.search(r'static const preset_t '+symbol+r'_PRESETS\[\]\s*=\s*\{(.*?)\n\};',text,re.S)
         if not block: raise SystemExit('Missing presets: '+symbol)
         presets[model] = re.findall(r'\{\s*"([^"]+)"',block.group(1))

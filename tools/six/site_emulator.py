@@ -77,7 +77,7 @@ def build_emulator(root, dist, firmware_hash):
     html=html.replace('id="start">Start</button>','id="start">Start Rhythmer</button>')
     html=html.replace('id="export-save">Export…','id="export-save">Prepare backup')
     html=html.replace('<p class="rotate">','''<div class="rhy-controls" aria-label="Emulator controls"><button data-rhy-control data-key="12" disabled>PLAY / STOP</button><button data-rhy-control data-enc="-1" disabled>TRACK −</button><button data-rhy-control data-enc="1" disabled>TRACK +</button><button data-rhy-control data-key="8" disabled>HOME</button><button data-rhy-control data-key="6" disabled>EDIT</button><button data-rhy-control data-key="11" disabled>SEQ</button><button data-rhy-control id="rhy-audio" disabled>Pause audio</button><span class="rhy-meter"><meter id="rhy-level" min="0" max="1" value="0" aria-label="Actual audio output level"></meter><output id="rhy-db" aria-live="off">Output −∞ dBFS</output></span></div><p class="rotate">''',1)
-    html=html.replace('<span class="rhy-meter">','<button data-rhy-control id="rhy-fresh" disabled>RESET / BREAK ONLY</button><span class="rhy-meter">')
+    html=html.replace('<span class="rhy-meter">','<button data-rhy-control id="rhy-fresh" disabled>RESET / EMPTY</button><span class="rhy-meter">')
     html=html.replace('src="main.js"','src="main.js?v='+hashlib.sha256(source.encode()).hexdigest()[:12]+'"')
     (target/'index.html').write_text(html)
     shutil.copy2(root/'site/emulator/rhythmer.css',target/'rhythmer.css')

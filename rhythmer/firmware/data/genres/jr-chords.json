@@ -1,0 +1,779 @@
+{
+  "sourceSha256": "99c624565fbc035dd0c0923b4c70bc02090acacbf2f6603653916de2653c3894",
+  "adaptation": "Four voices; rootless 9/13 share bass root. Scale-aware quality validation remains active. No copied recordings.",
+  "rows": [
+    {
+      "key": "JR_VELVET",
+      "mode": "major",
+      "source": {
+        "id": "jr-velvet",
+        "name": "Velvet",
+        "genre": "Neo Soul",
+        "moods": [
+          "Warm"
+        ],
+        "mode": "curated",
+        "source": "JR TREK",
+        "chords": [
+          {
+            "symbol": "maj9",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7,
+              11,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m9",
+            "root": 9,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m9",
+            "root": 2,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "13",
+            "root": 7,
+            "intervals": [
+              0,
+              4,
+              7,
+              10,
+              14,
+              21
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "Neo Soul": [
+            "Essentials"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "trek-original"
+        ],
+        "tags": [
+          "Extended"
+        ],
+        "complexity": "Rich"
+      },
+      "degrees": [
+        0,
+        5,
+        1,
+        4
+      ],
+      "qualities": [
+        "Q_R9",
+        "Q_R9",
+        "Q_R9",
+        "Q_R13"
+      ]
+    },
+    {
+      "key": "JR_MIDNIGHT",
+      "mode": "major",
+      "source": {
+        "id": "jr-midnight-call",
+        "name": "Midnight Call",
+        "genre": "R&B",
+        "moods": [
+          "Tender"
+        ],
+        "mode": "curated",
+        "source": "JR TREK",
+        "chords": [
+          {
+            "symbol": "maj9",
+            "root": 5,
+            "intervals": [
+              0,
+              4,
+              7,
+              11,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "13",
+            "root": 7,
+            "intervals": [
+              0,
+              4,
+              7,
+              10,
+              14,
+              21
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m9",
+            "root": 4,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m9",
+            "root": 9,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "R&B": [
+            "Essentials"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "trek-original"
+        ],
+        "tags": [
+          "Extended"
+        ],
+        "complexity": "Rich"
+      },
+      "degrees": [
+        3,
+        4,
+        2,
+        5
+      ],
+      "qualities": [
+        "Q_9",
+        "Q_R13",
+        "Q_R9",
+        "Q_R9"
+      ]
+    },
+    {
+      "key": "JR_SILHOUETTE",
+      "mode": "major",
+      "source": {
+        "id": "jr-silhouette",
+        "name": "Silhouette",
+        "genre": "R&B",
+        "moods": [
+          "Tender",
+          "Nostalgic"
+        ],
+        "mode": "curated",
+        "source": "JR TREK",
+        "chords": [
+          {
+            "symbol": "maj7",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7,
+              11
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m7",
+            "root": 4,
+            "intervals": [
+              0,
+              3,
+              7,
+              10
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m9",
+            "root": 9,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m11",
+            "root": 2,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14,
+              17
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "R&B": [
+            "Slow Jam"
+          ]
+        },
+        "usage": "Verse",
+        "references": [
+          "pwj-rnb"
+        ],
+        "tags": [
+          "Extended"
+        ],
+        "complexity": "Rich"
+      },
+      "degrees": [
+        0,
+        2,
+        5,
+        1
+      ],
+      "qualities": [
+        "Q_7",
+        "Q_7",
+        "Q_9",
+        "Q_11"
+      ]
+    },
+    {
+      "key": "JR_CLOSE",
+      "mode": "major",
+      "source": {
+        "id": "jr-close-to-you",
+        "name": "Close To You",
+        "genre": "R&B",
+        "moods": [
+          "Hopeful"
+        ],
+        "mode": "curated",
+        "source": "JR TREK",
+        "chords": [
+          {
+            "symbol": "m9",
+            "root": 2,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "7sus4",
+            "root": 7,
+            "intervals": [
+              0,
+              5,
+              7,
+              10
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "maj9",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7,
+              11,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "maj9",
+            "root": 5,
+            "intervals": [
+              0,
+              4,
+              7,
+              11,
+              14
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "R&B": [
+            "Essentials"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "trek-original"
+        ],
+        "tags": [
+          "Extended",
+          "Suspended"
+        ],
+        "complexity": "Rich"
+      },
+      "degrees": [
+        1,
+        4,
+        0,
+        3
+      ],
+      "qualities": [
+        "Q_9",
+        "Q_S79",
+        "Q_9",
+        "Q_9"
+      ]
+    },
+    {
+      "key": "JR_BLUE",
+      "mode": "minor",
+      "source": {
+        "id": "jr-blue-satin",
+        "name": "Blue Satin",
+        "genre": "R&B",
+        "moods": [
+          "Sad"
+        ],
+        "mode": "curated",
+        "source": "JR TREK",
+        "chords": [
+          {
+            "symbol": "m9",
+            "root": 0,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "m9",
+            "root": 5,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "13",
+            "root": 10,
+            "intervals": [
+              0,
+              4,
+              7,
+              10,
+              14,
+              21
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "maj9",
+            "root": 3,
+            "intervals": [
+              0,
+              4,
+              7,
+              11,
+              14
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "R&B": [
+            "Essentials"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "trek-original"
+        ],
+        "tags": [
+          "Extended"
+        ],
+        "complexity": "Rich"
+      },
+      "degrees": [
+        0,
+        3,
+        6,
+        2
+      ],
+      "qualities": [
+        "Q_9",
+        "Q_9",
+        "Q_R13",
+        "Q_9"
+      ]
+    },
+    {
+      "key": "JR_NIGHT",
+      "mode": "minor",
+      "source": {
+        "id": "jr-night-promise",
+        "name": "Night Promise",
+        "genre": "R&B",
+        "moods": [
+          "Sad",
+          "Tender"
+        ],
+        "mode": "curated",
+        "source": "JR TREK",
+        "chords": [
+          {
+            "symbol": "m9",
+            "root": 0,
+            "intervals": [
+              0,
+              3,
+              7,
+              10,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "maj9",
+            "root": 8,
+            "intervals": [
+              0,
+              4,
+              7,
+              11,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "maj7",
+            "root": 3,
+            "intervals": [
+              0,
+              4,
+              7,
+              11
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "7sus4",
+            "root": 10,
+            "intervals": [
+              0,
+              5,
+              7,
+              10
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "R&B": [
+            "Slow Jam"
+          ]
+        },
+        "usage": "Verse",
+        "references": [
+          "ni-hiphop"
+        ],
+        "tags": [
+          "Extended",
+          "Suspended"
+        ],
+        "complexity": "Rich"
+      },
+      "degrees": [
+        0,
+        5,
+        2,
+        6
+      ],
+      "qualities": [
+        "Q_9",
+        "Q_9",
+        "Q_7",
+        "Q_S79"
+      ]
+    },
+    {
+      "key": "SH_PLAY",
+      "mode": "major",
+      "source": {
+        "id": "shld-017093372a45",
+        "name": "Playful Major 26",
+        "genre": "Open Library",
+        "moods": [
+          "Playful",
+          "Joyful"
+        ],
+        "mode": "major",
+        "source": "SHLD / MIT",
+        "chords": [
+          {
+            "symbol": "I7",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7,
+              11
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "V7",
+            "root": 7,
+            "intervals": [
+              0,
+              4,
+              7,
+              10
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "viadd9",
+            "root": 9,
+            "intervals": [
+              0,
+              3,
+              7,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "IV7",
+            "root": 5,
+            "intervals": [
+              0,
+              4,
+              7,
+              11
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "Open Library": [
+            "Major"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "shld"
+        ],
+        "tags": [],
+        "complexity": "Color"
+      },
+      "degrees": [
+        0,
+        4,
+        5,
+        3
+      ],
+      "qualities": [
+        "Q_7",
+        "Q_7",
+        "Q_ADD9",
+        "Q_7"
+      ]
+    },
+    {
+      "key": "SH_TRIUMPH",
+      "mode": "major",
+      "source": {
+        "id": "shld-b76010ec6173",
+        "name": "Triumphant Major 31",
+        "genre": "Open Library",
+        "moods": [
+          "Triumphant"
+        ],
+        "mode": "major",
+        "source": "SHLD / MIT",
+        "chords": [
+          {
+            "symbol": "ii7",
+            "root": 2,
+            "intervals": [
+              0,
+              3,
+              7,
+              10
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "Vadd9",
+            "root": 7,
+            "intervals": [
+              0,
+              4,
+              7,
+              14
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "I7",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7,
+              11
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "Open Library": [
+            "Major"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "shld"
+        ],
+        "tags": [],
+        "complexity": "Color"
+      },
+      "degrees": [
+        1,
+        4,
+        0
+      ],
+      "qualities": [
+        "Q_7",
+        "Q_ADD9",
+        "Q_7"
+      ]
+    },
+    {
+      "key": "SH_RELAX",
+      "mode": "major",
+      "source": {
+        "id": "shld-41ffd06b6147",
+        "name": "Relaxed Major 37",
+        "genre": "Open Library",
+        "moods": [
+          "Relaxed",
+          "Joyful"
+        ],
+        "mode": "major",
+        "source": "SHLD / MIT",
+        "chords": [
+          {
+            "symbol": "IV",
+            "root": 5,
+            "intervals": [
+              0,
+              4,
+              7
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "I",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "IV6",
+            "root": 5,
+            "intervals": [
+              0,
+              4,
+              7,
+              9
+            ],
+            "bass": null
+          },
+          {
+            "symbol": "Iadd9",
+            "root": 0,
+            "intervals": [
+              0,
+              4,
+              7,
+              14
+            ],
+            "bass": null
+          }
+        ],
+        "classification": {
+          "Open Library": [
+            "Major"
+          ]
+        },
+        "usage": "Loop",
+        "references": [
+          "shld"
+        ],
+        "tags": [],
+        "complexity": "Color"
+      },
+      "degrees": [
+        3,
+        0,
+        3,
+        0
+      ],
+      "qualities": [
+        "Q_TRI",
+        "Q_TRI",
+        "Q_6",
+        "Q_ADD9"
+      ]
+    }
+  ]
+}

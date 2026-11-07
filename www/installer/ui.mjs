@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=833cc29d1299';
-import {mountProgress} from './progress.mjs?v=833cc29d1299';
+import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=ecb1d3113a63';
+import {mountProgress} from './progress.mjs?v=ecb1d3113a63';
 const $=s=>document.querySelector(s),mode=new URLSearchParams(location.search).get('mode')==='stock'?'stock':'rhythmer';
 let manifest,target,recovery,source,up,access,working=false,writing=false,backupReady=false,bundleReady=false,releaseLock,heartbeat,channel;
 document.body.dataset.mode=mode;
@@ -29,7 +29,7 @@ async function preload(){
  const b=await validateInstallBundle(await loadBytes(manifest.bundle.url),manifest);
  recovery=b.recovery;target=mode==='stock'?recovery:b.firmware;bundleReady=true;
  $('#stock-status').textContent='READY / Official V15: exact size, SHA-256 and package layout verified automatically.';
- $('#build-status').textContent=`READY / Installation bundle verified: Rhythmer + Amen/Think + official V15 recovery. Rhythmer SHA-256: ${b.firmware.sha256}`;
+ $('#build-status').textContent=`READY / ${manifest.version}${manifest.buildRevision?' · build '+manifest.buildRevision:''} · Rhythmer + Amen/Think + official V15 recovery verified. Rhythmer SHA-256: ${b.firmware.sha256}`;
  $('#recovery-download').href=manifest.recoveryArchive.url;$('#bundle-download').href=manifest.archive.url;
  log('Installation bundle verified, including genuine official V15 and both loop CRCs/hashes.');refresh();
 }

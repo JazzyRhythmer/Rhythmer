@@ -10,7 +10,10 @@ export function parseInfo(data){
  for(let i=0;i<engines;i++){const z=a.indexOf(0,cursor);if(z<cursor||z-cursor>8)return null;cursor=z+1;}
  const tracks=a[cursor];
  if(!Number.isInteger(tracks)||tracks<1||tracks>16)return null;
- return {name,engines,tracks,isRhythmer:name==='JIANT Rhythmer dev'&&engines===21&&tracks===6};
+ // This public release supplies FELUCCA_VERSION; the browser data engine
+ // retains its development ABI label. Do not accept arbitrary JIANT versions.
+ const knownName=['Rhythmer dev','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(name);
+ return {name,engines,tracks,isRhythmer:knownName&&engines===21&&tracks===6};
 }
 export async function getMidi(){if(!navigator.requestMIDIAccess)throw Error('Web MIDI is unavailable in this browser. Use Chrome or Edge on a computer.');return navigator.requestMIDIAccess({sysex:true});}
 export async function queryInfo(access,inputID,outputID){

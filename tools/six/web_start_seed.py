@@ -3,8 +3,8 @@ import base64, hashlib, json, os, struct, subprocess, zlib
 
 def build_web_start(root, build, downloads, firmware_hash):
     tool=build/'web_start_project'
-    sources=[root/'tools/six/web_start_project.c',*[root/('jiant/firmware/six/'+n+'.c') for n in ('bass303','jungle','tb3po','six303_bridge')]]
-    subprocess.run(['clang','-w','-O1','-fwrapv','-DJUNGLE_AUDIO_CODE=', '-I'+str(build/'gen'),'-I'+str(root/'jiant/firmware/src'),*map(str,sources),'-lm','-o',str(tool)],check=True)
+    sources=[root/'tools/six/web_start_project.c',*[root/('rhythmer/firmware/six/'+n+'.c') for n in ('bass303','jungle','tb3po','six303_bridge')]]
+    subprocess.run(['clang','-w','-O1','-fwrapv','-DJUNGLE_AUDIO_CODE=', '-I'+str(build/'gen'),'-I'+str(root/'rhythmer/firmware/src'),*map(str,sources),'-lm','-o',str(tool)],check=True)
     project=build/'web-start.project';subprocess.run([str(tool),str(project)],check=True)
     saved=json.loads((build/'Rhythmer-six-track-test.fm1save').read_text())
     assert saved['hash']==firmware_hash==hashlib.sha256(base64.b64decode(saved['package'])).hexdigest()
@@ -22,6 +22,6 @@ def build_web_start(root, build, downloads, firmware_hash):
         raw=bytearray(b'\xff'*4096);raw[:32]=header;raw[256:256+len(data)]=data
         sector['data']=base64.b64encode(raw).decode();projects+=1
     assert projects>=2
-    saved['name']='Rhythmer — Break-only start'
-    saved['startingProject']={'revision':1,'tempo':160,'tracksWithNotes':[6],'breakSource':'A / Amen','breakSteps':32}
+    saved['name']='Rhythmer — Empty start'
+    saved['startingProject']={'revision':2,'tempo':160,'tracksWithNotes':[],'breakSource':'A / Amen','breakSteps':32}
     (downloads/'Rhythmer-start.fm1save').write_text(json.dumps(saved)+'\n')

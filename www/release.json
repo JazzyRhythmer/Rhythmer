@@ -1,7 +1,7 @@
 {
-  "version": "0.1.0-beta.2",
-  "product": "FM-1_748001",
-  "sha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6",
+  "version": "0.1.1-beta3",
+  "product": "FM-1_748005",
+  "sha256": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0",
   "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-06",
@@ -33,29 +33,29 @@
       "sha256": "728587067d6c28193f1384ef0dcdcf71c40afbc1df54db2afc6d0beb6aa9a265"
     },
     {
-      "name": "Rhythmer-0.1.0-beta.2-install.zip",
-      "bytes": 3135310,
-      "sha256": "3348acb66b0a35e1b751bb132e5fb051d2db5352c5249d4da74ddf4e3dee85ec"
+      "name": "Rhythmer-0.1.1-beta3-install.zip",
+      "bytes": 3169570,
+      "sha256": "0fc54bd5b7d6a5ff11e1f66a92803bc19bc4c59a2d095f92d11910c017086069"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
-      "bytes": 1120751,
-      "sha256": "5a2f9981523620f5912c043d98ffc65a423823a22c44cf8c8e3bb234b0d8a683"
+      "bytes": 1351416,
+      "sha256": "2f19ac38a3c15fb0bb148b7cfd33eadc0dbe230530556f6e4f5cdadefd3c223f"
     },
     {
       "name": "Rhythmer-start.fm1save",
-      "bytes": 1120878,
-      "sha256": "b501bd2a67b545452f6ffb2e17c5cc407e8c6db794d49020b2ed3d972e204910"
+      "bytes": 1351534,
+      "sha256": "a169b3ddc3a88bd55d038721914244faf56e148710be805440cf258744a3a042"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
-      "bytes": 2260708,
-      "sha256": "ed69c041824109220665c0252e3fd9abda60a0484d7914a7144cc74fd65a4fba"
+      "bytes": 2261425,
+      "sha256": "2c89a51bdc29fc349424699f4d1bca5850beb4f7edca56188ffc245398f7ce64"
     },
     {
       "name": "Rhythmer.fwsc",
-      "bytes": 828065,
-      "sha256": "976d7cc2d3698a458424bdd83b0eb070ce8ce628a9059b41386ad0dd64ad97a6"
+      "bytes": 828061,
+      "sha256": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -100,22 +100,23 @@
     {
       "name": "think-160-preview.wav",
       "bytes": 96044,
-      "sha256": "c056096cb7a8d8cc8841f308631512ed89ff61e880a60a8a48162ca07cf4d303"
+      "sha256": "c845152535434a9a756a5455460c5ecc679468d8b12a237c70ff2df2ed9bdcd2"
     },
     {
       "name": "think-160-repeat.wav",
       "bytes": 384044,
-      "sha256": "456dde8853e12d20e39259fb0c4b21e3a42095b14f37152c799444737cb0d136"
+      "sha256": "611f8665264de0b9c0786659b7adada2ddd11638ab29c385cfecb57385c6de60"
     },
     {
       "name": "think-160.slot",
       "bytes": 81920,
-      "sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d"
+      "sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
     }
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
   "releaseHold": null,
-  "releaseCaution": "Optimized beta: host and emulator checks passed. This exact binary awaits physical FM-1 revalidation; reduction of the reported hardware audio artifacts is not yet confirmed.",
+  "buildRevision": "20261107.2",
+  "releaseCaution": "Early beta: an earlier same-version device test revealed overload in a busy six-track ensemble. This revision optimizes shared Phaser and Break processing without changing clocks, synchronization or normal voice budgets. This exact binary still needs physical sustained-load listening. Back up and leave CPU headroom.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

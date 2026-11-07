@@ -7,7 +7,7 @@ def digest(data):return hashlib.sha256(data).hexdigest()
 def build_installer(root, dist, release):
     local=release.get('localOnly',True)
     dest=dist/'installer';dest.mkdir(exist_ok=True)
-    for source in [root/'site/vendor/jiant-installer',root/'site/installer']:
+    for source in [root/'site/vendor/upstream-installer',root/'site/installer']:
         for file in source.iterdir():
             if file.is_file():shutil.copy2(file,dest/file.name)
     page=dest/'index.html';html=page.read_text()
@@ -102,13 +102,13 @@ permission is not documented. Do not publish the bundle on that basis.
 Read THIRD-PARTY-AUDIO.txt and audio-rights.json. Credits are not a license.
 '''
     if not local:
-        readme=readme.replace('LOCAL DEVELOPMENT INSTALLATION','PUBLIC BETA INSTALLATION').replace('Open http://127.0.0.1:8766/installer/ in desktop Chrome or Edge and press','Open the installer linked in the repository README in Chrome or Edge. Press').replace('This bundle contains original Amen/Think recordings whose public redistribution\npermission is not documented. Do not publish the bundle on that basis.','This bundle contains original Amen/Think recordings. The owner directs their\ndistribution with credits; rights-holder redistribution permission has not\nbeen documented. This is not a blanket license for users.').replace('Hardware flashing, recovery and playback remain physically untested.','Read the release-specific test record. This release fixes SEQ note visibility.\nHost and emulator checks passed; this exact binary is not physically tested.\nEarlier owner hardware tests apply to beta.1, not automatically to this package.')
+        readme=readme.replace('LOCAL DEVELOPMENT INSTALLATION','PUBLIC BETA INSTALLATION').replace('Open http://127.0.0.1:8766/installer/ in desktop Chrome or Edge and press','Open the installer linked in the repository README in Chrome or Edge. Press').replace('This bundle contains original Amen/Think recordings whose public redistribution\npermission is not documented. Do not publish the bundle on that basis.','This bundle contains original Amen/Think recordings. The owner directs their\ndistribution with credits; rights-holder redistribution permission has not\nbeen documented. This is not a blanket license for users.').replace('Hardware flashing, recovery and playback remain physically untested.','Read the release-specific test record and change log. Host and emulator\nchecks passed; this exact binary is not physically tested. Earlier owner\nhardware results do not automatically apply to this package.')
         page=dest/'index.html';text=page.read_text().replace('LOCAL DEVELOPMENT','PUBLIC BETA').replace('LOCAL INSTALL BUNDLE','INSTALL BUNDLE').replace('COMPLETE LOCAL INSTALLATION','COMPLETE INSTALLATION').replace('This build and its samples remain local.','The project owner directs distribution with credits; this is not rights-holder permission.').replace('complete local installation bundle','complete installation bundle');page.write_text(text)
     archive=downloads/('Rhythmer-dev-local-install.zip' if local else 'Rhythmer-'+release['version']+'-install.zip')
     with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
         z.write(bundle,bundle.name);z.write(downloads/'Rhythmer.fwsc','firmware/Rhythmer.fwsc')
         for meta in loops:z.write(downloads/Path(meta['url']).name,'samples/'+Path(meta['url']).name)
-        z.write(root/'site/LEGAL-NOTICE.txt','LEGAL-NOTICE.txt');z.writestr('README.txt',readme);z.writestr('THIRD-PARTY-AUDIO.txt',notice);z.writestr('audio-rights.json',json.dumps(rights,indent=2));z.write(root/'LICENSE','licenses/Rhythmer-GPL-3.0.txt');z.write(root/'jiant/firmware/hortator/MIT-Mutable-Instruments.txt','licenses/Hortator-MIT-Mutable-Instruments.txt')
+        z.write(root/'site/LEGAL-NOTICE.txt','LEGAL-NOTICE.txt');z.writestr('README.txt',readme);z.writestr('THIRD-PARTY-AUDIO.txt',notice);z.writestr('audio-rights.json',json.dumps(rights,indent=2));z.write(root/'LICENSE','licenses/Rhythmer-GPL-3.0.txt');z.write(root/'rhythmer/firmware/hortator/MIT-Mutable-Instruments.txt','licenses/Hortator-MIT-Mutable-Instruments.txt')
         for f in recoveryDir.iterdir():z.write(f,'official-v15/'+f.name)
     archives=Path('/Volumes/SSD/Development/Archives/rhythmer');archives.mkdir(parents=True,exist_ok=True);shutil.copy2(archive,archives/archive.name)
     recoveryArchive=downloads/'FM-1-V15-recovery.zip'
@@ -119,6 +119,7 @@ Read THIRD-PARTY-AUDIO.txt and audio-rights.json. Credits are not a license.
     manifest=dict(version=release['version'],channel='local-development' if local else 'public-beta',physicalHardwareTested=release.get('physicalHardwareTested',False),localOnly=local,ownerTest=release.get('ownerTest'),firmware=firmware,loops=loops,recovery=recovery,
                   recoveryArchive=dict(url='../downloads/'+recoveryArchive.name,bytes=recoveryArchive.stat().st_size,sha256=digest(recoveryArchive.read_bytes())),bundle=dict(url='../downloads/'+bundle.name,bytes=len(data),sha256=digest(data)),archive=dict(url='../downloads/'+archive.name,bytes=archive.stat().st_size,sha256=digest(archive.read_bytes())),audioRightsURL='../audio-rights.json',publicRedistributionCleared=False)
     if release.get('releaseHold'):manifest['releaseHold']=release['releaseHold']
+    if release.get('buildRevision'):manifest['buildRevision']=release['buildRevision']
     (dest/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     fixture=(dest/'index.html').read_text().replace('src="ui.mjs"','src="ui-fixture.mjs"').replace('<title>Rhythmer / Installer</title>','<title>SIMULATION / Rhythmer Installer</title>')
     (dest/'ui-tests.html').write_text(fixture)

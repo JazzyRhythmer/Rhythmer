@@ -1,0 +1,827 @@
+[
+  {
+    "name": "SUBTHUMP",
+    "kind": 3,
+    "model": "BDTRX",
+    "params": [
+      -4,
+      68,
+      35,
+      35,
+      14,
+      14,
+      35,
+      24
+    ]
+  },
+  {
+    "name": "HARDSNAP",
+    "kind": 4,
+    "model": "SDTRX",
+    "params": [
+      0,
+      7,
+      127,
+      0,
+      0,
+      64,
+      92,
+      0
+    ]
+  },
+  {
+    "name": "POPSNARE",
+    "kind": 32,
+    "model": "SDTRX",
+    "params": [
+      0,
+      12,
+      127,
+      29,
+      36,
+      22,
+      35,
+      0
+    ]
+  },
+  {
+    "name": "SWOOPTOM",
+    "kind": 5,
+    "model": "TMTRX",
+    "params": [
+      0,
+      48,
+      48,
+      102,
+      64,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "FUZZTOM",
+    "kind": 33,
+    "model": "TMTRX",
+    "params": [
+      -12,
+      27,
+      42,
+      17,
+      98,
+      98,
+      112,
+      0
+    ]
+  },
+  {
+    "name": "SHORTTOM",
+    "kind": 34,
+    "model": "TMTRX",
+    "params": [
+      1,
+      24,
+      48,
+      24,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "BUZZLOW",
+    "kind": 35,
+    "model": "TMTRX",
+    "params": [
+      -12,
+      30,
+      0,
+      24,
+      98,
+      127,
+      43,
+      0
+    ]
+  },
+  {
+    "name": "GRITCONG",
+    "kind": 6,
+    "model": "CGTRX",
+    "params": [
+      11,
+      15,
+      30,
+      29,
+      105,
+      127,
+      107,
+      0
+    ]
+  },
+  {
+    "name": "ROOMCLAP",
+    "kind": 7,
+    "model": "CPTRX",
+    "params": [
+      10,
+      127,
+      56,
+      7,
+      43,
+      56,
+      0,
+      93
+    ]
+  },
+  {
+    "name": "WIDECLAP",
+    "kind": 26,
+    "model": "CPTRX",
+    "params": [
+      15,
+      106,
+      0,
+      22,
+      77,
+      0,
+      10,
+      9
+    ]
+  },
+  {
+    "name": "KNOCK",
+    "kind": 8,
+    "model": "RSTRX",
+    "params": [
+      -4,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "GRITRIM",
+    "kind": 36,
+    "model": "RSTRX",
+    "params": [
+      -1,
+      0,
+      50,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "PUREBELL",
+    "kind": 9,
+    "model": "CBTRX",
+    "params": [
+      0,
+      48,
+      127,
+      127,
+      0,
+      0,
+      105,
+      0
+    ]
+  },
+  {
+    "name": "LONGBELL",
+    "kind": 37,
+    "model": "CBTRX",
+    "params": [
+      0,
+      79,
+      13,
+      21,
+      127,
+      43,
+      119,
+      0
+    ]
+  },
+  {
+    "name": "NOISEHAT",
+    "kind": 10,
+    "model": "CHTRX",
+    "params": [
+      0,
+      8,
+      0,
+      0,
+      127,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "METALHAT",
+    "kind": 21,
+    "model": "CHTRX",
+    "params": [
+      0,
+      71,
+      112,
+      0,
+      127,
+      127,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "THINHAT",
+    "kind": 38,
+    "model": "CHTRX",
+    "params": [
+      0,
+      0,
+      23,
+      127,
+      127,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "TINHAT",
+    "kind": 22,
+    "model": "CHTRX",
+    "params": [
+      0,
+      0,
+      0,
+      0,
+      127,
+      127,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "AIROPEN",
+    "kind": 11,
+    "model": "OHTRX",
+    "params": [
+      0,
+      61,
+      57,
+      8,
+      127,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "DARKOPEN",
+    "kind": 31,
+    "model": "OHTRX",
+    "params": [
+      0,
+      86,
+      120,
+      0,
+      84,
+      127,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "SIZZLE",
+    "kind": 39,
+    "model": "OHTRX",
+    "params": [
+      0,
+      20,
+      0,
+      112,
+      127,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "HALFOPEN",
+    "kind": 40,
+    "model": "OHTRX",
+    "params": [
+      0,
+      29,
+      0,
+      29,
+      127,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "WASHCYM",
+    "kind": 12,
+    "model": "CYTRX",
+    "params": [
+      0,
+      35,
+      127,
+      93,
+      107,
+      127,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "PINGBELL",
+    "kind": 27,
+    "model": "CYTRX",
+    "params": [
+      0,
+      0,
+      127,
+      0,
+      126,
+      0,
+      127,
+      0
+    ]
+  },
+  {
+    "name": "THINCRSH",
+    "kind": 41,
+    "model": "CYTRX",
+    "params": [
+      0,
+      0,
+      0,
+      100,
+      35,
+      127,
+      63,
+      0
+    ]
+  },
+  {
+    "name": "LONGRIDE",
+    "kind": 28,
+    "model": "CYTRX",
+    "params": [
+      0,
+      106,
+      127,
+      64,
+      64,
+      0,
+      71,
+      0
+    ]
+  },
+  {
+    "name": "BIGBOOM",
+    "kind": 15,
+    "model": "B2TRX",
+    "params": [
+      -1,
+      74,
+      33,
+      22,
+      7,
+      4,
+      31,
+      6
+    ]
+  },
+  {
+    "name": "ZAPKICK",
+    "kind": 42,
+    "model": "B2TRX",
+    "params": [
+      13,
+      64,
+      127,
+      0,
+      0,
+      0,
+      50,
+      0
+    ]
+  },
+  {
+    "name": "TICKKICK",
+    "kind": 43,
+    "model": "B2TRX",
+    "params": [
+      -3,
+      49,
+      12,
+      55,
+      92,
+      22,
+      43,
+      6
+    ]
+  },
+  {
+    "name": "SUBDIRT",
+    "kind": 29,
+    "model": "B2TRX",
+    "params": [
+      -24,
+      64,
+      32,
+      0,
+      0,
+      0,
+      54,
+      0
+    ]
+  },
+  {
+    "name": "FMSUB",
+    "kind": 16,
+    "model": "BDEFM",
+    "params": [
+      -13,
+      68,
+      10,
+      32,
+      29,
+      5,
+      4,
+      24
+    ]
+  },
+  {
+    "name": "NOISEZAP",
+    "kind": 44,
+    "model": "BDEFM",
+    "params": [
+      24,
+      49,
+      35,
+      44,
+      0,
+      0,
+      0,
+      127
+    ]
+  },
+  {
+    "name": "FMBOOM",
+    "kind": 45,
+    "model": "BDEFM",
+    "params": [
+      -9,
+      80,
+      117,
+      4,
+      95,
+      35,
+      27,
+      35
+    ]
+  },
+  {
+    "name": "RISEKICK",
+    "kind": 46,
+    "model": "BDEFM",
+    "params": [
+      4,
+      54,
+      0,
+      0,
+      37,
+      32,
+      127,
+      36
+    ]
+  },
+  {
+    "name": "TONESNR",
+    "kind": 17,
+    "model": "SDEFM",
+    "params": [
+      -9,
+      60,
+      14,
+      79,
+      0,
+      5,
+      127,
+      29
+    ]
+  },
+  {
+    "name": "LONGTOM",
+    "kind": 18,
+    "model": "TMEFM",
+    "params": [
+      12,
+      85,
+      62,
+      36,
+      64,
+      4,
+      45,
+      51
+    ]
+  },
+  {
+    "name": "DROPTOM",
+    "kind": 47,
+    "model": "TMEFM",
+    "params": [
+      1,
+      31,
+      127,
+      111,
+      5,
+      4,
+      79,
+      0
+    ]
+  },
+  {
+    "name": "RISETOM",
+    "kind": 48,
+    "model": "TMEFM",
+    "params": [
+      7,
+      73,
+      0,
+      0,
+      8,
+      4,
+      127,
+      0
+    ]
+  },
+  {
+    "name": "GRITTOM",
+    "kind": 49,
+    "model": "TMEFM",
+    "params": [
+      -12,
+      70,
+      12,
+      0,
+      76,
+      16,
+      65,
+      99
+    ]
+  },
+  {
+    "name": "BUZZCLAP",
+    "kind": 19,
+    "model": "CPEFM",
+    "params": [
+      24,
+      45,
+      91,
+      30,
+      75,
+      36,
+      127,
+      61
+    ]
+  },
+  {
+    "name": "FMZAP",
+    "kind": 50,
+    "model": "CPEFM",
+    "params": [
+      -13,
+      14,
+      0,
+      4,
+      127,
+      127,
+      38,
+      32
+    ]
+  },
+  {
+    "name": "DEEPBLIP",
+    "kind": 51,
+    "model": "CPEFM",
+    "params": [
+      -24,
+      64,
+      0,
+      1,
+      12,
+      33,
+      127,
+      0
+    ]
+  },
+  {
+    "name": "RATTLE",
+    "kind": 52,
+    "model": "CPEFM",
+    "params": [
+      -8,
+      0,
+      127,
+      24,
+      115,
+      127,
+      87,
+      8
+    ]
+  },
+  {
+    "name": "FMRIM",
+    "kind": 20,
+    "model": "RSEFM",
+    "params": [
+      1,
+      10,
+      8,
+      15,
+      38,
+      21,
+      59,
+      0
+    ]
+  },
+  {
+    "name": "RIMSNARE",
+    "kind": 53,
+    "model": "RSEFM",
+    "params": [
+      3,
+      23,
+      0,
+      4,
+      100,
+      62,
+      50,
+      85
+    ]
+  },
+  {
+    "name": "CLANK",
+    "kind": 1,
+    "model": "CBEFM",
+    "params": [
+      -2,
+      61,
+      92,
+      56,
+      17,
+      112,
+      42,
+      0
+    ]
+  },
+  {
+    "name": "GONG",
+    "kind": 54,
+    "model": "CBEFM",
+    "params": [
+      -11,
+      92,
+      0,
+      0,
+      126,
+      24,
+      127,
+      0
+    ]
+  },
+  {
+    "name": "FMHAT",
+    "kind": 0,
+    "model": "HHEFM",
+    "params": [
+      -2,
+      52,
+      0,
+      0,
+      3,
+      12,
+      78,
+      26
+    ]
+  },
+  {
+    "name": "TRASHHAT",
+    "kind": 23,
+    "model": "HHEFM",
+    "params": [
+      3,
+      69,
+      4,
+      84,
+      99,
+      81,
+      100,
+      94
+    ]
+  },
+  {
+    "name": "TREMHAT",
+    "kind": 24,
+    "model": "HHEFM",
+    "params": [
+      -14,
+      76,
+      65,
+      49,
+      76,
+      48,
+      78,
+      24
+    ]
+  },
+  {
+    "name": "SPITHAT",
+    "kind": 25,
+    "model": "HHEFM",
+    "params": [
+      -8,
+      20,
+      0,
+      0,
+      85,
+      29,
+      28,
+      106
+    ]
+  },
+  {
+    "name": "FMCRASH",
+    "kind": 2,
+    "model": "CYEFM",
+    "params": [
+      -2,
+      93,
+      22,
+      107,
+      76,
+      88,
+      86,
+      0
+    ]
+  },
+  {
+    "name": "LOWCHIME",
+    "kind": 30,
+    "model": "CYEFM",
+    "params": [
+      -15,
+      77,
+      57,
+      44,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "FMSPLASH",
+    "kind": 55,
+    "model": "CYEFM",
+    "params": [
+      0,
+      25,
+      64,
+      0,
+      127,
+      127,
+      127,
+      0
+    ]
+  },
+  {
+    "name": "SIZZRIDE",
+    "kind": 56,
+    "model": "CYEFM",
+    "params": [
+      5,
+      81,
+      126,
+      119,
+      8,
+      40,
+      91,
+      0
+    ]
+  }
+]
