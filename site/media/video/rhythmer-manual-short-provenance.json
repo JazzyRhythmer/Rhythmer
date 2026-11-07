@@ -1,0 +1,21 @@
+{
+  "duration": 48,
+  "revision": 2,
+  "size": [
+    1080,
+    1920
+  ],
+  "fps": 30,
+  "firmwareVersion": "0.1.1-beta3",
+  "firmwareBuild": "20261107.2",
+  "firmwareSha256": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0",
+  "visuals": "Actual guide screenshot and host-rendered firmware UI; not physical device footage. Held-SEQ UI freshly captured; external editorial shortcut highlights.",
+  "audio": "Original atmospheric breakbeat score created for Rhythmer; no artist recordings",
+  "audioSourceSha256": "33f64313a0faf6b4f8f72d507c4ec44f2bb4793dd668fde591000203068fca9c",
+  "keyMessages": [
+    "Read the manual before playing",
+    "BREAK GEN writes genre-aware chop sequences, retaining tempo, samples and other parts",
+    "Hold SEQ on Break: F3 STRAIGHT, G3 MUTATE, A3 RANDOM",
+    "Release SEQ for BRK PERF live gestures"
+  ]
+}

@@ -74,6 +74,12 @@ def build():
     release['buildRevision']=config.get('buildRevision')
     release['releaseCaution']=config.get('releaseCaution')
     (dist/'release.json').write_text(json.dumps(release,indent=2)+'\n')
+    validation_file=dist/'RELEASE-VALIDATION.json'
+    validation_file.unlink(missing_ok=True)
+    for candidate in (b/'RELEASE-VALIDATION.json',ROOT/'RELEASE-VALIDATION.json'):
+        if candidate.is_file() and json.loads(candidate.read_text()).get('firmwareSha256')==digest:
+            shutil.copy2(candidate,validation_file)
+            break
     (dist/'config.json').write_text(json.dumps({k:v for k,v in config.items() if k!='buildDirectory'},ensure_ascii=False,indent=2)+'\n')
     presets = {}
     for filename,symbol,model in [('eng_serum.c','SERUM','SERUM'),('eng_phase.c','PHASE','PHASE'),('eng_lofi.c','LOFI','LOFI'),('eng_mono2k.c','M2STAT','FM+STAT'),('eng_mono2k.c','M2SAW','SWAV-SAW'),('eng_mono2k.c','M2SID','SID-6581')]:
