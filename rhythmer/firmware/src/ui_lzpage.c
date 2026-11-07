@@ -149,23 +149,25 @@ static void lfo_cap(const track_t *t, int32_t x, int32_t y, int mode)   /* "1.18
 {
     const char *u = "";
     char b[32], w[12];
-    param_format(&TP[P_LRATE], t->p[P_LRATE], b, &u);
+    unsigned second = lfo_page_second(cur_page()), rate = second ? P_L2RATE : P_LRATE, wave = second ? P_L2WAVE : P_LWAVE;
+    param_format(&TP[rate], t->p[rate], b, &u);
     str_cpy(b + str_len(b), u, 32 - str_len(b));
     str_cpy(b + str_len(b), " \xB7 ", 32 - str_len(b));
-    param_format(&TP[P_LWAVE], t->p[P_LWAVE], w, &u);
+    param_format(&TP[wave], t->p[wave], w, &u);
     str_cpy(b + str_len(b), w, 32 - str_len(b));
     if (mode)                                           /* (0.9.18) LFO, LFO 2: MODE too (LFO DEST: no room) */
-        str_cpy(b + str_len(b), t->p[P_LPHASE] < 0 ? " \xB7 FREE" : " \xB7 TRIG", 32 - str_len(b));
+        str_cpy(b + str_len(b), t->p[second ? P_L2PHASE : P_LPHASE] < 0 ? " \xB7 FREE" : " \xB7 TRIG", 32 - str_len(b));
     ed_cap(x, y, b, T_TEXT);
 }
 static void graph_lfodest(const track_t *t, const page_t *pg)
 {
-    int32_t x, py = 0, src = mulq15(t->lfo_val, t->lfo_fade), k;
-    uint32_t span = 0xFFFFFFFFu / 40u, ph = t->lfo_ph - 20u * span;
+    int second=lfo_page_second(pg);
+    int32_t x, py = 0, src = second?mulq15(t->lfo2_val,t->lfo2_fade):mulq15(t->lfo_val, t->lfo_fade), k;
+    uint32_t span = 0xFFFFFFFFu / 40u, ph = (second?t->lfo2_ph:t->lfo_ph) - 20u * span;
     lfo_cap(t, 10, 6, 0);
     cv_rect(10, 70, 80, 1, T_RAISE);
     for (x = 0; x < 80; x++) {                          /* (two cycles, the phase now a third in) */
-        int32_t y = 70 - lfo_wave((track_t *)t, ph + (uint32_t)x * span) * 44 / 32768;
+        int32_t y = 70 - (second?six_lfo2_wave(t,ph+(uint32_t)x*span):lfo_wave((track_t *)t, ph + (uint32_t)x * span)) * 44 / 32768;
         if (x)
             cv_line_t(10 + x - 1, py, 10 + x, y, T_THEME, 2);
         py = y;

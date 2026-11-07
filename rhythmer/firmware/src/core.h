@@ -131,6 +131,12 @@ enum {                          /* per-track parameters */
 #define P_HVEL P_FM1_SUS
 #define P_HTIM P_FM1_LEVEL
 #define P_HGAT P_FM2_SUS
+/* Rhythmer: obsolete split HUMAN and two unused DIGITAL slots. Encoded
+ * depths retain their old defaults; AMP 127 means no LFO2 DEST data. */
+#define P_L2DPIT P_HTIM
+#define P_L2DFLT P_HGAT
+#define P_L2DSHP P_FM3_DEC
+#define P_L2DAMP P_FM4_LEVEL
 #define P_HRQ P_FM2_LEVEL              /* (0.6.88) SEQ > TIMING's REC Q: how much live recording snaps to the grid, 127 (every
                                          * project before it) 100 %: on it; less: the notes keep that much of where they were */
 /* (JIANT 0.7.8) three more in DIGITAL's last slots; SUS and LEVEL slots hold 127 in every project and preset before them,

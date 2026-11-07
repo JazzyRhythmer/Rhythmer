@@ -248,6 +248,7 @@ static void six_graph_surface(const track_t *t,const page_t *pg){
  if(lz_on()&&lz_fam()==LZ_SAVE){graph_save_lz(pg);return;}
  if(lz_on()&&lz_fam()==LZ_KEY&&graph_key_lz(t,pg))return;
  if(pg->graph==GR_MOD){six_graph_matrix(t);return;}
- if(pg->graph==GR_LFO){graph_lfo(t,T_TEXT);return;}
+ if(pg->graph==GR_LFO){graph_lfo(t,T_TEXT);cv_text_in(8,graph_h()-12,224,&AF_X,lfo_page_second(pg)?"ROUTE: LFO 2 DEST / MOD":"ROUTE: LFO 1 DEST / MOD",T_TEXT,T_BG);return;}
+ if(pg->id[0]==P_LD_PIT||pg->id[0]==ID_L2DEST){graph_lfo(t,T_TEXT);return;}
  if(!graph_tech(t,pg))six_graph_vectors(t);
 }

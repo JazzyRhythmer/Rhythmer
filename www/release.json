@@ -1,29 +1,17 @@
 {
   "version": "0.1.1-beta3",
   "product": "FM-1_748005",
-  "sha256": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0",
-  "physicalHardwareTested": false,
+  "sha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
+  "physicalHardwareTested": true,
   "ownerTest": {
-    "date": "2026-11-06",
-    "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
-    "method": "Owner-reported manual FM-1 test on the functioning unit",
-    "result": "Owner confirmed playback and return to official V15 for the public package",
-    "reportedPaths": [
-      "Official V15 to Rhythmer FM-1_748001 installed and playing",
-      "Rhythmer FM-1_748001 to official V15 confirmed"
+    "date": "2026-11-08",
+    "firmwareSha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
+    "method": "Owner-reported listening on a physical FM-1",
+    "result": "Owner confirmed completing physical-device listening for build 20261108.2.",
+    "verifiedScope": [
+      "Physical-device listening, owner reported"
     ],
-    "migrationAndRecoveryMatrixVerified": false,
-    "transitionPolicy": "Use official V15 when switching between Rhythmer and another custom firmware. Direct foreign-custom transitions are unsupported.",
-    "notConfirmed": [
-      "Direct installation from another custom firmware is intentionally unsupported",
-      "Physical validation on UC25HQ80 flash",
-      "Cold power-loss recovery or sustained-load reliability"
-    ],
-    "separateInterruptionReport": {
-      "description": "Owner reported powering off a separate FM-1 during an update, followed by a dark screen and no USB response. Exact interrupted stage and recovery remain unconfirmed.",
-      "recovered": false,
-      "hardwareDamageDiagnosed": false
-    }
+    "migrationAndRecoveryMatrixVerified": false
   },
   "localOnly": false,
   "files": [
@@ -34,28 +22,28 @@
     },
     {
       "name": "Rhythmer-0.1.1-beta3-install.zip",
-      "bytes": 3169570,
-      "sha256": "0fc54bd5b7d6a5ff11e1f66a92803bc19bc4c59a2d095f92d11910c017086069"
+      "bytes": 3171988,
+      "sha256": "0eea28f3870a1c427cde786ee4f2af96cd97c5447aa4d19b97cc611c3014f524"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
-      "bytes": 1351416,
-      "sha256": "2f19ac38a3c15fb0bb148b7cfd33eadc0dbe230530556f6e4f5cdadefd3c223f"
+      "bytes": 1351501,
+      "sha256": "5d0a9f2bf699c2eec1339fc31b2d015d51550ffcc8879b29d6ff7e65c8aaaab3"
     },
     {
       "name": "Rhythmer-start.fm1save",
       "bytes": 1351534,
-      "sha256": "a169b3ddc3a88bd55d038721914244faf56e148710be805440cf258744a3a042"
+      "sha256": "d7c0c59d75de5326984346f908845955348955c76035423d691bdd449fa7c658"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2261425,
-      "sha256": "2c89a51bdc29fc349424699f4d1bca5850beb4f7edca56188ffc245398f7ce64"
+      "sha256": "c0e2515b9cd7d8b7228a1e58a16cc0a0804d834382a4ed8d64a4570a5b0e8757"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "6ef6f75316c4e70672c9a4e26fdb852340be28cc0242c8fcb63086506a438fb0"
+      "sha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -115,8 +103,8 @@
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
   "releaseHold": null,
-  "buildRevision": "20261107.2",
-  "releaseCaution": "Early beta: an earlier same-version device test revealed overload in a busy six-track ensemble. This revision optimizes shared Phaser and Break processing without changing clocks, synchronization or normal voice budgets. This exact binary still needs physical sustained-load listening. Back up and leave CPU headroom.",
+  "buildRevision": "20261108.2",
+  "releaseCaution": "Maintenance build 20261108.2 restores the public 20261107.2 audio renderer and overload behavior. Four tracks are the default; enabling six requires the CPU notice and OCT+ confirmation. Busy patterns may cause noise or glitches: mute tracks or reduce simultaneous voices/effects. Dual-LFO destinations, GEN bass/level improvements, editor and illustrated manual are included. Back up before installation.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

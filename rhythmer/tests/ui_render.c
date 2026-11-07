@@ -1168,8 +1168,8 @@ static void setup(int s)
     case S_REVERB2: song.g[G_RMOD] = 80; song.g[G_RWIDE] = 100; go_title("REVERB 2"); break;
     case S_CHORUS: song.g[G_CDEPTH] = 90; go_title("CHORUS"); break;
     case S_MASTER: song.g[G_CLIP] = 60; song.g[G_PUNCH] = 50; song.g[G_DUCK] = 40; go_title("MASTER"); break;
-    case S_LFO2: TSEL->p[P_LPHASE] = 32; go_title("LFO 2"); break;   /* (0.9.18) PHASE, TRIG */
-    case S_LFO2_FREE: TSEL->p[P_LPHASE] = -1; go_title("LFO 2"); break;   /* .. FREE: PHASE dimmed */
+    case S_LFO2: TSEL->p[P_L2PHASE] = 32; go_title("LFO 2"); break;
+    case S_LFO2_FREE: TSEL->p[P_L2PHASE] = -1; go_title("LFO 2 PHASE"); break;
     case S_LFO_DEST: TSEL->p[P_LD_PIT] = 20; TSEL->p[P_LD_FLT] = -40; TSEL->p[P_LD_AMP] = 60; go_title("LFO DEST"); break;
     case S_MACRO_LAYER:                              /* M1: T1 CUT and T4's MRPH; M2: CLIP; M3 at 0, M4 none */
         go_home(); ui.layer = LAYER_MACRO;

@@ -1415,6 +1415,19 @@ static __attribute__((noinline)) void uac_render_end(void)
 #endif
 }
 
+/* A deadline fallback may happen before even one mix_block joined core 1.
+ * In that case rs_in can still belong to the prior resampler job. Do not
+ * wait, cancel it or overwrite it merely to pad the current USB half. */
+static int uac_guard_ready(void)
+{
+#if FELUCCA_UAC_48K
+    uac_collect(0);
+    if(rq.busy)return 0;
+#endif
+    return 1;
+}
+#define UAC_GUARD_READY() uac_guard_ready()
+
 static __attribute__((noinline)) void uac_tap(const int32_t *out, uint32_t n)   /* audio ISR: one block (Q15) */
 {
     uint32_t w = ua_w, i;

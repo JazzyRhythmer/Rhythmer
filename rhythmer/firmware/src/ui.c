@@ -145,19 +145,19 @@ static void rp_apply(void)                             /* the settings into clic
     click_mode = (uint8_t)rp_get(RP_CLICK);
     click_lvl = (uint8_t)rp_get(RP_LEVEL);
     cin_bars = (uint8_t)rp_get(RP_COUNTIN);
-    /* 0x50 / 0x51: 4 / 6 tracks. Migrate the previous machine switches once.
-     * Unset settings start with six tracks, independent of their assigned engines. */
+    /* 0x60 / 0x61: confirmed 4 / 6 tracks. Old or unset settings start in four. */
     uint8_t *m=&favorites.factory[15][15];
     if((*m==1u||*m==2u)&&favorites.factory[15][16])favorites.factory[15][31]=*m; /* Legacy CPU-test core count. */
-    if((*m&0xFEu)!=0x50u)*m=(uint8_t)(0x50u|(((*m&0xFCu)==0x40u)?((*m&3u)!=0u):1u));
+    if((*m&0xFEu)!=0x60u)*m=0x60u; /* One-time safe four-track migration; notes stay intact. */
     six_machine_mask=(*m&1u)?3u:0u;trk_live=(*m&1u)?6u:4u;
     sys_load = (uint8_t)(ui_load <= LOAD_ECO ? ui_load : LOAD_FULL);   /* (0.6.30) LOAD (voice.c) */
     trks_ui = trk_live==6u;                         /* (GLO > SYSTEM's TRACKS and LOAD show them) */
     load_ui = (int16_t)(LOAD_ECO - sys_load);
 }
+static void trks_request(uint32_t v);
 static void trks_put(uint32_t v)
 {
-    favorites.factory[15][15]=(uint8_t)(0x50u|(v!=0u));rp_apply();
+    favorites.factory[15][15]=(uint8_t)(0x60u|(v!=0u));rp_apply();
     if(song.sel>=trk_live)song.sel=(uint8_t)(trk_live-1u);
 }
 /* (0.6.30) LOAD as MENU and GLO > SYSTEM step it, the lightest first: 0 ECO, 1 LITE, 2 FULL */
@@ -337,7 +337,7 @@ static uint16_t val_col(uint32_t c) { return c == ui.hot_col && ui.hot_t ? T_ACC
 enum { CF_NONE, CF_CLEAR_SEQ, CF_CLEAR_TRK, CF_OVR_PROJ, CF_OVR_USER, CF_LOAD_PAT,
        CF_DEL_ROW, CF_CLEAR_SONG, CF_INIT_SOUND, CF_CLEAR_MOTION, CF_ERASE_USER, CF_CLEAR_PFX,
        CF_RECALL_SOUND, CF_CLEAR_ALL, CF_DICE_ALL, CF_INIT_SYS, CF_DICE_SOUND, CF_DICE_SEQ, CF_DICE_LFO,
-       CF_DICE_FX, CF_CPU_TEST, CF_MUT_BACK, CF_LIVE_COMMIT };   /* ui.confirm: TOOLS' clears; (0.6.21) HOME + SELECT:
+       CF_DICE_FX, CF_CPU_TEST, CF_MUT_BACK, CF_LIVE_COMMIT, CF_TRACKS6 };   /* ui.confirm: TOOLS' clears; (0.6.21) HOME + SELECT:
                                    * everything diced; (0.6.65) EDIT + SELECT: keep the diced sound?; (0.6.67) SEQ / LFO / FX + SELECT:
                                    * keep the diced sequence / LFO / effects?;
                                    * SAVE over a used slot; a pattern over the user's steps;
@@ -1304,8 +1304,7 @@ static int param_kept(uint32_t i)
 {
     return i == P_LEVEL || i == P_PAN || i == P_MUTE || (i >= P_AMODE && i <= P_SGATE) ||
            (i >= P_SLCR && i <= P_SLDEPTH) || i == P_SOFS || i == P_POFS ||
-           (!FELUCCA_FM4 && (i == P_HVEL || i == P_HTIM || i == P_HGAT || i == P_HRQ)) ||   /* (0.6.87) HUMAN: the sequencer's, a sound
-                                                         * keeps it (FELUCCA_FM4: DIGITAL's OP SUS / LEVEL there) */
+           (!FELUCCA_FM4 && (i == P_HVEL || i == P_HRQ)) ||   /* HUMAN and REC Q remain pattern settings; obsolete split slots now hold LFO2 depths. */
            (!FELUCCA_FM4 && (i == P_CHRD || i == P_CVOI || i == P_CSTR || i == P_TCHAN ||
                              i == P_MSND || i == P_MPAT || i == P_MAMT || i == P_MMODE));   /* (0.7.0) SCL > CHORD, CHANCE,
                                                          * MUTATE: the sequencer's too (a community report: browsing

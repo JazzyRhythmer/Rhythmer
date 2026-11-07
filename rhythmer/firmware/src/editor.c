@@ -433,10 +433,21 @@ static void ed_handle(const uint8_t *f, uint32_t n)   /* f: the bytes between F0
         ed_b(0x56); ed_b(1); ed_b(FM6_NBANK);   /* (JIANT 0.6.11, Felucca 1.4.1) FM6's voice bank: cmds 74..77, SLOT 9..40 */
         ed_b(0x4A); ed_b(1); ed_b(1);   /* (JIANT 0.6.62) 'J': this is JIANT (the web installer writes over it, web/index_pkg.html) */
         ed_b(0x4F); ed_b(1); ed_b(LM_N);   /* (0.8.5) 'O': the DRUM-X octaves, a step's lane modes 0..6 after its ratchet */
+        ed_b(0x32);ed_b(1);ed_b(1); /* LFO2 DEST: atomic GET/SET scope 2, IDs 0..3 */
         ed_b(0x59); ed_b(1); ed_b(LYR_LEN - 1u);   /* (JIANT 0.8.5) 'Y': LYRIC (cmd 39), a track's lyric, at most 63 bytes */
         break;
     case ED_GET:
     case ED_SET:
+        if(na>=2u&&a[0]==2u){
+            if(a[1]>=4u)return;
+            if(cmd==ED_SET&&na>=4u){
+                int fresh=!lfo2_dest_active(TSEL);
+                lfo2_dest_put(TSEL,a[1],clamp(ed_rv(a+2),a[1]==3?0:-64,a[1]==3?127:63));
+                for(unsigned j=0;j<4;j++)if(fresh||j==a[1])motion_capture(TSEL,L2D_ID[j],TSEL->p[L2D_ID[j]]);
+                ui.force=1;
+            }
+            ed_b(2);ed_b(a[1]);ed_v(lfo2_dest_value(TSEL,a[1]));break;
+        }
         if (na < 2u || !(d = ed_desc(a[0], a[1], &vp)))
             return;
         if (cmd == ED_SET && na >= 4u && !(chain_busy() && !a[0] && a[1] >= P_SLEN && a[1] <= P_SGATE)) {

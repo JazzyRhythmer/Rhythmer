@@ -121,7 +121,7 @@ static void settings_fresh(void)
 #ifdef FELUCCA_FAVORITES
     favorites.factory[15][20] = SKIN_AIR;
     favorites.factory[15][17] |= 4u; /* Prefer upstream rated 320 MHz profile on hardware. */
-    favorites.factory[15][15] = 0x51u; /* Six freely assigned tracks at first boot. */
+    favorites.factory[15][15] = 0x60u; /* Four tracks until the six-track CPU notice is confirmed. */
 #endif
 }
 

@@ -7,3 +7,5 @@ body{background:#0c0d0d;color:#eee;font-family:ui-monospace,SFMono-Regular,Conso
 [hidden]{display:none!important}.rhy-project-confirm{max-width:600px;background:#111;color:#eee;border:1px solid #888;padding:26px}.rhy-project-confirm::backdrop{background:#000b}.rhy-project-confirm p{line-height:1.7}.rhy-project-confirm select{padding:10px;margin:12px 0 20px}
 
 .rhy-build{display:inline-block;font:12px monospace;border:1px solid #555;padding:5px 8px;margin:10px 0 10px 16px;color:#ddd}
+/* Keep LFO/MOD quick links clear of the editor's sticky header and track bar. */
+#groups h2,#groups h3{scroll-margin-top:11rem}

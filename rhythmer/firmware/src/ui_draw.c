@@ -1792,7 +1792,7 @@ static void draw_columns(void)
                 unit = "GRID";                           /* (0.6.30) no chorus: the send goes nowhere */
         }
         card_mot_of(vp);                                /* (a global: never) */
-        draw_column(c, d->label, val, unit, vp == &lphase_ui && TSEL->p[P_LPHASE] < 0 ? T_DIM : VAL(c), d->fmt == F_ENUM && d->max < 2 ? -1 : RATIO(d, enum_rank(d, *vp)),
+        draw_column(c, d->label, val, unit, vp == &lphase_ui && TSEL->p[lfo_page_second(cur_page()) ? P_L2PHASE : P_LPHASE] < 0 ? T_DIM : VAL(c), d->fmt == F_ENUM && d->max < 2 ? -1 : RATIO(d, enum_rank(d, *vp)),
                     param_icon(d, *vp));
     }
 }
@@ -1952,6 +1952,10 @@ static void confirm_text(char *a, char *b)
         break;
     case CF_CLEAR_ALL:
         str_cpy(a, "CLEAR ALL SEQUENCES?", 24);
+        break;
+    case CF_TRACKS6:
+        str_cpy(a, "ENABLE 6 TRACKS?", 24);
+        str_cpy(b, "HIGHER CPU LOAD", 24);
         break;
     case CF_CPU_TEST:                                /* (0.6.83) SAVE > TOOLS 6 */
         str_cpy(a, "BUILD CPU TEST SONG?", 24);
@@ -2128,6 +2132,13 @@ static void draw_confirm(void)
     cv_begin(212, 140, T_BG);                         /* NOTICE: the card */
     {
     uint16_t cb = dlg_card(0, 0, 212, 140, T_BG);
+    if(ui.confirm==CF_TRACKS6){
+        cv_text_in(0,12,212,&AF_M,"ENABLE 6 TRACKS?",T_TEXT,cb);
+        cv_text_in(0,38,212,&AF_S,"BUSY 6-TRACK PATTERNS",T_MID,cb);
+        cv_text_in(0,51,212,&AF_S,"MAY CAUSE NOISE / GLITCHES",T_MID,cb);
+        cv_text_in(0,70,212,&AF_X,"IF THIS HAPPENS: MUTE TRACKS",T_TEXT,cb);
+        cv_text_in(0,81,212,&AF_X,"OR REDUCE VOICES / FX",T_TEXT,cb);
+    }else{
     cv_text_on(12, 12 - AF_M_CAP_Y, &AF_M, "?", T_ACCENT, cb);
     if (text_w(tf, a) > 196)
         tf = &AF_S;
@@ -2138,6 +2149,7 @@ static void draw_confirm(void)
         text_fit(f, sizeof f, b, &AF_S, 196);          /* a name: free text */
         GFX_HOOK_ALIGN(0, 0, 212, 0, AL_H, "dialog detail centred");
         cv_text_flags(ink_in(&AF_S, f, 212), 60, &AF_S, f, T_MID, cb, 8u | (f[str_len(f) - 1u] == ELLIPSIS));
+    }
     }
     dlg_button(12, 92, 90, "OCT -", ui.confirm == CF_DICE_ALL ? "CANCEL" : ui.confirm == CF_MUT_BACK ? "KEEP" : "NO", 0, cb);
     dlg_button(110, 92, 90, "OCT +", ui.confirm == CF_MUT_BACK ? "BACK" : "YES", 1, cb);

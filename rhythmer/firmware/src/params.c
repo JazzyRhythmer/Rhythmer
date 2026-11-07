@@ -66,6 +66,7 @@ static const char *const N_APDIV[] = {"4BAR", "2BAR", "1BAR", "1/2", "1/4", "1/8
 /* modulation matrix (mod.c): sources, destinations (E1..E8 = P_E0..P_E7: shown with the engine's labels) */
 static const char *const N_MSRC[] = {"OFF", "LFO 1", "ENV", "VEL", "KEY", "RAND", "MODW", "AT", "EXPR",
                                      "M1", "M2", "M3", "M4", "STEP", "NOISE", "LFO 2"};   /* (0.7.8) NOISE */   /* (JIANT: the macros, LFO held; the modulation sequence) */
+static const uint8_t MSRC_ORDER[] = {0,1,15,2,3,4,5,6,7,8,9,10,11,12,13,14};
 static const char *const N_MDST[] = {"OFF", "PITCH", "CUT", "SHP", "AMP", "PAN", "DIST", "CHO", "DLY", "REV", "RATE",
                                      "VIB", "E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8",
                                      "CLIP", "PNCH",   /* (JIANT: the master, FX > MASTER) */
@@ -146,6 +147,12 @@ static const param_desc_t TP[P_COUNT] = {
                 [P_FM##k##_REL] = PD("REL", F_TIME, 0, 127, 0), \
                 [P_FM##k##_LEVEL] = PD("LEVEL", F_PCT, 0, 127, 127)
     FMOP(1), FMOP(2), FMOP(3), FMOP(4),
+    /* Raw storage descriptors; LFO2 DEST presents decoded, identical depths.
+     * Keep historical defaults for omitted parameters in compact old stores. */
+    [P_L2DPIT] = PD("L2 PIT", F_INT, 0, 127, 127),
+    [P_L2DFLT] = PD("L2 FLT", F_INT, 0, 127, 127),
+    [P_L2DSHP] = PD("L2 SHP", F_INT, 0, 127, 0),
+    [P_L2DAMP] = PD("L2 AMP", F_INT, -64, 127, 127),
 #undef FMOP
     [P_SOFS] = PD("ROTATE", F_INT, -32, 32, 0),    /* the sequence played OFS steps later (seq.c seq_src; 0.6.92: was OFFSET) */
     [P_POFS] = PD("PITCH", F_SEMI, -24, 24, 0),   /* its notes PIT semitones up (not on a kit) */
@@ -301,8 +308,8 @@ static const param_desc_t *track_desc(const track_t *t, uint32_t id)
         case P_CVOI: return &CHORD_DESC[1];
         case P_CSTR: return &CHORD_DESC[2];
         case P_HVEL: return &HUM_DESC[0];
-        case P_HTIM: return &HUM_DESC[1];
-        case P_HGAT: return &HUM_DESC[2];
+        case P_HTIM: return &TP[P_L2DPIT];
+        case P_HGAT: return &TP[P_L2DFLT];
         case P_HRQ: return &RECQ_DESC;
         case P_DRIFT: return &DRIFT_DESC;
         case P_WRDEP: return &WROT_DESC[0];
@@ -375,7 +382,7 @@ static const uint8_t DTIME_ORDER[NELEM(N_DTIME)] = {9, 8, 7, 6, 0, 1, 4, 2, 5, 3
                                                          * then the free times, short to long */
 static const uint8_t *enum_order(const param_desc_t *d)
 {
-    return d->names == N_DIV ? DIV_ORDER : d->names == N_SLDIV ? SLDIV_ORDER : d->names == N_DTIME ? DTIME_ORDER :
+    return d->names == N_MSRC ? MSRC_ORDER : d->names == N_DIV ? DIV_ORDER : d->names == N_SLDIV ? SLDIV_ORDER : d->names == N_DTIME ? DTIME_ORDER :
            d->names == N_RWAVE ? RWAVE_ORDER : 0;
 }
 static int32_t enum_rank(const param_desc_t *d, int32_t v)   /* v's place in the shown order (+ min): the gauges */
@@ -579,12 +586,23 @@ static int16_t load_ui;
  * (RAM, a track each) for TRIG again, and PHASE turned in FREE moves only that (shown dimmed) */
 #define ID_LMODE 0xFBu
 #define ID_LPHS 0xFAu
+#define ID_L2MODE 0xF9u
+#define ID_L2PHS 0xF8u
+#define ID_L2DEST 0xF7u
 static const char *const N_LMODE[] = {"TRIG", "FREE"};
 static const param_desc_t LFO_MODE_DESC = PE("MODE", N_LMODE, 0);
 static const param_desc_t LFO_PHASE_DESC = PD("PHASE", F_INT, 0, 127, 0);
 static int16_t lmode_ui, lphase_ui;
-static uint8_t lfo_ph_mem[NTRK];
-static int lfo_mode_of(const track_t *t) { return t->p[P_LPHASE] < 0; }   /* 1 FREE */
+static uint8_t lfo_ph_mem[2][NTRK];
+static int lfo_page_second(const page_t *pg) { return pg->id[0] == P_L2RATE || pg->id[0] == ID_L2PHS || pg->id[0] == ID_L2DEST; }
+static const uint8_t L2D_ID[4]={P_L2DPIT,P_L2DFLT,P_L2DSHP,P_L2DAMP};
+static int16_t lfo2_dest_ui[4];
+static int lfo2_dest_active(const track_t *t){return t->p[P_L2DAMP]<=63;}
+static __attribute__((noinline)) int lfo2_dest_value(const track_t *t,unsigned k){return lfo2_dest_active(t)?t->p[L2D_ID[k]]+(k==3?64:-64):0;}
+static void lfo2_dest_put(track_t *t,unsigned k,int v){
+ if(!lfo2_dest_active(t)){for(unsigned j=0;j<3;j++)t->p[L2D_ID[j]]=64;t->p[P_L2DAMP]=-64;}
+ t->p[L2D_ID[k]]=(int16_t)(v+(k==3?-64:64));
+}
 static const page_t PAGES[] = {
     {"ENV", FAM_ENV, SC_TRACK, GR_ADSR, {P_ATK, P_DEC, P_SUS, P_REL}},
     {"ENV DEST", FAM_ENV, SC_TRACK, GR_NONE, {P_ED_FLT, P_ED_PIT, P_ED_SHP, P_ELOOP}},   /* JIANT 0.4: LOOP */
@@ -705,7 +723,9 @@ static const page_t PAGES[] = {
                                                          * modifiers (ui_live.c, seq_live.c) */
     {"RIELES", FAM_GLO, SC_GLOBAL, GR_LIVE, {0xFF, 0xFF, 0xFF, 0xFF}},   /* .. the six sequences as rails, four knobs */
     {"LFO 1 PHASE", FAM_LFO, SC_TRACK, GR_LFO, {ID_LPHS, 0xFF, 0xFF, 0xFF}},
-    {"LFO 2", FAM_LFO, SC_TRACK, GR_LFO, {P_L2RATE, P_L2WAVE, P_L2PHASE, P_L2FADE}},   /* (0.9.18) PHASE: where TRIG starts (FREE: dimmed) */
+    {"LFO 2", FAM_LFO, SC_TRACK, GR_LFO, {P_L2RATE, P_L2WAVE, ID_L2MODE, P_L2FADE}},
+    {"LFO 2 PHASE", FAM_LFO, SC_TRACK, GR_LFO, {ID_L2PHS, 0xFF, 0xFF, 0xFF}},
+    {"LFO 2 DEST", FAM_LFO, SC_TRACK, GR_NONE, {ID_L2DEST,ID_L2DEST,ID_L2DEST,ID_L2DEST}},
     {"DRUM VOICE",FAM_EDIT,SC_TRACK,GR_DXSND,{0xFF,0xFF,0xFF,0xFF}},
 };
 #define NPAGES (sizeof(PAGES) / sizeof(PAGES[0]))
@@ -723,6 +743,7 @@ static uint8_t sl_ui_step;       /* (JIANT 0.6.3) the SL PITCH page: the step KN
 static const param_desc_t *page_desc(const page_t *pg, uint32_t slot, int16_t **valp)
 {
     uint32_t id = pg->id[slot];
+    if(id==ID_L2DEST){lfo2_dest_ui[slot]=(int16_t)lfo2_dest_value(TSEL,slot);*valp=&lfo2_dest_ui[slot];return &TP[P_LD_PIT+slot];}
     if (id == 0xFFu) {
         *valp = 0;
         return 0;
@@ -735,12 +756,13 @@ static const param_desc_t *page_desc(const page_t *pg, uint32_t slot, int16_t **
         *valp = &trks_ui;
         return &TRKS_DESC;
     }
-    if (id == ID_LMODE || id == ID_LPHS) {           /* (0.9.18) the LFO's MODE and PHASE: views of P_LPHASE */
-        int32_t ph = TSEL->p[P_LPHASE];
+    if (id == ID_LMODE || id == ID_LPHS || id == ID_L2MODE || id == ID_L2PHS) {
+        unsigned second = lfo_page_second(pg), mode = id == ID_LMODE || id == ID_L2MODE;
+        int32_t ph = TSEL->p[second ? P_L2PHASE : P_LPHASE];
         lmode_ui = (int16_t)(ph < 0);
-        lphase_ui = (int16_t)(ph < 0 ? lfo_ph_mem[song.sel % NTRK] : ph);
-        *valp = id == ID_LMODE ? &lmode_ui : &lphase_ui;
-        return id == ID_LMODE ? &LFO_MODE_DESC : &LFO_PHASE_DESC;
+        lphase_ui = (int16_t)(ph < 0 ? lfo_ph_mem[second][song.sel % NTRK] : ph);
+        *valp = mode ? &lmode_ui : &lphase_ui;
+        return mode ? &LFO_MODE_DESC : &LFO_PHASE_DESC;
     }
     if (id == G_LOADP) {                              /* (0.6.30) the same */
         *valp = &load_ui;

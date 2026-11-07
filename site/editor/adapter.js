@@ -5,6 +5,31 @@ $('midiports').hidden=WORKSPACE;
 $('mode-'+(WORKSPACE?'browser':'usb')).setAttribute('aria-current','page');
 var machine=el('div',{id:'machine-tools',class:'group'});
 $('p-sound').prepend(machine);
+const lfoHelp=el('div',{class:'group',id:'dual-lfo-help'});
+lfoHelp.append(el('h2',{text:'TWO LFOS / PER TRACK'}),el('p',{class:'dim',text:'Each of T1–T6 has independent LFO 1 and LFO 2. Each has a DEST page for PITCH, FILTER, SHAPE and AMP, separate from the four MOD slots. Set RATE, WAVE, MODE, PHASE and FADE in the LFO panels. MOD sources list LFO 1 then LFO 2. Save the sound or project to keep the settings.'}));
+const lfoLinks=el('div',{class:'bar'});
+for(const title of ['LFO 1','LFO 2','LFO 2 DEST','MOD'])lfoLinks.append(el('button',{text:'OPEN '+title,onclick:()=>{
+  const heading=[...document.querySelectorAll('#groups h2,#groups h3')].find(h=>h.textContent.trim()===title);
+  heading?.scrollIntoView({block:'start',behavior:'smooth'});
+}}));
+lfoHelp.append(lfoLinks);
+$('p-sound').prepend(lfoHelp);
+// Four independent destination depths stored in Rhythmer's reclaimed slots.
+// Raw parameter IDs remain stable; the custom rows show decoded musical depths.
+function lfo2DestRow(k){
+  if(!dev.info.lfo2Dest)return null;
+  const ids=[65,68,72,80],names=['PITCH','FILTER','SHAPE','AMP'];
+  const input=el('input',{type:'range',min:k===3?0:-64,max:k===3?127:63,step:1,'aria-label':'LFO 2 '+names[k]});
+  const out=el('span',{class:'v'}),row=el('div',{class:'row'},el('span',{text:names[k]}),input,out);
+  row.dataset.lfo2depth=k;
+  input.addEventListener('change',()=>op(async()=>{
+    const d=dev,track=d.sel??0,value=+input.value;
+    if(dev!==d||(d.sel??0)!==track)throw Error('Track changed; read the sound again');
+    await rq(req.set(2,k,value));
+    d.dump=await getDump(d);refreshAll();renderRhythmer();
+  }));
+  return row;
+}
 var projectsBox=el('div',{id:'project-bank',class:'group'});
 $('p-projects').prepend(projectsBox);
 const disconnectUpstream=disconnect;
@@ -18,6 +43,12 @@ const oldRenderPanels=renderPanels;
 renderPanels=function(){oldRenderPanels();if(machine)renderRhythmer();};
 function renderRhythmer(){
   if(!dev?.dump)return;
+  document.querySelectorAll('[data-lfo2depth]').forEach(row=>{
+    const k=+row.dataset.lfo2depth,ids=[65,68,72,80],raw=dev.dump.p;
+    const v=raw[80]<=63?raw[ids[k]]+(k===3?64:-64):0;
+    const input=row.querySelector('input');if(input!==document.activeElement)input.value=v;
+    row.querySelector('.v').textContent=Math.round(v*100/(k===3?127:64))+' %';
+  });
   const e=dev.dump.engine;
   const help=document.querySelector('[data-t=notesHelp]');if(help)help.textContent=e===15?'C1–C16 chops · R1–R16 repeats/up-down · A / B sample · RET return. Up to four commands per step; NOTE / TIE / REST control playback.':t('notesHelp');
   const owner=dev.mix?.tracks?.findIndex(t=>t.engine===15)??-1;

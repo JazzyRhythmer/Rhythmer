@@ -191,7 +191,8 @@ static __attribute__((noinline)) int mod_begin(track_t *t)
     for (k = 0; k < NMSLOT; k++)
         if (p[P_M1SRC + 3u * k] && p[P_M1DST + 3u * k] && p[P_M1AMT + 3u * k])
             break;
-    if (k == NMSLOT)
+    int l2=lfo2_dest_active(t)&&(p[P_L2DPIT]!=64||p[P_L2DFLT]!=64||p[P_L2DSHP]!=64||p[P_L2DAMP]!=-64);
+    if (k == NMSLOT && !l2)
         return 0;
     lfo = mulq15(t->lfo_val, t->lfo_fade);              /* (the LFO of the block before: track_render ticks it) */
     for (j = k; j < NMSLOT; j++)
@@ -204,6 +205,14 @@ static __attribute__((noinline)) int mod_begin(track_t *t)
     mp->nv = mp->nk = 0;
     mp->pit = mp->cut = mp->shp = 0;
     mp->gain = 32767;
+    if(l2){
+        int32_t x=mulq15(t->lfo2_val,t->lfo2_fade),a=lfo2_dest_value(t,3);
+        mp->pit=(x*lfo2_dest_value(t,0)*3)>>15;
+        mp->cut=(x*lfo2_dest_value(t,1))>>7;
+        mp->shp=(x*lfo2_dest_value(t,2))>>7;
+        mp->amp=a!=0;
+        if(a)mp->gain=32767-mulq15((x+32768)>>1,a*258);
+    }
     for (; k < NMSLOT; k++) {
         uint32_t s = (uint32_t)p[P_M1SRC + 3u * k], d = (uint32_t)p[P_M1DST + 3u * k];
         int32_t a = p[P_M1AMT + 3u * k], x;

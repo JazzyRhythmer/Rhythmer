@@ -221,7 +221,7 @@ def build_loader():
 
 # (JIANT 0.6.78) core 0's hottest audio code, run from RAM (app.ld .hot_text, src/core.h FELUCCA_HOTRAM): the mix, the
 # master, the FX layer, the SLICER, and core 0's own copies of a part's mix and the buses (core 1 runs the flash ones)
-HOT_FNS = ("mix_block", "mix_part_m0", "fx_run0", "perf_begin", "perf_pre", "perf_block", "perf_master", "slicer_bus")
+HOT_FNS = ("mix_block", "mix_part_m0", "fx_run0", "perf_begin", "perf_block", "perf_master", "slicer_bus")
 ACID_HOT_FNS = ("run_control", "run_voice", "run_amp", "run_post")
 
 

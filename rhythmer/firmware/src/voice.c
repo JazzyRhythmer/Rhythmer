@@ -157,11 +157,13 @@ static __attribute__((noinline)) void tf_run(track_t *t, int32_t *out, uint32_t 
             envq = t->v[i].env >> 9;
     {   /* (0.6.81) the sweep kept where it is heard: CUT moved down so its top stays open at most (an open filter swept
          * up did nothing: half an LFO's cycle, a whole ENV, lost) */
-        int32_t span = (p[P_LD_FLT] < 0 ? -p[P_LD_FLT] : p[P_LD_FLT]) * 256 + (p[P_ED_FLT] > 0 ? p[P_ED_FLT] * 256 : 0);
+        int32_t d2=lfo2_dest_value(t,1);
+        int32_t span = ((p[P_LD_FLT] < 0 ? -p[P_LD_FLT] : p[P_LD_FLT])+(d2<0?-d2:d2)) * 256 + (p[P_ED_FLT] > 0 ? p[P_ED_FLT] * 256 : 0);
         if (cut + span > (127 << 8))
             cut = (127 << 8) - span > 0 ? (127 << 8) - span : 0;
     }
     cut += ((mulq15(t->lfo_val, t->lfo_fade) * p[P_LD_FLT]) >> 7) + ((envq * p[P_ED_FLT]) >> 7);
+    if(t->engine!=ENGI_BREAK)cut+=(mulq15(t->lfo2_val,t->lfo2_fade)*lfo2_dest_value(t,1))>>7;
     if(t->engine==ENGI_BREAK)cut+=t->v[0].s[BENV_CUT];
     {
         uint32_t on = !(ft == FT_LP && fo == TF_DRY && cut >= (127 << 8) && !p[P_FRES]), was = tf_on[ti];
@@ -754,7 +756,7 @@ static void mono_remove(track_t *t, uint32_t note)
 
 static int pfx_note(track_t *t, uint32_t note, uint32_t vel);   /* pfx.c (in fx.c) */
 static uint8_t trk_hush;
-static uint8_t trk_live = NTRK;
+static uint8_t trk_live = 4u;
 static volatile uint8_t six_machine_mask=3u;
 static int six_track_enabled(unsigned k){return k<trk_live&&k<NTRK;}
 static volatile uint8_t asleep_hit;                     /* (0.6.28) a note went to a track asleep (ui_input: the hint) */                            /* (JIANT 0.6.18) MENU > TRACKS: the tracks that play (4 LOW CPU, the
@@ -1207,7 +1209,7 @@ static uint32_t track_render(track_t *t, int32_t *out, uint32_t n)
     if (nr && e == &ENG_DRUM)                           /* (0.6.16) DRUM-X: DRV and the knee on the kit's sum */
         drum_bus(t, out, n);
     if (nr && (t->p[P_FTYPE] || t->p[P_FCUT] < 127 || t->p[P_FRES] || tf_on[(uint32_t)(t - trk) % NTRK] ||
-               ((e == &ENG_WHEEL || e == &ENG_DRUM) && (t->p[P_LD_FLT] || t->p[P_ED_FLT])) ||   /* (0.6.81: their
+               ((e == &ENG_WHEEL || e == &ENG_DRUM) && (t->p[P_LD_FLT] || t->p[P_ED_FLT] || lfo2_dest_value(t,1))) ||   /* (0.6.81: their
                                                          * only filter, for the LFO / ENV -> FILTER) */
                tf_xb[(uint32_t)(t - trk) % NTRK] || tf_cmb[(uint32_t)(t - trk) % NTRK]))
         /* (JIANT 0.5) the FILTER (track_post); 0.6.8: and a block more to leave the chain (track_filter's fade) */

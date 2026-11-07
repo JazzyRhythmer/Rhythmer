@@ -1,3 +1,11 @@
+# Maintenance build 20261108.2 — 0.1.1-beta3
+
+- Restore public 20261107.2 audio rendering, FX and voice governor; remove rejected experimental output protection.
+- Start in four-track mode, preserving inactive T5/T6 music. Six-track mode needs an explicit OCT+ CPU-notice confirmation; OCT− cancels.
+- Independent LFO2 destinations and adjacent LFO sources; retained GEN bass selection and level improvements.
+- Publish matching web editor, 16-section manual and illustrated track-mode instructions.
+- Host, emulator, editor and loader checks passed; the owner confirmed physical-device listening.
+
 # Changelog
 
 ## 0.1.0-beta.2 - 2026-11-07

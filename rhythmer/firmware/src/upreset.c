@@ -47,6 +47,8 @@
 #define UP_FM_AT (UP_PMAX * 2u - 1u)             /* (JIANT 0.3) packed[]'s last byte (past P_COUNT): UP_FM_MARK = DRUM's */
 #define UP_FM_MARK 0x46u                         /* E5 is FM; a DRUM record without it held ACC there: FM off */
 #define UP_V04_MARK 0x47u                        /* (JIANT 0.4) .. and LOFI's / ANALOG's E values today's (core.h sound_v04) */
+#define UP_L2_AT (UP_FM_AT-1u)
+#define UP_L2_MARK 0x4cu
 typedef struct {
     uint8_t used, ver, engine, np;               /* UP_USED, UP_VER, engine, P_COUNT when stored */
     char name[12];                               /* ASCII 32..126, 0-padded (no 0 when 12 long) */
@@ -223,6 +225,7 @@ static int up_parse(const uint8_t *a, uint32_t na, up_rec_t *r, uint32_t *slot)
             if (value < -64 || value > 127) return 1;
             up_set_value(r, i, (int16_t)value);
         }
+    if(up_value(r,P_L2DAMP)<=63)r->packed[UP_L2_AT]=UP_L2_MARK;
     if (na >= k + 33u + 16u && a[k + 32u] == 1u) {    /* a drum grid */
         r->ver = UP_VER_GRID;
         for (i = 0; i < 16u; i++) {
@@ -253,6 +256,7 @@ static void up_values(const up_rec_t *r, int16_t *v)   /* mapped and clamped for
     up_params(r, v, def);
     for (i = 0; i < P_COUNT; i++)
         v[i] = (int16_t)param_fit(param_desc_of(r->engine, i), v[i]);   /* (a retired KIT: the kit it plays) */
+    if(r->engine!=ENGI_DIGITAL&&!(r->ver>=4u&&r->np==P_COUNT&&r->packed[UP_L2_AT]==UP_L2_MARK))v[P_L2DAMP]=127;
 }
 
 #include "up_fm6.c"                            /* the FM6 user presets' patches: the same kind of store */
@@ -375,6 +379,7 @@ static int up_store(uint32_t k, const char *name)
     r.engine = TSEL->eng_req;
     r.np = P_COUNT;
     r.packed[UP_FM_AT] = UP_V04_MARK;
+    if(lfo2_dest_active(TSEL))r.packed[UP_L2_AT]=UP_L2_MARK;
     up_set_name(&r, k, name);
     for (i = 0; i < P_COUNT; i++)
         up_set_value(&r, i, motion_base_value(TSEL, i));

@@ -241,7 +241,7 @@ static void menu_put(uint32_t row, uint32_t v)
         return;
     }
     switch (row) {
-    case MI_TRACKS: trks_put(v); break;
+    case MI_TRACKS: trks_request(v); break;
     case MI_COLOR:
         settings.palette = COLOR_MENU[v % 4u];
         palette_set(settings.palette);                                /* (the menu signature redraws) */

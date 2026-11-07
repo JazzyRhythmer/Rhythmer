@@ -84,3 +84,17 @@ assert state['done'] and not state['error'],state
 result=json.loads(run('JSON.stringify({passed:checks.length,checks})'))
 Path(os.environ.get('RHYTHMER_EDITOR_RESULTS','/Volumes/SSD/Development/TestResults/rhythmer/installer/editor-results.json')).write_text(json.dumps(result,indent=2)+'\n')
 print('PASS:',result['passed'],'actual four-project C storage, archive restore and autosave failure/recovery checks')
+
+# Both sources and every slot survive the actual editor's section-save path.
+run("wa.ws_init();wa.ws_boot();for(let k=0;k<6;k++){ask(req.track(k));for(const [id,v] of [[9,20+k],[10,1],[11,k],[12,5+k],[115,80+k],[116,3],[117,30+k],[118,10+k]])ask(req.set(0,id,v));for(let j=0;j<4;j++){ask(req.set(0,49+3*j,j%2?15:1));ask(req.set(0,50+3*j,1));ask(req.set(0,51+3*j,12+j));}}check(parse[CMD.PROJECT](ask(req.project(1,0))).used,'six-track dual-LFO section saved through editor');for(let k=0;k<6;k++){ask(req.track(k));ask(req.set(0,9,0));ask(req.set(0,115,0));}ask(req.project(0,0));for(let k=0;k<6;k++){ask(req.track(k));const p=parse[CMD.DUMP](ask(req.dump()),info).p;check(p[9]===20+k&&p[115]===80+k&&p[116]===3&&p[117]===30+k&&p[118]===10+k&&[0,1,2,3].every(j=>p[49+3*j]===(j%2?15:1)&&p[51+3*j]===12+j),'independent LFO 1/2 and all four sources restored on T'+(k+1));}'OK'")
+assert 'TWO LFOS / PER TRACK' in html and '["LFO 1 DEST", 0,' in html
+result=json.loads(run('JSON.stringify({passed:checks.length,checks})'))
+Path(os.environ.get('RHYTHMER_EDITOR_RESULTS','/Volumes/SSD/Development/TestResults/rhythmer/installer/editor-results.json')).write_text(json.dumps(result,indent=2)+'\n')
+print('PASS:',result['passed'],'including six-track dual-LFO editor save/restore checks')
+
+run("function enumShown(d) {"+html.split("function enumShown(d) {",1)[1].split("\n}",1)[0]+"\n}; true;")
+run("check(info.lfo2Dest,'matching firmware advertises atomic LFO2 DEST');wa.ws_init();wa.ws_boot();for(let k=0;k<6;k++){ask(req.track(k));for(let j=0;j<4;j++)check(parse[CMD.GET](ask(req.get(2,j))).value===0,'default LFO2 DEST is zero T'+(k+1)+' / '+j);for(const [id,v] of [[0,-30+k],[1,24+k],[2,-12+k],[3,90+k]])check(parse[CMD.SET](ask(req.set(2,id,v))).value===v,'atomic direct depth set T'+(k+1)+' / '+id);const p=parse[CMD.DUMP](ask(req.dump()),info).p;check([0,1,2,3].every(j=>p[49+3*j]===0),'direct depths preserve all MOD slots T'+(k+1));}check(parse[CMD.PROJECT](ask(req.project(1,0))).used,'six-track LFO2 DEST section saved');for(let k=0;k<6;k++){ask(req.track(k));ask(req.set(2,0,0));}ask(req.project(0,0));for(let k=0;k<6;k++){ask(req.track(k));const want=[-30+k,24+k,-12+k,90+k];check(want.every((v,j)=>parse[CMD.GET](ask(req.get(2,j))).value===v),'all four direct depths restored T'+(k+1));}var d2Source=parse[CMD.DESC](ask(req.desc(0,49)));check(enumShown(d2Source).slice(0,4).map(n=>d2Source.names[n]).join(',')==='OFF,LFO 1,LFO 2,ENV','browser SRC order keeps adjacent LFOs with stable wire IDs');'OK'")
+assert '["LFO 2 DEST", 2, [0,1,2,3]]' in html
+result=json.loads(run('JSON.stringify({passed:checks.length,checks})'))
+Path(os.environ.get('RHYTHMER_EDITOR_RESULTS','/Volumes/SSD/Development/TestResults/rhythmer/installer/editor-results.json')).write_text(json.dumps(result,indent=2)+'\n')
+print('PASS:',result['passed'],'including atomic dedicated LFO2 DEST, six-track save/restore and SRC ordering')

@@ -16,6 +16,19 @@
   "emulator": "https://joakimeriksson.github.io/fm1-emu/?fw=local&mhz=240",
   "language": "en",
   "ownerTest": {
+    "date": "2026-11-08",
+    "firmwareSha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
+    "method": "Owner-reported listening on a physical FM-1",
+    "result": "Owner confirmed completing physical-device listening for build 20261108.2.",
+    "verifiedScope": [
+      "Physical-device listening, owner reported"
+    ],
+    "migrationAndRecoveryMatrixVerified": false
+  },
+  "version": "0.1.1-beta3",
+  "product": "FM-1_748005",
+  "githubRepository": "JazzyRhythmer/Rhythmer",
+  "previousOwnerTest": {
     "date": "2026-11-06",
     "firmwareSha256": "3d4e86553d1e32be88de832ec70398575d7438857ef53edd62b57b8da36dfc9a",
     "method": "Owner-reported manual FM-1 test on the functioning unit",
@@ -37,24 +50,7 @@
       "hardwareDamageDiagnosed": false
     }
   },
-  "version": "0.1.1-beta3",
-  "product": "FM-1_748005",
-  "githubRepository": "JazzyRhythmer/Rhythmer",
-  "previousOwnerTest": {
-    "date": "2026-11-06",
-    "firmwareSha256": "e705abe330aa80191d1470ccee5a891716e3d60db8450c9ba306c675454d3677",
-    "method": "Owner-reported manual FM-1 test",
-    "result": "Owner reported all functions working after installation",
-    "migrationAndRecoveryMatrixVerified": false,
-    "reportedPaths": [
-      "Official V15 to Rhythmer installed and running",
-      "Rhythmer to official V15 or another firmware confirmed"
-    ],
-    "notConfirmed": [
-      "Distinct other-custom-firmware to Rhythmer installation",
-      "Deliberately interrupted physical update recovery"
-    ]
-  },
-  "releaseCaution": "Early beta: an earlier same-version device test revealed overload in a busy six-track ensemble. This revision optimizes shared Phaser and Break processing without changing clocks, synchronization or normal voice budgets. This exact binary still needs physical sustained-load listening. Back up and leave CPU headroom.",
-  "buildRevision": "20261107.2"
+  "releaseHold": null,
+  "buildRevision": "20261108.2",
+  "releaseCaution": "Maintenance build 20261108.2 restores the public 20261107.2 audio renderer and overload behavior. Four tracks are the default; enabling six requires the CPU notice and OCT+ confirmation. Busy patterns may cause noise or glitches: mute tracks or reduce simultaneous voices/effects. Dual-LFO destinations, GEN bass/level improvements, editor and illustrated manual are included. Back up before installation."
 }

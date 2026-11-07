@@ -205,6 +205,7 @@ static void con_status(void)
     con_kv("audio_late", (int32_t)felucca_dbg.late);
     con_kv("voices_shed", (int32_t)shed_count);
     con_kv("audio_lost", (int32_t)audio_lost);         /* (0.8.9) halves never rendered (a click each): a render > ~2 halves */
+    con_kv("voice_cap",(int32_t)voice_cap());
     con_kv("voices_given_up", (int32_t)voice_kills);    /* (0.8.9) events, one a voice: the three below */
     con_kv("voices_trimmed", (int32_t)voice_trims);     /* the load budget: a tail already under -50 dB, inaudible */
     con_kv("voices_stolen", (int32_t)(voice_kills - voice_trims - shed_count));   /* for a new note, the 8 all busy */

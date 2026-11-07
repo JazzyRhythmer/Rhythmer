@@ -5,7 +5,7 @@ int main(int argc,char **argv) {
  int bad=0; ui_power_on(); load_depth++; fm6_init(); power_on_parts(); load_depth--; six_native_init();song.master_q12=4096;trk_live=NTRK;ui_rec_prefs|=0x80u;
 
  /* Track count is independent of machine category; inactive data is retained. */
- bad+=check("fresh firmware defaults to six active tracks",trk_live==6);
+ bad+=check("six-track test fixture enables all tracks",trk_live==6);
  trks_put(1);uint32_t ac0=steps_sig(&trk[4]),br0=steps_sig(&trk[5]);
  for(unsigned m=0;m<2;m++){
   trks_put(m);bad+=check("GLO four/six track modes",trk_live==(m?6u:4u)&&six_track_enabled(4)==(int)m&&six_track_enabled(5)==(int)m);
@@ -34,7 +34,7 @@ int main(int argc,char **argv) {
  bad+=check("stored Acid Break IDs remain stable",ENGI_BREAK==15u&&ENGI_ACID==16u&&ENGI_SERUM==17u);
  project_capture(&proj_scratch);bad+=check("Garden engines pack and round trip",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire)&&proj_scratch.t[1].engine==ENGI_SERUM&&proj_scratch.t[2].engine==ENGI_PHASE&&proj_scratch.t[3].engine==ENGI_LOFI);
  favorite_set(ENGI_ACID,0,1);favorite_set(ENGI_BREAK,0,1);favorite_set(ENGI_SERUM,0,1);favorite_set(ENGI_LOFI,0,1);favorite_set(ENGI_LOFI,0,0);
- bad+=check("new synth favorites preserve Acid Break and machine bits",favorite_has(ENGI_ACID,0)&&favorite_has(ENGI_BREAK,0)&&favorite_has(ENGI_SERUM,0)&&!favorite_has(ENGI_LOFI,0)&&favorites.factory[15][15]==0x51u);
+ bad+=check("new synth favorites preserve Acid Break and machine bits",favorite_has(ENGI_ACID,0)&&favorite_has(ENGI_BREAK,0)&&favorite_has(ENGI_SERUM,0)&&!favorite_has(ENGI_LOFI,0)&&favorites.factory[15][15]==0x61u);
 
  for(unsigned k=0;k<5;k++){song.sel=k; dice_seq(&trk[k]); bad+=check("JIANT DICE creates sequence",!seq_is_empty(&trk[k]));}
  song.sel=SIX_BREAK_TRACK;dice_seq(TSEL);int chops_ok=1;for(unsigned i=0;i<NSTEP;i++)if(TSEL->step[i].time==ST_NOTE&&TSEL->step[i].n)chops_ok&=TSEL->step[i].n==1&&TSEL->step[i].note[0]<16;bad+=check("JIANT DICE uses valid break chops",chops_ok&&!seq_is_empty(TSEL));for(unsigned i=0;i<NSTEP;i++)step_clear(&TSEL->step[i]);
@@ -109,7 +109,7 @@ int main(int argc,char **argv) {
  TSEL->p[P_ROOT]=TSEL->p[P_SCALE]=0;TSEL->p[P_LN5]=64;six_gen_apply(0,0);bad+=check("explicit CHR is never replaced with MIN",TSEL->p[P_SCALE]==0);
  go_title("SCL");frame();turn(EN_K2,2);bad+=check("SCL UI marks explicit scale",TSEL->p[P_LN5]==64&&TSEL->p[P_SCALE]==2);
  go_title("303 GEN 2");frame();bad+=check("Acid generation page uses actual SCL parameters",cur_page()->id[0]==P_ROOT&&cur_page()->id[1]==P_SCALE);
- favorite_set(ENGI_M2STAT,0,1);favorite_set(ENGI_M2SAW,0,1);favorite_set(ENGI_M2SID,0,1);bad+=check("MONO2K favorites keep old engines and metadata",favorite_has(ENGI_M2STAT,0)&&favorite_has(ENGI_M2SAW,0)&&favorite_has(ENGI_M2SID,0)&&favorite_has(ENGI_ACID,0)&&favorites.factory[15][15]==0x51u);
+ favorite_set(ENGI_M2STAT,0,1);favorite_set(ENGI_M2SAW,0,1);favorite_set(ENGI_M2SID,0,1);bad+=check("MONO2K favorites keep old engines and metadata",favorite_has(ENGI_M2STAT,0)&&favorite_has(ENGI_M2SAW,0)&&favorite_has(ENGI_M2SID,0)&&favorite_has(ENGI_ACID,0)&&favorites.factory[15][15]==0x61u);
  const char *titles[]={"SCL","CHORD","ARP","PHASER"};
  for(unsigned k=0;k<4;k++){go_title(titles[k]);frame();bad+=check(titles[k],!ui.home);}
  for(unsigned k=0;k<5;k++){

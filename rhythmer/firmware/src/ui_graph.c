@@ -120,7 +120,7 @@ static void graph_adsr(const track_t *t, uint16_t c)
  * at the LFO's own rate; behind the playhead dimmer (what it played), the level now a dot, its depth after FADE */
 static void graph_lfo(const track_t *t, uint16_t c)
 {
-    int second=cur_page()->id[0]==P_L2RATE;
+    int second=lfo_page_second(cur_page());
     int32_t x, cy = graph_ht / 2, a = 38 * graph_ht / 100, py = cy, xp = PANEL_W / 4;
     uint32_t span = 0xFFFFFFFFu / (PANEL_W / 2u), ph = (second?t->lfo2_ph:t->lfo_ph) - (uint32_t)xp * span;
     int32_t now = cy - mulq15(second?t->lfo2_val:t->lfo_val, second?t->lfo2_fade:t->lfo_fade) * a / 32768;

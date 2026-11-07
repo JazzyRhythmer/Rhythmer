@@ -447,20 +447,21 @@ static int32_t accel(uint32_t role, int32_t s, int32_t range)
 
 /* (0.9.18) the LFO's MODE (mode 1) or PHASE turned to v (params.c ID_LMODE, ID_LPHS): FREE stores PHASE -1, keeping
  * TRIG's phase in lfo_ph_mem for TRIG again; FREE begun fades the LFO in from 0 (its FADE, once: it is turned on) */
-static void lfo_view_put(track_t *t, int mode, int32_t v)
+static void lfo_view_put(track_t *t, int second, int mode, int32_t v)
 {
     uint32_t k = (uint32_t)(t - trk) % NTRK;
+    int16_t *ph = &t->p[second ? P_L2PHASE : P_LPHASE];
     if (!mode) {
-        if (t->p[P_LPHASE] >= 0)
-            t->p[P_LPHASE] = (int16_t)v;
+        if (*ph >= 0)
+            *ph = (int16_t)v;
         else
-            lfo_ph_mem[k] = (uint8_t)v;
-    } else if (v && t->p[P_LPHASE] >= 0) {
-        lfo_ph_mem[k] = (uint8_t)t->p[P_LPHASE];
-        t->p[P_LPHASE] = -1;
-        lfo_fade_restart(1u << k);
-    } else if (!v && t->p[P_LPHASE] < 0)
-        t->p[P_LPHASE] = lfo_ph_mem[k];
+            lfo_ph_mem[second][k] = (uint8_t)v;
+    } else if (v && *ph >= 0) {
+        lfo_ph_mem[second][k] = (uint8_t)*ph;
+        *ph = -1;
+        if (second) t->lfo2_fade = 0; else t->lfo_fade = 0;
+    } else if (!v && *ph < 0)
+        *ph = lfo_ph_mem[second][k];
 }
 
 /* a knob turned parameter id of track t: recorded (AUTOMATION), and picked by MIDI LEARN (0.9.12, midi_learn.c) */
@@ -552,6 +553,17 @@ static void confirm_open(uint32_t kind, uint32_t trk)
     ui.confirm_trk = (uint8_t)trk;
     ui.act = 0;
     ui.force = 1;
+}
+
+static void trks_request(uint32_t v)
+{
+    if(v && trk_live<6u){
+        trks_ui=0;ui.menu=0;
+        confirm_open(CF_TRACKS6,0);
+        return;
+    }
+    trks_put(v);settings_save();
+    ui_message(v?"6 TRACK MODE":"4 TRACK MODE");
 }
 
 /* (0.9.18) KNOB 1 the step: a detent a step, a fast turn on a pattern longer than a bar several (KNOB ACCEL: up to x4
@@ -1284,19 +1296,24 @@ static void edit_param(uint32_t slot, int32_t steps)
         return;
     v = param_turn(d, *vp, accel(EN_K1 + slot, steps, d->fmt == F_ENUM ? 0 : d->max - d->min));
     *vp = (int16_t)v;
+    if(pg->id[0]==ID_L2DEST){
+        int fresh=!lfo2_dest_active(TSEL);
+        lfo2_dest_put(TSEL,slot,v);
+        if(fresh)for(unsigned j=0;j<4;j++)knob_cap(TSEL,L2D_ID[j]);
+        else knob_cap(TSEL,L2D_ID[slot]);return;
+    }
     if(vp==&TSEL->p[P_ROOT]||vp==&TSEL->p[P_SCALE]){
      /* scale_link shares the chosen key with melodic tracks; keep CHR explicit. */
      for(unsigned j=0;j<NTRK;j++)if(trk[j].eng_req==ENGI_ACID)trk[j].p[P_LN5]=64;
     }
     if (vp == &trks_ui) {                               /* (0.6.18) GLO > SYSTEM's TRKS: the MENU's setting, saved */
-        trks_put(v);
-        ui_message(v?"6 TRACK MODE":"4 TRACK MODE");
-        settings_save();
+        trks_request(v);
         return;
     }
     if (vp == &lmode_ui || vp == &lphase_ui) {          /* (0.9.18) LFO MODE / PHASE: P_LPHASE written back */
-        lfo_view_put(TSEL, vp == &lmode_ui, v);
-        knob_cap(TSEL, P_LPHASE);
+        int second = lfo_page_second(pg);
+        lfo_view_put(TSEL, second, vp == &lmode_ui, v);
+        knob_cap(TSEL, second ? P_L2PHASE : P_LPHASE);
         return;
     }
     if (vp == &load_ui) {                               /* (0.6.30) GLO > SYSTEM's LOAD: the same */
@@ -2274,10 +2291,12 @@ static void ui_input_frame(void)
             uint32_t kind = ui.confirm;
             ui.confirm = 0;
             ui.force = 1;
-            if (kind != CF_OVR_PROJ && kind != CF_OVR_USER && kind != CF_ERASE_USER && kind != CF_DICE_ALL &&
+            if (kind != CF_TRACKS6 && kind != CF_OVR_PROJ && kind != CF_OVR_USER && kind != CF_ERASE_USER && kind != CF_DICE_ALL &&
                 !dice_kind(kind) && kind != CF_DEL_ROW && kind != CF_CLEAR_SONG && !chain_busy())
                 undo_mark();                            /* (0.6.21) the music before a clear, INIT, RECALL, pattern */
-            if (kind == CF_OVR_PROJ) {                  /* overwrite: the NAME screen writes it */
+            if (kind == CF_TRACKS6) {
+                trks_put(1);settings_save();ui_message("6 TRACK MODE");
+            } else if (kind == CF_OVR_PROJ) {                  /* overwrite: the NAME screen writes it */
                 name_open(NK_PROJ_SAVE, ui.confirm_trk & 3u);
             } else if (kind == CF_OVR_USER) {
                 name_open(NK_USER_SAVE, ui.confirm_trk);

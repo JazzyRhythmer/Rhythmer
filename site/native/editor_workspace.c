@@ -44,6 +44,8 @@ static void lcd_blit(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint1
 #include "../../rhythmer/firmware/src/gfx.c"
 #include "../../rhythmer/firmware/src/panel.c"
 #include "../../rhythmer/firmware/src/ui.c"
+/* Offline data editing cannot acknowledge a device CPU warning. */
+static void trks_request(uint32_t v){if(!v)trks_put(0);else ui_message("CONFIRM ON DEVICE: OCT+");}
 #include "../../rhythmer/firmware/src/menu_items.c"
 static void panel_setup(void) {}
 

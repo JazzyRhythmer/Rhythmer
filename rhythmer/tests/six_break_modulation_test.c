@@ -47,6 +47,8 @@ int main(int argc,char **argv){
  key_on(0,t);key_off(0,t);C("Releasing a live chop keeps an underlying sequence gate",t->v[0].gate&&t->v[0].s[BENV_SEQ]&&!t->v[0].s[BENV_KEYS]);
  seq_note_off(t,0);C("Sequence release after live playing closes the envelope gate",!t->v[0].gate);
  t=reset();t->p[P_M1SRC]=MS_LFO2;t->p[P_M1DST]=MD_AMP;t->p[P_M1AMT]=63;t->p[P_L2RATE]=115;seq_note_on(t,0,127);double trem=render(t,512,0);C("LFO 2 AMP modulation attenuates real Break output",trem<dry*.9);
+ t=reset();lfo2_dest_put(t,1,63);t->p[P_FCUT]=60;t->p[P_L2RATE]=115;seq_note_on(t,0,127);render(t,512,&hash);C("LFO 2 DEST FILTER changes Break audio without a MOD slot",hash!=dryhash&&t->v[0].s[BENV_CUT]!=0);
+ t=reset();lfo2_dest_put(t,3,127);t->p[P_L2RATE]=115;seq_note_on(t,0,127);double direct=render(t,512,0);C("LFO 2 DEST AMP attenuates real Break without a MOD slot",direct<dry*.9);
  t=reset();seq_note_on(t,0,127);render(t,32,&dryhash);
  t=reset();t->p[P_M1SRC]=MS_ENV;t->p[P_M1DST]=MD_E1+3;t->p[P_M1AMT]=40;seq_note_on(t,0,127);render(t,32,&hash);C("ENV matrix changes Amenity FILTER audio without rewriting its knob",hash!=dryhash&&t->p[P_E3]==64&&t->m_env>0);
  power_on_parts();t=&trk[5];

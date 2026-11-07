@@ -263,11 +263,11 @@ static int32_t menu_document(int32_t y, int draw)
     }
     y = menu_text("THE PROJECT", y + 216, T_THEME, draw);
     y = menu_text("Rhythmer by Jazzy Rhythmer", y, T_TEXT, draw);
-    y = menu_text("An independent six-track groovebox firmware for the M-VAVE FM-1.", y, T_TEXT, draw);
+    y = menu_text("Six-track firmware for M-VAVE FM-1.", y, T_TEXT, draw);
     y = menu_text("YouTube: youtube.com/@jazzyrhythmer", y + 4, T_MID, draw);
     y = menu_text("Instagram: instagram.com/jazzyrhythmer", y, T_MID, draw);
-    y = menu_text("Built on JIANT, Felucca and the credited projects below. Original authors retain their copyrights.", y + 4, T_TEXT, draw);
-    y = menu_text("Free software, GPL-3.0-only: the full notices and the sources it builds on travel with the source.", y + 4, T_TEXT, draw);
+    y = menu_text("Based on JIANT/Felucca. Upstream copyrights retained.", y + 4, T_TEXT, draw);
+    y = menu_text("GPL-3.0-only. Full notices in source and release.", y + 4, T_TEXT, draw);
     y -= 216;
     {   /* (0.6.17) the audio's load since power-on (voice.c load_diag): to tell what happened when it clicked */
         char b[40], n[12];
@@ -302,7 +302,7 @@ static int32_t menu_document(int32_t y, int draw)
     }
     y = menu_text("LICENSES + SOURCE", y + 12, T_THEME, draw);
     y = menu_text("DRUM + own samples: GPL-3.0-only", y, T_TEXT, draw);
-    y = menu_text("Fonts and icons: their licences travel with the source and the release files.", y, T_TEXT, draw);
+    y = menu_text("Fonts/icons: licenses in source and release.", y, T_TEXT, draw);
     y = menu_text("NO WARRANTY", y, T_TEXT, draw);
     y = menu_text("Full notices in source:", y + 8, T_TEXT, draw);
     y = menu_text("github.com/JazzyRhythmer/Rhythmer", y, T_MID, draw);

@@ -146,7 +146,7 @@
 
 
 <style id="jiant-brand">/*JIANT_UI*/</style>
-<link rel="stylesheet" href="rhythmer.css?v=9bd5b4d878ac"></head>
+<link rel="stylesheet" href="rhythmer.css?v=951093f62aec"></head>
 <body class="jiant-editor">
 <main><section id="rhythmer-mode"><a href="../#editor" target="_top" class="rhy-title">RHYTHMER / EDITOR</a><span class="rhy-build">0.1.1-beta3</span><div class="bar"><a id="mode-browser" href="?target=browser">BROWSER WORKSPACE</a><a id="mode-usb" href="?target=usb">USB FM-1</a></div><p id="workspace-status" role="status"></p><p id="mode-note"></p></section>
   <button class="lang" id="lang"></button>
@@ -464,6 +464,7 @@ const parse = {
     }
     /* (JIANT 0.8.5) 'Y' 1 n, the last tag: LYRIC (cmd 39), a track's lyric of at most n bytes; 0 = none */
     const ty = trailer.length - 3;
+    o.lfo2Dest = ty >= 3 && trailer[ty-3]===0x32 && trailer[ty-2]===1 && trailer[ty-1]===1;
     o.lyric = ty >= 0 && trailer[ty] === 0x59 && trailer[ty + 1] === 1 ? trailer[ty + 2] : 0;
     return o;
   },
@@ -2406,7 +2407,7 @@ function divLength(n) {
   const m = /^(\d+)\/(\d+)$/.exec(n) || /^(\d+)(T|BAR)$/.exec(n);
   return !m ? null : m[2] === "BAR" ? +m[1] : m[2] === "T" ? 2 / 3 / +m[1] : +m[1] / +m[2];
 }
-function enumShown(d) {
+function enumShown(d) { if(d.names?.[1]==="LFO 1"&&d.names?.[15]==="LFO 2")return [0,1,15,2,3,4,5,6,7,8,9,10,11,12,13,14];
   const vals = [];
   for (let v = d.min; v <= d.max; v++) vals.push(v);
   const len = d.fmt === F.ENUM && d.names ? d.names.map(divLength) : [null];
@@ -2838,7 +2839,7 @@ const knownLayout = (info) => [71].includes(info.gcount) &&   /* (JIANT FUNB: 5,
 const P = { LEVEL: 0, SLEN: 29 };
 const LAYOUT = (pe0) => [
   { t: "ENV", pages: [["ENV", 0, [1, 2, 3, 4]], ["ENV DEST", 0, [5, 6, 7, 8]]] },
-  { t: "LFO", pages: [["LFO 1", 0, [9, 10, 11, 12]], ["LFO 2", 0, [pe0-4,pe0-3,pe0-2,pe0-1]], ["LFO DEST", 0, [13, 14, 15, 16]],
+  { t: "LFO", pages: [["LFO 1", 0, [9, 10, 11, 12]], ["LFO 2", 0, [pe0-4,pe0-3,pe0-2,pe0-1]], ["LFO 2 DEST", 2, [0,1,2,3]], ["LFO 1 DEST", 0, [13, 14, 15, 16]],
     ...(pe0 >= 112 ? [["MSEQ", 0, [93, 95, 94]], ...[0, 1, 2, 3].map((k) => [`STEPS ${4 * k + 1}-${4 * k + 4}`, 0,
       [96 + 4 * k, 97 + 4 * k, 98 + 4 * k, 99 + 4 * k]])] : [])] },   /* (JIANT) the modulation sequence: LEN DIV SLEW, its 16 levels */
   ...(pe0 >= 61 ? [{ t: "MOD", mod: 49 }] : []),   /* the matrix: P_M1SRC 49 .. P_M4AMT 60, one row per slot */
@@ -2907,7 +2908,7 @@ async function connect() {
   sayK("connecting");
   try {
     if (!access) {
-      if (WORKSPACE) { const w = await import("./workspace.mjs?v=9bd5b4d878ac"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }
+      if (WORKSPACE) { const w = await import("./workspace.mjs?v=951093f62aec"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }
       else {
         try { access = await navigator.requestMIDIAccess({ sysex: true }); }
         catch (e) { sayK("denied"); return; }
@@ -3203,7 +3204,7 @@ function buildGroups() {
   for (const [id, divs] of Object.entries(groups)) $(id).replaceChildren(...divs);
 }
 
-function paramRow(s, id) {
+function paramRow(s, id) { if(s===2)return lfo2DestRow(id);
   const d = s ? dev.gdesc[id] : dev.pdesc[id];
   if (!visible(d) || (s === 1 && G_SKIP.has(d.label))) return null;
   if (!s && d.label === "PHASE" && d.min === -1 && d.fmt === F.INT) return lfoModeRows(id, d);
@@ -4737,6 +4738,31 @@ $('midiports').hidden=WORKSPACE;
 $('mode-'+(WORKSPACE?'browser':'usb')).setAttribute('aria-current','page');
 var machine=el('div',{id:'machine-tools',class:'group'});
 $('p-sound').prepend(machine);
+const lfoHelp=el('div',{class:'group',id:'dual-lfo-help'});
+lfoHelp.append(el('h2',{text:'TWO LFOS / PER TRACK'}),el('p',{class:'dim',text:'Each of T1–T6 has independent LFO 1 and LFO 2. Each has a DEST page for PITCH, FILTER, SHAPE and AMP, separate from the four MOD slots. Set RATE, WAVE, MODE, PHASE and FADE in the LFO panels. MOD sources list LFO 1 then LFO 2. Save the sound or project to keep the settings.'}));
+const lfoLinks=el('div',{class:'bar'});
+for(const title of ['LFO 1','LFO 2','LFO 2 DEST','MOD'])lfoLinks.append(el('button',{text:'OPEN '+title,onclick:()=>{
+  const heading=[...document.querySelectorAll('#groups h2,#groups h3')].find(h=>h.textContent.trim()===title);
+  heading?.scrollIntoView({block:'start',behavior:'smooth'});
+}}));
+lfoHelp.append(lfoLinks);
+$('p-sound').prepend(lfoHelp);
+// Four independent destination depths stored in Rhythmer's reclaimed slots.
+// Raw parameter IDs remain stable; the custom rows show decoded musical depths.
+function lfo2DestRow(k){
+  if(!dev.info.lfo2Dest)return null;
+  const ids=[65,68,72,80],names=['PITCH','FILTER','SHAPE','AMP'];
+  const input=el('input',{type:'range',min:k===3?0:-64,max:k===3?127:63,step:1,'aria-label':'LFO 2 '+names[k]});
+  const out=el('span',{class:'v'}),row=el('div',{class:'row'},el('span',{text:names[k]}),input,out);
+  row.dataset.lfo2depth=k;
+  input.addEventListener('change',()=>op(async()=>{
+    const d=dev,track=d.sel??0,value=+input.value;
+    if(dev!==d||(d.sel??0)!==track)throw Error('Track changed; read the sound again');
+    await rq(req.set(2,k,value));
+    d.dump=await getDump(d);refreshAll();renderRhythmer();
+  }));
+  return row;
+}
 var projectsBox=el('div',{id:'project-bank',class:'group'});
 $('p-projects').prepend(projectsBox);
 const disconnectUpstream=disconnect;
@@ -4750,6 +4776,12 @@ const oldRenderPanels=renderPanels;
 renderPanels=function(){oldRenderPanels();if(machine)renderRhythmer();};
 function renderRhythmer(){
   if(!dev?.dump)return;
+  document.querySelectorAll('[data-lfo2depth]').forEach(row=>{
+    const k=+row.dataset.lfo2depth,ids=[65,68,72,80],raw=dev.dump.p;
+    const v=raw[80]<=63?raw[ids[k]]+(k===3?64:-64):0;
+    const input=row.querySelector('input');if(input!==document.activeElement)input.value=v;
+    row.querySelector('.v').textContent=Math.round(v*100/(k===3?127:64))+' %';
+  });
   const e=dev.dump.engine;
   const help=document.querySelector('[data-t=notesHelp]');if(help)help.textContent=e===15?'C1–C16 chops · R1–R16 repeats/up-down · A / B sample · RET return. Up to four commands per step; NOTE / TIE / REST control playback.':t('notesHelp');
   const owner=dev.mix?.tracks?.findIndex(t=>t.engine===15)??-1;
@@ -4824,7 +4856,7 @@ download=function(name,obj){
 };
 // Audio is intentionally separate from the musical archive protocol.
 const samplePanel=document.getElementById('p-samples');
-import('./break-samples.mjs?v=9bd5b4d878ac').then(({initBreakSamples})=>initBreakSamples({
+import('./break-samples.mjs?v=951093f62aec').then(({initBreakSamples})=>initBreakSamples({
  container:samplePanel,mode:WORKSPACE?'browser':'usb',getWorkspace:()=>workspace,getDevice:()=>dev,
  request:(d,r,o)=>sessionRequest(d,r,o),
  operation:async fn=>{if(!dev)throw Error('Connect Rhythmer first');const release=beginBusy();try{return await fn();}finally{release();}},

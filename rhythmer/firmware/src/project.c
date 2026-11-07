@@ -141,6 +141,7 @@ typedef struct {
     uint8_t macro[4];                          /* the macros M1..M4 (mod.c macro_v), 0..127: after the lane's tracks */
     char lyr[NTRK][LYR_LEN];                   /* (0.8.5) VOICE's lyrics (sing.c lyr_txt): FUNC's 'L' 'Y' blocks, "" before */
     char name[PROJ_NAME_LEN];                  /* the project's name: upper-case ASCII 32..126, 0-padded; "" = none */
+    uint8_t lfo2_mask;                         /* 'L2' tail marker: only tagged tracks use the reclaimed depths */
     uint32_t sum;
 } project_t;
 /* Historical FUN5/6 types are frozen, independent of today's P_COUNT/step_t. */
@@ -618,6 +619,7 @@ static void proj_sl_migrate(project_t *q)
 static int proj_import(project_t *q, const void *b, int n)
 {
     proj_sl_found = 0;
+    q->lfo2_mask=0;
     if (!proj_import_any(q, b, n) || !proj_engines_ok(q))
         return 0;
     if (!proj_sl_found) {
@@ -627,6 +629,8 @@ static int proj_import(project_t *q, const void *b, int n)
     proj_fm4(q);
     proj_perc(q);                                       /* (SAMPLE PERC: DRUM, before the retired engines) */
     proj_phys_gone(q);
+    for(unsigned t=0;t<NTRK;t++)if(!((q->lfo2_mask>>t)&1u))q->t[t].p[P_L2DAMP]=127;
+    q->sum=proj_sum(q);
     return 1;
 }
 static int proj_import_any(project_t *q, const void *b, int n)
@@ -864,7 +868,7 @@ static uint32_t proj_packed_size(const project_t *q)
         for (i = 0; i < NSTEP; i++)
             n += proj_step_empty(&q->t[t].step[i]) ? 0u : proj_step_size(&q->t[t].step[i]);
     }
-    return n;
+    return n+(q->lfo2_mask?3u:0u);
 }
 static int proj_pack(project_store_t *out, const project_t *q)
 {
@@ -1017,6 +1021,7 @@ static int proj_pack(project_store_t *out, const project_t *q)
             }
         }
     }
+    if(q->lfo2_mask){b[pos++]='L';b[pos++]='2';b[pos++]=q->lfo2_mask;}
     memcpy(b + PROJC_PFX_OFF, q->pfx_lane, sizeof q->pfx_lane);
     b[PROJC_PFX_OFF + sizeof q->pfx_lane] = q->pfx_ltgt > 2u ? 0u : q->pfx_ltgt;
     for (i = 0; i < 4u; i++)
@@ -1297,6 +1302,9 @@ static int proj_unpack_c(project_t *q, const uint8_t *b)
             }
         }
     }
+    if(pos+3u<=room&&b[pos]=='L'&&b[pos+1u]=='2'){
+        q->lfo2_mask=b[pos+2u];if(!q->lfo2_mask||(q->lfo2_mask>>nt))return 0;
+    }
     proj_new_tracks(q, nt);                             /* (a FUNC of fewer tracks: the rest at power-on) */
     for (t = nt; t < NTRK; t++)
         memcpy(q->fm6[t], FM6_INIT, FM6_PACKED);
@@ -1560,6 +1568,7 @@ static void project_capture(project_t *p)
     p->sel = song.sel;
     p->parts = NPART;
     p->phys = PROJ_PHYS;p->rsv=dx_md_hi;
+    for(i=0;i<NTRK;i++)if(lfo2_dest_active(&trk[i]))p->lfo2_mask|=(uint8_t)(1u<<i);
     p->chain = chain_config;
     for (i = 0; i < NTRK; i++) {
         for (uint32_t j = 0; j < P_COUNT; j++) p->t[i].p[j] = motion_base_value(&trk[i], j);
@@ -1809,8 +1818,8 @@ static int project_restore_runtime(const project_t *input)
             const param_desc_t *d = param_desc_of(e, i);
             t->p[i] = (int16_t)param_fit(d, s->p[i]);
         }
-        if (!FELUCCA_FM4) {   /* (0.6.92) HUMAN is one amount (P_HVEL): a project of 0.6.87 .. 0.6.91 with VEL, TIME and
-                               * GATE apart keeps the largest of them (not DIGITAL's operator slots, FELUCCA_FM4) */
+        if (!((p->lfo2_mask>>k)&1u))t->p[P_L2DAMP]=127;
+        if (!FELUCCA_FM4 && !((p->lfo2_mask>>k)&1u)) {   /* old split HUMAN migrates only on untagged tracks */
             int16_t m = t->p[P_HVEL];
             if (t->p[P_HTIM] < m) m = t->p[P_HTIM];
             if (t->p[P_HGAT] < m) m = t->p[P_HGAT];

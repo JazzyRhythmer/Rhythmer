@@ -10,7 +10,8 @@ src=(R/'site/src/manual.mjs').read_text().replace('export ','')
 landing=(R/'site/src/landing.mjs').read_text().replace('export ','')
 result=run(src+'\n'+landing+'''
 const checks=[];const check=(ok,label)=>{if(!ok)throw Error(label);checks.push(label);};
-const rows=manualSections();check(rows.length===15,'15 complete manual sections');
+const rows=manualSections();check(rows.length===16,'16 complete manual sections');
+const trackHelp=rows.find(r=>r[0]==='tracks')[2];check(['six-track-warning.png','knob 1 / TRACKS','knob 2 / TRACKS','OCT+','OCT−','noise or glitches'].every(t=>trackHelp.includes(t)),'track-mode guide includes actual notice, both paths, confirmation and remedies');
 const ids=rows.map(r=>r[0]);const links=renderLanding({config:{creator:'Jazzy Rhythmer',links:{},localOnly:false},release:{version:'0.1.1-beta3',sha256:'current',buildRevision:'20261107.2'},symbol:()=>'',makerNote:()=>'',ext:()=>''});
 const targets=[...links.matchAll(/href="#guide\/([^"#]+)"/g)].map(m=>m[1]);
 check(targets.length>=6&&targets.every(t=>ids.includes(t)),'every homepage chapter link resolves');
