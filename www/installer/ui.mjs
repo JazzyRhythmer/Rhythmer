@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=ecb1d3113a63';
-import {mountProgress} from './progress.mjs?v=ecb1d3113a63';
+import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=3156538adfcd';
+import {mountProgress} from './progress.mjs?v=3156538adfcd';
 const $=s=>document.querySelector(s),mode=new URLSearchParams(location.search).get('mode')==='stock'?'stock':'rhythmer';
 let manifest,target,recovery,source,up,access,working=false,writing=false,backupReady=false,bundleReady=false,releaseLock,heartbeat,channel;
 document.body.dataset.mode=mode;

@@ -72,6 +72,7 @@ def build():
     release = {'version':config.get('version','Rhythmer dev'),'product':config.get('product','FM-1_900'),'sha256':digest,'physicalHardwareTested':config.get('ownerTest',{}).get('firmwareSha256')==digest,'ownerTest':config.get('ownerTest'),'localOnly':config.get('localOnly',True),'files':files,'sampleNotice':'Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.'}
     release['releaseHold']=config.get('releaseHold')
     release['buildRevision']=config.get('buildRevision')
+    release['audioBaseTest']=config.get('audioBaseTest')
     release['releaseCaution']=config.get('releaseCaution')
     (dist/'release.json').write_text(json.dumps(release,indent=2)+'\n')
     validation_file=dist/'RELEASE-VALIDATION.json'

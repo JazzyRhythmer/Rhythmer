@@ -1,15 +1,17 @@
 {
   "version": "0.1.1-beta3",
   "product": "FM-1_748005",
-  "sha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
-  "physicalHardwareTested": true,
+  "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+  "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-08",
-    "firmwareSha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
-    "method": "Owner-reported listening on a physical FM-1",
-    "result": "Owner confirmed completing physical-device listening for build 20261108.2.",
+    "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
+    "buildRevision": "20261108.6",
+    "method": "Owner-reported physical FM-1 installation and listening",
+    "result": "Owner reports this native Hortator/buffer build works very well, without the earlier buffering issue.",
     "verifiedScope": [
-      "Physical-device listening, owner reported"
+      "Installed build 20261108.6",
+      "Physical playback/listening, owner reported"
     ],
     "migrationAndRecoveryMatrixVerified": false
   },
@@ -22,28 +24,28 @@
     },
     {
       "name": "Rhythmer-0.1.1-beta3-install.zip",
-      "bytes": 3171988,
-      "sha256": "0eea28f3870a1c427cde786ee4f2af96cd97c5447aa4d19b97cc611c3014f524"
+      "bytes": 3158911,
+      "sha256": "c5c595169e42e36dbc66b06067e08bc82df90c8d5726d6382e70dc39aec4258c"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
-      "bytes": 1351501,
-      "sha256": "5d0a9f2bf699c2eec1339fc31b2d015d51550ffcc8879b29d6ff7e65c8aaaab3"
+      "bytes": 1351502,
+      "sha256": "5996517b926112f865c71589a425af06bd21ac53543ad09b0cd41d4f4a4da0ce"
     },
     {
       "name": "Rhythmer-start.fm1save",
-      "bytes": 1351534,
-      "sha256": "d7c0c59d75de5326984346f908845955348955c76035423d691bdd449fa7c658"
+      "bytes": 1351517,
+      "sha256": "2e2889a3d66646cc93a0bdd67cf2a8cbf628c90963bb9b6553c17df0c942c70c"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2261425,
-      "sha256": "c0e2515b9cd7d8b7228a1e58a16cc0a0804d834382a4ed8d64a4570a5b0e8757"
+      "sha256": "5a9bb77a6dda19ad0cf3d41400b8f9ef523ab9124d2c53ec7378c3ceef13fcc2"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d"
+      "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -103,8 +105,19 @@
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
   "releaseHold": null,
-  "buildRevision": "20261108.2",
-  "releaseCaution": "Maintenance build 20261108.2 restores the public 20261107.2 audio renderer and overload behavior. Four tracks are the default; enabling six requires the CPU notice and OCT+ confirmation. Busy patterns may cause noise or glitches: mute tracks or reduce simultaneous voices/effects. Dual-LFO destinations, GEN bass/level improvements, editor and illustrated manual are included. Back up before installation.",
+  "buildRevision": "20261108.7",
+  "audioBaseTest": {
+    "ownerConfirmed": true,
+    "buildRevision": "20261108.6",
+    "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
+    "finalRevision": "20261108.7",
+    "firmwareSourceDifferences": [
+      "rhythmer/firmware/src/ui.c",
+      "rhythmer/firmware/src/ui_input.c"
+    ],
+    "change": "UI-only changes: confirmed optional-slot defaults, EMPTY excluded from sound carousel, fresh shared SCL defaults to CHR. Audio DSP, buffer, voice management and core algorithms unchanged."
+  },
+  "releaseCaution": "Native Hortator Acid, MIDI-only generation and restored buffer headroom. The creator confirmed stable playback on audio-base build 20261108.6. This revision fills empty T5/T6 with Acid/Break on confirmed six-track activation, skips EMPTY during preset browsing and starts fresh SCL in CHR. Existing assignments, notes and stored scales are preserved. Busy six-track arrangements still need CPU headroom. Back up before installation.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

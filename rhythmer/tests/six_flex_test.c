@@ -6,7 +6,7 @@ static int break_in_models(void){unsigned e=ENGI_SERUM,found=0;for(unsigned i=0;
 static void settle(void){int32_t out[64];for(unsigned i=0;i<24;i++)mix_block(out,32);}
 static void save_fixture(const char *path){project_capture(&proj_scratch);if(!proj_pack(&proj_wire,&proj_scratch))exit(3);FILE *f=fopen(path,"wb");if(!f)exit(4);fwrite(&proj_wire,1,sizeof proj_wire,f);fclose(f);}
 int main(int argc,char **argv){
- int bad=0;ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trks_put(1);song.master_q12=4096;
+ int bad=0;ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);song.master_q12=4096;
  song.sel=5;int stored=up_store(0,"BREAK U");bad+=check("save a BREAK user preset",(stored==0||stored==3)&&up_used(0)&&up_engine(0)==ENGI_BREAK);favorite_set(ENGI_BREAK,0,1);favorite_set(NENGINES,0,1);
  for(unsigned k=0;k<6;k++){
   song.sel=k;int own=k==5;
@@ -35,10 +35,10 @@ int main(int argc,char **argv){
  }
  six_native_init();
  for(unsigned k=0;k<6;k++){track_t *t=&trk[k];t->xf_on=t->xf=0;t->engine=t->eng_req;trk_note_on(t,36+k*3,127);}
- settle();int independent=1;for(unsigned k=0;k<6;k++)independent&=six_acid_note[k]==36+(int)k*3&&six_acid_gate[k];
+ settle();int independent=1;for(unsigned k=0;k<6;k++)independent&=(acid_voice[k].x[1]/16)==36+(int)k*3&&(acid_voice[k].x[2]&1);
  bad+=check("six Acid tracks keep separate notes and gates",independent);
- six_acid_state_t untouched=six_acid[1];trk_all_off(&trk[0]);settle();
- bad+=check("Acid note-off does not release another track",!six_acid_gate[0]&&six_acid_gate[1]&&six_acid_note[1]==39);
+ ha_voice_t untouched=acid_voice[1];trk_all_off(&trk[0]);settle();
+ bad+=check("Acid note-off does not release another track",!(acid_voice[0].x[2]&1)&&(acid_voice[1].x[2]&1)&&(acid_voice[1].x[1]/16)==39);
  (void)untouched;
  uint32_t seeds[6];memcpy(seeds,six_gen_seed,sizeof seeds);song.playing=1;bar_n=100;six_gen_poll();int auto_all=1;for(unsigned k=0;k<6;k++)auto_all&=seeds[k]!=six_gen_seed[k];bad+=check("auto mutation follows each Acid independently",auto_all);song.playing=0;
  project_capture(&proj_scratch);bad+=check("six Acid project round trips",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire));

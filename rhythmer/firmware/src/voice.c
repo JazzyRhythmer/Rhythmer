@@ -322,9 +322,11 @@ static void lfo_fade_restart(uint32_t mask)
  * ECO_VOICES between all (voice_cap), the load budget sooner (audio.c TIGHT_ON_ECO) */
 enum { LOAD_FULL, LOAD_LITE, LOAD_ECO };
 static volatile uint8_t sys_load;
-/* Runtime governor: keep JIANT's nominal polyphony; try existing LITE FX before
- * shrinking the shared ceiling under sustained overload (audio.c gov_tick).
- * LOAD_EFF leaves the user's saved LOAD setting unchanged. */
+/* (0.9.13) the load governor (audio.c gov_tick), ahead of the overload guard: gov_cap the voices all parts may share
+ * (one less after 6 halves in a row over the load budget, one more after 0.5 s under it, 4 at least), gov_lite LOAD LITE
+ * of its own while the guard keeps fading voices (two sheds in a second; 5 s calm to go back): the song's polyphony and
+ * the heavy reverbs give way before the audio is late. LOAD_EFF(): the LOAD the sound plays (the MENU's, else the
+ * governor's) */
 static volatile uint8_t gov_cap = 16u, gov_lite;
 #define LOAD_EFF() (sys_load ? sys_load : gov_lite)
 #define LITE_FM6_POLY 2u
@@ -361,14 +363,9 @@ static struct { volatile uint32_t peak, late, shed; } load_diag;
  * up): the room its render gives. A part still has NVOICE of its own (track_t.v: no RAM more); the load budget
  * (load_tight) and the overload guard (audio.c) measure core 0's half with core 1's wait in it, so they hold the
  * render in its time either way; a core 1 given up mid-session: NVOICE again from the next note */
-#define VOICES_2CORE 12u /* JIANT shared polyphony; MD admission has its own guard. */
+#define VOICES_2CORE 12u
 static int mc_two(void);                                /* (fx.c) */
 static int six_track_enabled(unsigned k);
-static unsigned md_costly_busy(void){
- unsigned count=0;for(unsigned k=0;k<NPART;k++)if(six_track_enabled(k)&&trk[k].engine==ENGI_DRUM&&!trk[k].p[P_MUTE])
-  for(unsigned i=0;i<NVOICE;i++)if(trk[k].v[i].active&&trk[k].v[i].stage!=4u)count+=md_costly_mode(md_voice_mode(&trk[k],&trk[k].v[i]));
- return count;
-}
 static uint32_t voice_budget(void)
 {
     return sys_load == LOAD_ECO ? ECO_VOICES : mc_two() ? VOICES_2CORE : NVOICE;
@@ -396,10 +393,19 @@ static uint32_t lowest_held(const track_t *t)           /* index of the lowest h
     return low;
 }
 
+/* Protect the transient, not the entire drum lifetime. kfade is unused until
+ * stage 4 and is reset on each hit (including FLAM); it counts rendered CTLs.
+ * Past 40 ms a drum tail participates in the original budget/overload policy. */
+#define DRUM_ATTACK_BLOCKS ((FS * 40u + CTL * 1000u - 1u) / (CTL * 1000u))
+static int drum_attack(const track_t *t,const voice_t *v)
+{
+    return t->engine==ENGI_DRUM && v->active && v->stage!=4u && v->kfade<DRUM_ATTACK_BLOCKS;
+}
+
 /* the voice to give up for a new one (see the top); soft: only released voices and
  * extra voices of other non-POLY parts (also ones left after a mode change).
  * Returns its index, *pp its part; NVOICE = none */
-static uint32_t voice_victim_ex(const track_t *self, int soft, track_t **pp,const voice_t *avoid)
+static uint32_t voice_victim(const track_t *self, int soft, track_t **pp)
 {
     uint32_t p, i, best = NVOICE, cat = 4;
     for (p = 0; p < NPART; p++) {
@@ -411,11 +417,11 @@ static uint32_t voice_victim_ex(const track_t *self, int soft, track_t **pp,cons
         for (i = 0; i < NVOICE; i++) {
             const voice_t *v = &t->v[i];
             uint32_t c;
-            if (!v->active || v->stage == 4u || v==avoid)
+            if (!v->active || v->stage == 4u || drum_attack(t,v))
                 continue;
             if (!v->gate)
                 c = 1;                                  /* released */
-            else if (mode != V_POLY && i > 0)
+            else if (t->engine == ENGI_DRUM || (mode != V_POLY && i > 0))
                 c = 2;                                  /* extra UNISON, or a voice left by a mode / cap change */
             else if (!soft && mode == V_POLY && i != low)
                 c = 3;                                  /* held, not the bass */
@@ -430,8 +436,6 @@ static uint32_t voice_victim_ex(const track_t *self, int soft, track_t **pp,cons
     }
     return best;
 }
-
-static uint32_t voice_victim(const track_t *self,int soft,track_t **pp){return voice_victim_ex(self,soft,pp,0);}
 
 /* (0.8.9) console status: voices_given_up counts events, one per voice faded out early, whatever asked (a voice
  * already fading is not counted again); voice_trims the share of them the load budget took: a released tail already
@@ -457,7 +461,7 @@ static uint32_t quiet_tail(track_t **pp)
     for (p = 0; p < NPART; p++)
         for (i = 0; i < NVOICE; i++) {
             const voice_t *v = &trk[p].v[i];
-            if (!v->active || v->gate || v->stage == 4u || v->env_out >= 104)
+            if (!v->active || v->gate || v->stage == 4u || v->env_out >= 104 || drum_attack(&trk[p],v))
                 continue;
             if (best == NVOICE || v->age < (*pp)->v[best].age) {
                 best = i;
@@ -494,48 +498,6 @@ static voice_t *voice_reuse(track_t *t, voice_t *v)
     return v;
 }
 
-/* MD-only admission. A new MD hit can replace another MD hit, but cannot
- * evict a classic drum, chord note or Acid voice on any other part. */
-static int voice_is_md(const track_t *t,const voice_t *v)
-{
-    return t->engine==ENGI_DRUM && v->active && v->stage!=4u && dx_is_md(md_voice_mode(t,v));
-}
-static voice_t *md_voice_alloc(track_t *t,uint32_t note)
-{
-    voice_t *reuse=drum_reuse(t,note), *own=0, *other=0, *freev=0;
-    track_t *other_part=0;
-    unsigned count=0,local=0;
-    unsigned limit=md_heavy_note(note)?2u:md_track_poly(t);
-    if(!limit)limit=3u;
-    for(unsigned p=0;p<NPART;p++)for(unsigned i=0;i<NVOICE;i++){
-        voice_t *v=&trk[p].v[i];
-        if(&trk[p]==t&&!v->active&&!freev)freev=v;
-        if(!voice_is_md(&trk[p],v))continue;
-        count++;if(&trk[p]==t){local++;if(!own||v->age<own->age)own=v;}
-        if(!other||v->age<other->age){other=v;other_part=&trk[p];}
-    }
-    unsigned reuse_live=reuse&&reuse->active&&reuse->stage!=4u;
-    if(reuse_live&&voice_is_md(t,reuse)){count--;local--;}
-    unsigned md_cap=4u; /* Measured MD-only work cap; normal shared budget is unchanged. */
-    /* Reuse this part's own MD slot first; its new hit has no cross-track cost. */
-    if(local>=limit){if(!own)return 0;return own;}
-    if(count>=md_cap||(!reuse_live&&voices_busy()>=voice_cap())){
-        if(own)return own;
-        /* Like JIANT's hard voice_room(), a primary part voice may exceed a
-         * governor ceiling below the ensemble's minimum. Never exceed the
-         * nominal ceiling or the MD-only work cap, and never steal its chord. */
-        if(count<md_cap&&!local&&freev&&voices_busy()<voice_budget())return freev;
-        if(!other||!freev)return 0;
-        /* Never erase the only sounding hit of another MD part for an extra
-         * hit on this one. A dense all-MD ensemble may omit excess hits. */
-        unsigned n=0;for(unsigned i=0;i<NVOICE;i++)n+=voice_is_md(other_part,&other_part->v[i]);
-        if(n<=1u)return 0;
-        voice_kill(other);
-    }
-    if(reuse)return reuse;
-    return freev?freev:own;
-}
-
 /* POLY allocation (within the engine's voice cap). DRUM: reuse its lane; other engines: the same note.
  * Else a free voice: ROTATE takes
  * the next one round-robin (release tails ring out), REUSE (or any GLIDE) takes
@@ -549,7 +511,6 @@ static voice_t *voice_alloc(track_t *t, uint32_t note)
     uint32_t i, np = trk_nvoice(t), best = np, low = np, nfree = 0;
     int32_t bd = 0x7FFFFFFF;
     if (t->engine == ENGI_DRUM) {
-        if(dx_is_md(dx_kit[drum_lane(note)].mode))return md_voice_alloc(t,note);
         voice_t *v = drum_reuse(t, note);
         if (v)
             return voice_reuse(t, v);
@@ -655,6 +616,7 @@ static void voice_start(track_t *t, voice_t *v, uint32_t note, uint32_t vel, int
     v->gate = 1;
     v->active = 1;
     v->stage = 1;
+    v->kfade = 0;
     v->age = ++vage;
     if (e == &ENG_FORMANT)
         glide_from(v);
@@ -717,7 +679,7 @@ static void mono_play(track_t *t, uint32_t note, uint32_t vel, int retrig, int g
             v->note = (uint8_t)note;
             glide_from_trk(t, v);
             v->pitch16 = ((int32_t)note + trk_trans(t)) * 16 + t->pfx_rpit;
-            if(t->engine==ENGI_ACID){v->vel=(uint8_t)vel;six_acid_on(t,v);}
+            if(t->engine==ENGI_ACID){v->vel=(uint8_t)vel;acid_on(t,v);}
             v->mvel = t->m_vel;
             v->mrnd = t->m_rnd;
             if (vel > v->vel && nv == 1u)
@@ -759,16 +721,20 @@ static uint8_t trk_hush;
 static uint8_t trk_live = 4u;
 static volatile uint8_t six_machine_mask=3u;
 static int six_track_enabled(unsigned k){return k<trk_live&&k<NTRK;}
-static volatile uint8_t asleep_hit;                     /* (0.6.28) a note went to a track asleep (ui_input: the hint) */                            /* (JIANT 0.6.18) MENU > TRACKS: the tracks that play (4 LOW CPU, the
-                                                         * default; 6 HIGH): the ones past it get no notes and stop,
-                                                         * their sounds and steps kept (fx.c mix_part) */                                /* (0.6.15) bit k: track k muted by GLO's solo / the FX layer's
-                                                         * black key (perform.c): no new notes, as MUTE (a MIDI mute: a
-                                                         * silenced track's voices end, it costs nothing) */
+/* GEN ALL follows active slots and preserves explicitly assigned special
+ * machines wherever they live. Empty slots are eligible for a new instrument. */
+static uint8_t six_gen_work_mask; /* Eligible slots captured for one synchronous GEN transaction. */
+static unsigned six_gen_next(unsigned k){
+ if(six_gen_work_mask){while(k<trk_live&&!((six_gen_work_mask>>k)&1u))k++;return k<trk_live?k:NTRK;}
+ while(k<trk_live&&(trk[k].eng_req==ENGI_ACID||trk[k].eng_req==ENGI_BREAK))k++;
+ return k<trk_live?k:NTRK;
+}
+/* Inactive slots reject notes without generating a global editor popup. */
 static void trk_note_on(track_t *t, uint32_t note, uint32_t vel)
 {
     uint32_t any = 0, i, mode = trk_vmode(t);
+    if (t->eng_req == ENGI_EMPTY) return; /* Unassigned tracks never allocate voices. */
     if (!six_track_enabled((unsigned)(t-trk))) {
-        asleep_hit = 1;                                 /* (0.6.28) a note for a track asleep: the UI says so */
         return;
     }
     if (t->p[P_MUTE] || ((trk_hush >> ((uint32_t)(t - trk) % NTRK)) & 1u) ||
@@ -801,7 +767,6 @@ static void trk_note_on(track_t *t, uint32_t note, uint32_t vel)
     if(!any&&t->p[P_L2PHASE]>=0){t->lfo2_ph=(uint32_t)t->p[P_L2PHASE]<<25;t->lfo2_fade=0;}
     if (mode == V_POLY) {
         voice_t *v = voice_alloc(t, note);
-        if(!v)return; /* MD-only cap: ordinary parts are never sacrificed. */
         t->nmono = 0;                                   /* no stale mono stack after a mode change */
         t->mono_note = 0;
         v->fine = 0;
@@ -860,7 +825,7 @@ static void trk_note_off(track_t *t, uint32_t note)
 
 static void trk_all_off(track_t *t)
 {
-    if(t->engine==ENGI_BREAK){t->v[0].s[BENV_SEQ]=t->v[0].s[BENV_KEYS]=0;six_break_env_release(t);t->nmono=t->xp_n=0;return;}
+    if(t->engine==ENGI_BREAK){t->v[0].s[BENV_SEQ]=t->v[0].s[BENV_KEYS]=0;six_break_env_release(t);t->v[0].s[BENV_OFF]=33;t->nmono=t->xp_n=0;return;}
     uint32_t i;
     for (i = 0; i < NVOICE; i++) {
         t->v[i].gate = 0;
@@ -960,7 +925,7 @@ static void engine_block(track_t *t)
         any = t->engine != eng_idx(t->eng_req);
         if(any&&(t->engine==ENGI_BREAK||t->eng_req==ENGI_BREAK))memset(t->v[0].s,0,4*sizeof(t->v[0].s[0]));
         if(any&&(t->engine==ENGI_ACID||t->eng_req==ENGI_ACID)){
-            unsigned k=(unsigned)(t-trk);bass303_init(&six_acid[k].xox);bass303_set_lite(&six_acid[k].xox,1);six_acid_model[k]=0;six_acid_note[k]=-1;six_acid_gate[k]=0;
+            acid_reset(t);
         }
         t->engine = eng_idx(t->eng_req);
         t->xf_on = 0;
@@ -1007,6 +972,7 @@ static void trk_fade_out(track_t *t)
 /* one control tick (CTL samples) of the amplitude envelope; returns Q15 */
 static int32_t env_tick(track_t *t, voice_t *v)
 {
+    if(drum_attack(t,v))v->kfade++;
     const int16_t *p = t->p;
     int32_t sus = (int32_t)p[P_SUS] << 17;              /* Q24 */
     switch (v->stage) {
@@ -1076,10 +1042,10 @@ static uint32_t track_render(track_t *t, int32_t *out, uint32_t n)
         jungle_pitch((m.pitch16-60*16)/16);
         jungle_feedback((unsigned)t->p[P_E0]);jungle_variation((unsigned)t->p[P_E1]);
         jungle_warp((unsigned)t->p[P_E2]);jungle_filter((unsigned)t->p[P_E3]);
-        uint32_t nr=six_break_render(t,out,n);
+        six_break_render(t,out,n);uint32_t nr=0;
         track_post(t,ENGINES[ENGI_BREAK],out,n);
         int32_t gain=m.amp0,delta=(m.amp1-m.amp0)/(int32_t)n;
-        for(unsigned j=0;j<n;j++){gain+=delta;out[j]=mulq15(out[j],gain);}
+        for(unsigned j=0;j<n;j++){gain+=delta;out[j]=mulq15(out[j],gain);nr|=out[j]!=0;}
         if(t->xf_on&&t->xf)t->xf--; /* control state is never an allocated synthesis voice */
         return nr;
     }

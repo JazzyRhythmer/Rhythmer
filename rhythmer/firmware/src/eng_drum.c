@@ -463,6 +463,7 @@ static void drum_render(track_t *t, voice_t *v, int32_t *out, uint32_t n, const 
                                                           * (voice.c takes the level before the render) */
         v->vel = L->fv;
     if (L->fl && !--L->fl) {                             /* .. the hit itself */
+        v->kfade = 0;                                   /* the new flam's attack has its own protection window */
         dx_trigger(&L->x);
         L->age = 0;
         if (((uint32_t)v->s[0] & (DV_NLANE - 1u)) == DV_HATC)

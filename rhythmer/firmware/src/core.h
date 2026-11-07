@@ -13,12 +13,12 @@
 #define NPART 6                  /* synth parts: tracks 1..6 (JIANT 0.6: was 4) */
 #define NTRK NPART               /* tracks (the formats and the protocol count these): every track is a part */
 #define NSTEP 64
-#define HALF_FRAMES 512          /* SIX: 11.6 ms half; CTL stays 32. Bounded headroom for ensemble + animated UI. */
+#define HALF_FRAMES 512          /* 11.6 ms DMA headroom; synthesis/control ticks remain 32 frames. */
 #ifndef FELUCCA_FM4
 #define FELUCCA_FM4 0            /* the DIGITAL engine (eng_digital.c, four-operator FM): kept in the tree, not built
                                   * by default; replaced by FM6, its sounds convert (fm4_convert.c) */
 #endif
-#define NENGINES 21              /* stored engine IDs are append-only */
+#define NENGINES 22              /* stored engine IDs are append-only */
 #define ENGI_BREAK 15u
 #define ENGI_ACID 16u
 #define ENGI_SERUM 17u           /* Garden wavetable; 15 remains Rhythmer BREAK */
@@ -26,12 +26,11 @@
 #define ENGI_M2SAW 19u
 #define ENGI_M2SID 20u
 #define SIX_DRUM_TRACK 0u
-#define SIX_GEN_TRACKS 4u
-#define SIX_ACID_TRACK 4u
-#define SIX_BREAK_TRACK 5u
+#define SIX_GEN_TRACKS NTRK       /* capacity; GEN iterates eligible active slots */
+#define ENGI_EMPTY 21u           /* append-only: unassigned, no synthesis or voice allocation */
 #define ENGI_FM6 12u
 #define ENGI_DIGITAL 1u          /* reserved without FELUCCA_FM4: never selectable (eng_ok), its sounds load as FM6 */
-#define NENG_SHOWN 12   /* the engines one can pick: PRESETS, the EDIT layer, the editor,
+#define NENG_SHOWN 13   /* the engines one can pick: PRESETS, the EDIT layer, the editor,
                                                 * in the display order of engines.c ENGINE_ORDER (PHYS 9, and in
                                                 * JIANT SAMPLE 4, GRAIN 8, SLICE 13: retired) */
 /* (JIANT 0.6.71) the second core (hal/fm1_multicore.h; fx.c mix_block hands it some synth tracks). MC_CPU(): the core
@@ -739,14 +738,14 @@ static song_t song;
 /* Selectable musical machines on any track; default-role indices are boot only. */
 static uint32_t six_role_engine(uint32_t track, uint32_t e) {
  (void)track;
- if(e==ENGI_DRUM||e==ENGI_ACID||e==ENGI_BREAK)return e;
+ if(e==ENGI_DRUM||e==ENGI_ACID||e==ENGI_BREAK||e==ENGI_EMPTY)return e;
  return e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID||e==ENGI_SERUM||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_ANALOG||e==ENGI_FM6||e==ENGI_WHEEL?e:ENGI_SERUM;
 }
 /* BREAK is a project-wide singleton, including inactive tracks. Selection
  * availability is separate from stored-engine validity (project loading). */
 static int six_break_track(void){for(unsigned k=0;k<NTRK;k++)if(trk[k].eng_req==ENGI_BREAK)return (int)k;return -1;}
 static int six_engine_available(unsigned track,unsigned e){int owner=six_break_track();return e<NENGINES&&six_role_engine(track,e)==e&&(e!=ENGI_BREAK||owner<0||(unsigned)owner==track);}
-static const char *six_kind_label(unsigned e){return e==ENGI_DRUM?"DRUM":e==ENGI_ACID?"ACID":e==ENGI_BREAK?"BREAK":"SYNTH";}
+static const char *six_kind_label(unsigned e){return e==ENGI_EMPTY?"EMPTY":e==ENGI_DRUM?"DRUM":e==ENGI_ACID?"ACID":e==ENGI_BREAK?"BREAK":"SYNTH";}
 #define TSEL (&trk[song.sel])    /* the selected track */
 
 /* SWING of a track's step clock: the track's own plus the global one, at most 100 (#31). The sequencer

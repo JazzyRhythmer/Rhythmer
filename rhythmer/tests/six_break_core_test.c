@@ -2,7 +2,7 @@
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
 int main(int argc,char **argv){
- if(argc!=4)return 2;ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);song.master_q12=4096;
+ if(argc!=4)return 2;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);song.master_q12=4096;
  static uint8_t sample[72000];FILE *f=fopen(argv[3],"rb");if(!f)return 3;fseek(f,512,SEEK_SET);if(fread(sample,1,sizeof sample,f)!=sizeof sample)return 3;fclose(f);
  six_loops[0]=six_loops[1]=sample;six_loop_mask=3;six_loop_now=0;jungle_bind(sample,72000,48000);
  for(unsigned k=0;k<5;k++){set_engine_of(&trk[k],ENGI_FM6);trk[k].engine=trk[k].eng_req;trk[k].xf=trk[k].xf_on=0;apply_preset_to(&trk[k],0);trk[k].xf=trk[k].xf_on=0;}

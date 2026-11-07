@@ -11,8 +11,10 @@
 #include "eng_mono2k.c"
 #include "eng_formant.c"
 #include "eng_wheel.c"
+#include "fm6_core.c"          /* typed FM6/MD runtime union; DSP implementation unchanged */
 #include "eng_drum.c"           /* DRUM: the 8-lane DRUM-X kit (drumx_voice.c) */
 #include "eng_noise.c"
+#include "eng_acid.c"          /* native Hortator mono synth; MIDI generation is separate */
 #include "eng_fm6.c"            /* FM6: 6-operator FM, msfa ported (fm6_core.c, Apache-2.0) */
 #include "eng_animal.c"         /* (JIANT 0.8.3) ANIMAL: animal calls (CMOS PULSE WHSTL WING GLOTT) */
 #include "fm4_convert.c"        /* DIGITAL's tables, and its sounds -> FM6 */
@@ -42,6 +44,17 @@ static const engine_t ENG_GONE = {
     .note_on = phys_gone_note_on,
     .render = phys_gone_render,
     .knob = {P_E0, P_E1, P_E2, P_E3},
+};
+/* Explicitly unassigned track; this is not a silent synth preset. The single
+ * catalog entry lets both hardware and editor users clear an assigned track. */
+static const preset_t EMPTY_PRESETS[]={{.name="SELECT ENGINE"}};
+static const engine_t ENG_EMPTY={
+ .name="EMPTY",.page_title={"EMPTY","EMPTY"},
+ .edit={{"-",F_INT,0,0,0},{"-",F_INT,0,0,0},{"-",F_INT,0,0,0},{"-",F_INT,0,0,0},
+        {"-",F_INT,0,0,0},{"-",F_INT,0,0,0},{"-",F_INT,0,0,0},{"-",F_INT,0,0,0}},
+ .presets=EMPTY_PRESETS,.npresets=1,
+ .poly=1,.note_on=phys_gone_note_on,.render=phys_gone_render,
+ .knob={P_E0,P_E1,P_E2,P_E3}
 };
 #define ENGI_PHYS_TO 0u          /* the engine a retired engine's sound plays as: ANALOG (its first preset) */
 
@@ -73,7 +86,7 @@ static const engine_t *const ENGINES[NENGINES] = {
     &ENG_FM6,                    /* 12 (ENGI_FM6) */
     &ENG_GONE,                   /* 13: reserved (SLICE, retired in JIANT) */
     &ENG_ANIMAL,                 /* 14 retired in SIX */
-    &ENG_BREAK, &ENG_ACID, &ENG_SERUM, &ENG_M2STAT, &ENG_M2SAW, &ENG_M2SID,
+    &ENG_BREAK, &ENG_ACID, &ENG_SERUM, &ENG_M2STAT, &ENG_M2SAW, &ENG_M2SID, &ENG_EMPTY,
 };
 
 /* a track's engine number as an index (the audio paths: a compare, cheaper than % NENGINES; a bad number: 0) */
@@ -85,7 +98,7 @@ static inline uint32_t eng_idx(uint32_t e) { return e < NENGINES ? e : 0u; }
  * at power-on (TRK_DEF: T1..T6 are its first six), then PHASE WHEEL NOISE; was ANALOG FM6 PHASE LOFI VOICE WHEEL
  * NOISE DRUM ANIMAL. PROGRAM CHANGE numbers the sounds in this order too (ui.c midi_pc_poll) */
 static const uint8_t ENGINE_ORDER[NENG_SHOWN] = {
- ENGI_SERUM, ENGI_PHASE, ENGI_LOFI, ENGI_M2STAT, ENGI_M2SAW, ENGI_M2SID, ENGI_ANALOG, ENGI_FM6, ENGI_WHEEL, ENGI_DRUM, ENGI_ACID, ENGI_BREAK
+ ENGI_SERUM, ENGI_PHASE, ENGI_LOFI, ENGI_M2STAT, ENGI_M2SAW, ENGI_M2SID, ENGI_ANALOG, ENGI_FM6, ENGI_WHEEL, ENGI_DRUM, ENGI_ACID, ENGI_BREAK, ENGI_EMPTY
 };
 
 /* the engines one can pick (engine 1 only with FELUCCA_FM4), in ENGINE_ORDER: eng_ok(e), the n-th of them
@@ -156,13 +169,12 @@ static const struct {
 #define NPATTERNS (sizeof PATTERNS / sizeof PATTERNS[0])
 
 /* (0.9.9) the parts at power-on, INIT SYSTEM and NEW PROJECT (engine, preset, PATTERNS[n - 1] in the sequencer,
- * 0 = empty: all are), in the display order's first six: T1 DRUM-X's kit, T2 VOICE singing words, T3 ANIMAL's bird,
- * T4 LOFI's bytebeat organism, T5 ANALOG's bass, T6 FM6's electric piano. Each its preset's sound, dry (ui.c
+ * 0 = empty: all are), T1 DRUM, T2 SERUM, T3 PHASE, T4 LOFI, T5/T6 EMPTY. Populated tracks start dry (ui.c
  * power_sound_of: no DIST CHOR DLY REV send, the effects are the player's to add) */
 #define TRK_PR_VOICE 9u          /* SINGER EN (eng_formant.c FORMANT_PRESETS) */
 #define TRK_PR_ANALOG 14u        /* FAT BASS (eng_analog.c) */
 static const uint8_t TRK_DEF[NPART][3] = {{ENGI_DRUM,0,0},{ENGI_SERUM,0,0},{ENGI_PHASE,0,0},
- {ENGI_LOFI,3,0},{ENGI_ACID,0,0},{ENGI_BREAK,0,0}};
+ {ENGI_LOFI,3,0},{ENGI_EMPTY,0,0},{ENGI_EMPTY,0,0}};
 /* DRUM-X (DRUM's first, the factory kit), SINGER EN, CMOS BIRD, BYTEBEAT, FAT BASS, TINE EP */
 /* the parts at power-on through 0.9.8 (the same columns): what an old project's tracks it had no room for load as
  * (project.c proj_new_tracks, PROJ_DEF_SOUND: format 1's tracks 2..4, a 4-track format's T5 / T6): never change it.

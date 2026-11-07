@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
-static void reset(void){ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trks_put(1);}
+static void reset(void){ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);}
 static void save_project(const char *dir,const char *name){project_capture(&proj_scratch);if(!proj_pack(&proj_wire,&proj_scratch))exit(10);char p[1024];snprintf(p,sizeof p,"%s/upgrade-%s.project",dir,name);FILE *f=fopen(p,"wb");if(!f)exit(11);fwrite(&proj_wire,1,sizeof proj_wire,f);fclose(f);}
 static void screen(const char *dir,const char *name){char p[1024];snprintf(p,sizeof p,"%s/%s.ppm",dir,name);FILE *f=fopen(p,"wb");if(!f)exit(9);fprintf(f,"P6\n240 240\n255\n");for(unsigned i=0;i<240*240;i++){unsigned x=swap16(host_screen[i]);unsigned char c[3]={(x>>11)*255/31,((x>>5)&63)*255/63,(x&31)*255/31};fwrite(c,1,3,f);}fclose(f);}
 int main(int argc,char **argv){int bad=0;reset();
@@ -14,16 +14,16 @@ int main(int argc,char **argv){int bad=0;reset();
  /* Every Acid preset passes through the real track gate, not an unrelated oscillator. */
  for(unsigned p=0;p<ENG_ACID.npresets;p++){
   reset();track_t *t=&trk[4];apply_preset_to(t,p);t->engine=ENGI_ACID;t->xf=t->xf_on=0;t->p[P_MUTE]=0;
-  voice_t v={0};v.pitch16=36*16;v.vel=127;v.gate=1;t->slide_glide=0;six_acid_on(t,&v);
+  voice_t v={0};v.pitch16=36*16;v.vel=127;v.gate=1;t->slide_glide=0;acid_on(t,&v);
   vmod_t m={0};m.amp0=m.amp1=32767;long long energy=0;int peak=0;
   for(unsigned b=0;b<12000;b++){
-   if(b==200){v.pitch16=43*16;t->slide_glide=1;six_acid_on(t,&v);}
+   if(b==200){v.pitch16=43*16;t->slide_glide=1;acid_on(t,&v);}
    if(b==600)v.gate=0;
-   int32_t out[32]={0};six_acid_render(t,&v,out,32,&m);
+   int32_t out[32]={0};acid_render(t,&v,out,32,&m);
    for(unsigned j=0;j<32;j++){int a=abs(out[j]);if(a>peak)peak=a;energy+=(long long)out[j]*out[j];}
   }
-  printf("Acid %s peak=%d energy=%lld state=%zu/%zu\n",ENG_ACID.presets[p].name,peak,energy,sizeof(ha_voice_t),sizeof(bass303_t));
-  bad+=check("Acid preset sounds, stays bounded, and releases",energy>100000&&peak<262144&&six_acid_done(t,&v));
+  printf("Acid %s peak=%d energy=%lld state=%zu/%zu\n",ENG_ACID.presets[p].name,peak,energy,sizeof(ha_voice_t),sizeof(ha_voice_t));
+  bad+=check("Acid preset sounds, stays bounded, and releases",energy>100000&&peak<262144&&acid_done(t,&v));
   if(argc>1){for(unsigned i=0;i<16;i++){step_t *st=&t->step[i];step_clear(st);st->time=i%2?ST_TIE:ST_NOTE;if(!(i%2)){st->n=1;st->vel=i%4?100:127;st->note[0]=36+(i%3)*3;}}t->p[P_SLEN]=16;char label[24];snprintf(label,sizeof label,"acid-%u",p);save_project(argv[1],label);}
   project_capture(&proj_scratch);bad+=check("Acid model survives project codec",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire)&&proj_scratch.t[4].p[P_E5]==t->p[P_E5]);
  }

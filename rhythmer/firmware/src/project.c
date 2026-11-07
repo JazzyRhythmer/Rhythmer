@@ -399,6 +399,13 @@ static void proj_phys_gone(project_t *q)
     uint32_t k, i, n, hit = 0;
     for (k = 0; k < NTRK; k++) {
         proj_trk_t *d = &q->t[k];
+        /* Old mixed-engine Acid: preserve the HT colour and its parameters.
+         * Former X0X preset 0 now plays the native Hortator saw/square. */
+        if(d->engine==ENGI_ACID&&d->p[P_E5]>=2&&d->p[P_E5]<=3){
+            d->p[P_E5]&=1;
+            if(d->preset>0&&d->preset<5)d->preset--;
+            q->sum=proj_sum(q);
+        }
         if (!eng_gone(d->engine))
             continue;
         if (analog_from_trio(d->engine, &d->p[P_E0])) { /* (JIANT 0.4) TRIO: ANALOG's nearest, its envelope kept */

@@ -221,8 +221,7 @@ def build_loader():
 
 # (JIANT 0.6.78) core 0's hottest audio code, run from RAM (app.ld .hot_text, src/core.h FELUCCA_HOTRAM): the mix, the
 # master, the FX layer, the SLICER, and core 0's own copies of a part's mix and the buses (core 1 runs the flash ones)
-HOT_FNS = ("mix_block", "mix_part_m0", "fx_run0", "perf_begin", "perf_block", "perf_master", "slicer_bus")
-ACID_HOT_FNS = ("run_control", "run_voice", "run_amp", "run_post")
+HOT_FNS = ("mix_block", "mix_part_m0", "fx_run0", "perf_begin", "perf_block", "perf_master", "slicer_bus", "acid_render", "ha_coef")
 
 
 def hot_sections(ir, names=HOT_FNS):
@@ -309,24 +308,8 @@ def build_app():
             tc("cc", *cf, "-Xclang", "-disable-llvm-optzns", "-c", OUT / "felucca_hot.ll", "-o", OUT / "felucca.o")
         else:
             tc("cc", *cf, "-c", OUT / "felucca_size.ll", "-o", OUT / "felucca.o")
-    for name in ("bass303", "jungle", "tb3po", "six303_bridge"):
-        if name == "bass303" and hot:
-            # The six-track 303's hot loops previously stayed in flash outside
-            # the app's audio layout. Use the remaining bounded hot-RAM space
-            # for the same optimised code, shared by both cores; no DSP or
-            # voice-budget change. Mark sections after optimisation as above.
-            tc("cc", *flags, "-Ifirmware/six", "-S", "-emit-llvm", "-c", FW / "six" / "bass303.c", "-o", OUT / "bass303_opt.ll")
-            ir, n = hot_sections((OUT / "bass303_opt.ll").read_text(), ACID_HOT_FNS)
-            if n != len(ACID_HOT_FNS):
-                raise SystemExit(f"Acid hot RAM code: {n} of {len(ACID_HOT_FNS)} functions found")
-            # Include the private DSP helpers in the stable audio layout too.
-            # Function sections named only run_*/c_* otherwise land behind UI
-            # code, outside the intended .text.bass303* group and RAM call reach.
-            ir = re.sub(r'^(define [^\n]*?@([\w.]+)\([^\n]*?)\s*\{$',
-                        lambda m: m[0] if ' section "' in m[1] else f'{m[1]} section ".text.bass303.{m[2]}" {{', ir, flags=re.M)
-            (OUT / "bass303_hot.ll").write_text(ir)
-            tc("cc", *cf, "-Xclang", "-disable-llvm-optzns", "-c", OUT / "bass303_hot.ll", "-o", OUT / "bass303.o")
-        elif name == "jungle" and hot:
+    for name in ("jungle", "tb3po", "acid_generate"):
+        if name == "jungle" and hot:
             # Keep all Break helpers in the stable audio flash group. The
             # existing 2 KiB hot-RAM reserve remains intact.
             tc("cc", *flags, "-DJUNGLE_AUDIO_CODE=", "-Ifirmware/six", "-S", "-emit-llvm", "-c", FW / "six/jungle.c", "-o", OUT / "jungle_opt.ll")
@@ -339,7 +322,7 @@ def build_app():
             tc("cc", *flags, "-DJUNGLE_AUDIO_CODE=", "-Ifirmware/six", "-c", FW / "six" / (name + ".c"), "-o", OUT / (name + ".o"))
     elf = OUT / "felucca.elf"
     tc("pi32v2/bin/ld", "-T", FW / "app.ld", OUT / "crt0.o", OUT / "fm1_vec.o", OUT / "fm1_isr.o",
-       OUT / "felucca.o", OUT / "bass303.o", OUT / "jungle.o", OUT / "tb3po.o", OUT / "six303_bridge.o", "-o", elf)
+       OUT / "felucca.o", OUT / "jungle.o", OUT / "tb3po.o", OUT / "acid_generate.o", "-o", elf)
     for sect in ("text.bin", "data.bin", "ramtext.bin", "c1text.bin", "hottext.bin"):
         (OUT / sect).unlink(missing_ok=True)
     *_, syms, dis, rt = tc_all(("common/bin/objcopy", "-O", "binary", "-j", ".text", elf, OUT / "text.bin"),

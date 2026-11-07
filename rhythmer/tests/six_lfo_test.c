@@ -8,7 +8,7 @@ static void capture(const char *dir,const char *name){
  for(unsigned i=0;i<240*240;i++){unsigned p=swap16(host_screen[i]);unsigned char rgb[3]={(p>>11)*255/31,((p>>5)&63)*255/63,(p&31)*255/31};fwrite(rgb,1,3,f);}fclose(f);
 }
 int main(int argc,char **argv){
- int bad=0;ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);
+ int bad=0;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);
  const char *dir=argc>1?argv[1]:0;
  for(unsigned k=0;k<NTRK;k++){
   song.sel=k;track_t *t=TSEL;

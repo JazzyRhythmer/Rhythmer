@@ -90,8 +90,8 @@ static void overload(void)
     lead = held(&trk[0], 36); extra = held(&trk[0], 38);
     shed_voice();
     for (i = 0; i < 6u; i++) mix_block(out, CTL);
-    check("overload frees a held one-shot drum without waiting for its decay (faded over ~4 ms)",
-          lead && extra && lead->active && !extra->active && voices_busy() == 1u);
+    check("Rhythmer exception: overload preserves both one-shot drum hits",
+          lead && extra && lead->active && extra->active && voices_busy() == 2u && !shed_count);
 
     fresh();
     trk[0].p[P_VOICE] = V_UNISON;
@@ -125,10 +125,10 @@ static void dma(void)
     fm1_alnk0_irq();
     check("an auxiliary interrupt does not render a DMA half", !host_acks && !audio_halves && !felucca_dbg.in_audio);
     host_pending = FM1_AUDIO_HALF;
-    host_us = 5000;
+    host_us = HALF_FRAMES * 5000u / 128u;
     fm1_alnk0_irq();
     check("one slow half records elapsed load, tightens the budget, does not shed yet (0.6.19: two in a row again)",
-          host_acks == 1u && !shed_req && felucca_dbg.last_us == 5000u && !felucca_dbg.late && load_tight &&
+          host_acks == 1u && !shed_req && felucca_dbg.last_us == HALF_FRAMES * 5000u / 128u && !felucca_dbg.late && load_tight &&
           load_diag.peak >= 80u);
     fm1_alnk0_irq();
     check("a second slow half in a row requests shedding", host_acks == 2u && shed_req);
@@ -150,8 +150,8 @@ static void dma(void)
     fm1_alnk0_irq(); fm1_alnk0_irq();
     check("TIMER5 nested in the render counts toward the deadline", shed_req && felucca_dbg.last_us == host_us - host_nest);
     fresh();
-    host_us = 5000;
-    fm1_alnk0_irq(); host_us = 100; fm1_alnk0_irq(); host_us = 5000; fm1_alnk0_irq();
+    host_us = HALF_FRAMES * 5000u / 128u;
+    fm1_alnk0_irq(); host_us = 100; fm1_alnk0_irq(); host_us = HALF_FRAMES * 5000u / 128u; fm1_alnk0_irq();
     check("a lone slow half between fast ones does not shed (0.6.19: a spike is not an overload)", !shed_req);
     fresh();
     host_us = 580;
@@ -361,7 +361,7 @@ static void governor(void)
     uint32_t i, c0, c1, c2, lite, cap_lo, h1, h2;
     gov_cap = 16u; gov_lite = 0; gov_hot = gov_calm = gov_win = gov_lcalm = 0; gov_sheds = gov_floor = 0;
     c0 = voice_cap();
-    for (i = 0; i < 12u; i++) gov_tick(1, 0, 0, 0);
+    for (i = 0; i < GOV_HALVES(3u)*4u; i++) gov_tick(1, 0, 0, 0);
     c1 = gov_cap;
     for (i = 0; i < 200u; i++) gov_tick(1, 0, 0, 0);
     cap_lo = gov_cap;
@@ -370,9 +370,9 @@ static void governor(void)
     check("governor: over the budget, a voice less every 3 halves (12 halves: 4), down to 4", c1 == 8u && cap_lo == 4u && !gov_floor);
     check("  two sheds in a second: LOAD LITE of its own (the sound's LOAD; the MENU's stays FULL)",
           lite == LOAD_LITE && LOAD_EFF() == LOAD_LITE && sys_load == LOAD_FULL);
-    for (i = 0; i < 172u * 3u; i++) gov_tick(0, 0, 1, 0);
+    for (i = 0; i < GOV_HALVES(172u) * 3u; i++) gov_tick(0, 0, 1, 0);
     c2 = gov_cap;
-    for (i = 0; i < 1720u; i++) gov_tick(0, 0, 1, 0);
+    for (i = 0; i < GOV_HALVES(1720u); i++) gov_tick(0, 0, 1, 0);
     check("  calm: a voice back every 0.5 s, LITE off after 5 s, the cap back to the full",
           c2 == 7u && !gov_lite && voice_cap() == c0);
     gov_tick(0, 0, 0, 1);
@@ -380,7 +380,7 @@ static void governor(void)
     gov_cap = 16u; gov_lite = 0; gov_hot = gov_calm = gov_win = gov_lcalm = 0; gov_sheds = gov_floor = 0;
     for (i = 0; i < 4u; i++) gov_tick(1, 1, 0, 0);
     h1 = gov_cap;
-    for (i = 0; i < 4u + 7u; i++) gov_tick(1, 1, 0, 0);
+    for (i = 0; i < 4u + GOV_HALVES(8u)-1u; i++) gov_tick(1, 1, 0, 0);
     h2 = gov_lite;
     gov_tick(1, 1, 0, 0);
     check("  (0.9.14) past 75 %: a voice less every half (4 halves: 12 -> 8); at 4 and still past it 8 halves, LITE",

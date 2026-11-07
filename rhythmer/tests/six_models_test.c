@@ -2,7 +2,7 @@
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
 int main(void){
- int bad=0;ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trks_put(3);
+ int bad=0;ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(3);
  char layout_path[1024];snprintf(layout_path,sizeof layout_path,"%s/six-model-layout.json",getenv("RHYTHMER_BUILD_DIR")?getenv("RHYTHMER_BUILD_DIR"):"rhythmer/build");
  FILE *layout=fopen(layout_path,"w");if(!layout)return 2;
  fprintf(layout,"{\"song_sel\":%u,\"track_stride\":%u,\"engine\":%u,\"p\":%u,\"step\":%u,\"step_stride\":%u,\"step_note\":%u,\"voices\":%u,\"voice_stride\":%u,\"voice_note\":%u,\"voice_active\":%u,\"voice_stage\":%u,\"voice_age\":%u}\n",(unsigned)offsetof(song_t,sel),(unsigned)sizeof(track_t),(unsigned)offsetof(track_t,engine),(unsigned)offsetof(track_t,p),(unsigned)offsetof(track_t,step),(unsigned)sizeof(step_t),(unsigned)offsetof(step_t,note),(unsigned)offsetof(track_t,v),(unsigned)sizeof(voice_t),(unsigned)offsetof(voice_t,note),(unsigned)offsetof(voice_t,active),(unsigned)offsetof(voice_t,stage),(unsigned)offsetof(voice_t,age));fclose(layout);

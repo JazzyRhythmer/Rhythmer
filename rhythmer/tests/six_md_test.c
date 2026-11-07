@@ -3,7 +3,7 @@
 #define RHYTHMER_MD_TEST 1
 #include "ui_test.c"
 int main(int argc,char **argv){
- if(argc!=3)return 2;ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);int bad=0;
+ if(argc!=3)return 2;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);int bad=0;
  bad+=check("DRUM retains nine original kits plus ten MD kits",DX_NKIT==19&&ENG_DRUM.npresets==19);
  for(unsigned i=0;i<45;i++)bad+=check("classic and all MD choices round trip",dx_mode_ix(dx_mode_of(i))==i);
  for(unsigned kind=0;kind<MD_NMODEL;kind++){
@@ -35,7 +35,7 @@ int main(int argc,char **argv){
  md_voice_t before=*md_find(0,&closed->x);drum_kit[1][3].x.trig=1;
  md_lane_run(&trk[1],&drum_kit[1][3],&hat,0,0,0,0,0,hit,32);
  bad+=check("MD phases and ownership are independent per track",!memcmp(&before,md_find(0,&closed->x),sizeof before)&&md_find(1,&drum_kit[1][3].x)!=0);
- ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);
+ ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);
  for(unsigned k=0;k<6;k++){trk_all_off(&trk[k]);trk[k].p[P_MUTE]=k!=0;}
  set_engine_of(&trk[0],ENGI_DRUM);trk[0].engine=ENGI_DRUM;trk[0].xf=trk[0].xf_on=0;apply_preset_to(&trk[0],9);dx_kit_load(9);panic_req=0;xf_snap_t=0xFF;trk[0].xf=trk[0].xf_on=0;memset(drum_kit,0,sizeof drum_kit);
  trk_note_on(&trk[0],DRUM_LANE_NOTE[3],127);int32_t trans[64];mix_block(trans,32);bad+=check("initial MD note is actually rendered",dx_is_md(drum_kit[0][3].x.model)&&md_find(0,&drum_kit[0][3].x)!=0);
@@ -44,7 +44,7 @@ int main(int argc,char **argv){
  trk_note_on(&trk[0],DRUM_LANE_NOTE[3],127);mix_block(trans,32);bad+=check("new hit starts newly selected MD model",dx_md_id(drum_kit[0][3].x.model)==16);
  current=dx_kit[3];dx_kit[3]=DX_KIT_DEF[3];mix_block(trans,32);bad+=check("MD to classic change also waits for new hit",drum_kit[0][3].x.model==current.mode);
  trk_note_on(&trk[0],DRUM_LANE_NOTE[3],127);mix_block(trans,32);bad+=check("new classic hit leaves MD state safely",!dx_is_md(drum_kit[0][3].x.model));
- ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);
+ ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);
  for(unsigned k=0;k<6;k++){set_engine_of(&trk[k],ENGI_DRUM);trk[k].engine=ENGI_DRUM;trk[k].xf=trk[k].xf_on=0;apply_preset_to(&trk[k],11);trk[k].xf=trk[k].xf_on=0;}
  bad+=check("MD kit fits the existing section format",dx_kit_ok(dx_kit));
  for(unsigned kind=0;kind<MD_NMODEL;kind++){
@@ -57,16 +57,19 @@ int main(int argc,char **argv){
  sys_load=LOAD_FULL;mc_host=1;mc_host_v12=1;mc_off=0;
  bad+=check("MD does not reduce the JIANT twelve-voice budget",voice_budget()==12u);
  bad+=check("unused expensive lane does not lower normal drum polyphony",trk_nvoice(&trk[0])==8u);
- trk_note_on(&trk[0],56,127);bad+=check("sounding TRX cowbell limits MD only",md_track_poly(&trk[0])==2u&&trk_nvoice(&trk[0])==8u);
- trk_note_on(&trk[0],36,127);bad+=check("two costly MD hits leave ordinary shared polyphony intact",voice_budget()==12u);
  for(unsigned k=0;k<6;k++)memset(trk[k].v,0,sizeof trk[k].v);drum_md_reset();memset(drum_kit,0,sizeof drum_kit);
- for(unsigned k=0;k<6;k++)for(unsigned j=0;j<4;j++){
-  trk_note_on(&trk[k],DRUM_LANE_NOTE[j*2],127);
-  bad+=check("dense MD note input never exceeds actual shared budget",voices_busy()<=voice_cap());
- }
+ /* Eight MD lanes on one part, including costly filters: no 2/3 local or
+  * 4 global admission limit. Use non-hat models to isolate intentional choke. */
+ for(unsigned j=0;j<8;j++)md_patch_default(&dx_kit[j],9);
+ for(unsigned j=0;j<8;j++)trk_note_on(&trk[0],DRUM_LANE_NOTE[j],127);
+ bad+=check("MD admits eight lanes like ordinary DRUM",voices_busy()==8u);
  md_test_triggers=md_test_renders=0;int32_t burst[64];mix_block(burst,32);
- bad+=check("stolen pending MD notes never execute a full trigger",md_test_triggers<=4u);
- bad+=check("MD burst renders only the retained voice budget",md_test_renders<=4u);
+ bad+=check("eight costly MD hits each trigger and render",md_test_triggers==8u&&md_test_renders==8u);
+ for(unsigned j=0;j<8;j++)for(unsigned k=j+1;k<8;k++)
+  bad+=check("each MD lane owns independent physical state",md_find(0,&drum_kit[0][j].x)&&md_find(0,&drum_kit[0][k].x)&&md_find(0,&drum_kit[0][j].x)!=md_find(0,&drum_kit[0][k].x));
+ for(unsigned k=1;k<6;k++)for(unsigned j=0;j<8;j++)trk_note_on(&trk[k],DRUM_LANE_NOTE[j],127);
+ md_test_triggers=md_test_renders=0;mix_block(burst,32);
+ bad+=check("all six drum parts have eight physical MD states",md_test_triggers==40u&&md_test_renders==48u);
  for(unsigned k=0;k<6;k++)memset(trk[k].v,0,sizeof trk[k].v);drum_md_reset();memset(drum_kit,0,sizeof drum_kit);
  mc_host=atoi(argv[1]);mc_host_v12=1;mc_off=0;gov_cap=4;song.master_q12=4096;FILE *f=fopen(argv[2],"wb");if(!f)return 4;unsigned split=0;
  for(unsigned b=0;b<1600;b++){
@@ -78,5 +81,5 @@ int main(int argc,char **argv){
  char path[1024];snprintf(path,sizeof path,"%s.ui.ppm",argv[2]);FILE *screen=fopen(path,"wb");if(!screen)return 5;
  fprintf(screen,"P6\n240 240\n255\n");for(unsigned i=0;i<240*240;i++){unsigned p=swap16(host_screen[i]);unsigned char rgb[3]={(p>>11)*255/31,((p>>5)&63)*255/63,(p&31)*255/31};fwrite(rgb,1,3,screen);}fclose(screen);
  bad+=check("MD tracks participate in both cores",!mc_host||split>0);
- printf("MD %s-core render: %s (split blocks %u, hit storage %zu B)\n",mc_host?"two":"one",bad?"FAIL":"PASS",split,sizeof md_pool+sizeof md_aux);return !!bad;
+ printf("MD %s-core render: %s (split blocks %u, hit storage %zu B)\n",mc_host?"two":"one",bad?"FAIL":"PASS",split,sizeof md_pool+sizeof md_aux+sizeof md_shared);return !!bad;
 }

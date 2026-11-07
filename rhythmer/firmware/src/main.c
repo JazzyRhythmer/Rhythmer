@@ -128,7 +128,7 @@ static void fm1_fault(const fm1_crash_t *c)
     fm1_reboot();
 }
 
-/* power-on: the parts with their power-on sounds (0.9.9: T1 DRUM-X, T2 VOICE, T3 ANIMAL, T4 LOFI, T5 ANALOG, T6 FM6,
+/* power-on: the parts with their power-on sounds (Rhythmer: DRUM, SERUM, PHASE, LOFI; remaining slots unassigned,
  * engines.c TRK_DEF; as INIT SYSTEM: ui.c power_sound_of); the sequencers empty. RESTORE LAST ON brings the last session back after (autosave_boot) */
 static void felucca_init(void)
 {

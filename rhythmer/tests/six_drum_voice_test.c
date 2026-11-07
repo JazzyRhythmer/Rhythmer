@@ -2,7 +2,7 @@
 #define UI_TEST_NO_MAIN 1
 #define RHYTHMER_MD_TEST 1
 #include "ui_test.c"
-int main(int argc,char **argv){int bad=0;ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);song.sel=0;
+int main(int argc,char **argv){int bad=0;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);song.sel=0;
  bad+=check("all 55 MD factory sounds and 57 articulations present",MD_NSOUND==55&&MD_NMODEL==57&&DX_VOICES==127&&DX_NKIT==19);
  for(unsigned lane=0;lane<8;lane++){
   dx_ui_lane=lane;

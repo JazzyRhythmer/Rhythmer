@@ -11,7 +11,7 @@ static void fixture(const char *dir,const char *name){
  snprintf(path,sizeof path,"%s/break-tools-%s.steps",dir,name);f=fopen(path,"wb");if(!f)exit(23);fwrite(TSEL->step,1,sizeof TSEL->step,f);fclose(f);
 }
 int main(int argc,char **argv){
- ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);song.sel=5;
+ ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);song.sel=5;
  if(argc>1){char p[1024];snprintf(p,sizeof p,"%s/break-tools-layout.json",argv[1]);FILE *f=fopen(p,"w");if(!f)return 22;
   fprintf(f,"{\"layer\":%u,\"rec\":%u,\"seq_idx\":%u,\"source\":%u,\"every\":%u,\"action\":%u}\n",(unsigned)offsetof(__typeof__(ui),layer),(unsigned)offsetof(song_t,rec),(unsigned)offsetof(track_t,seq_idx),P_LN0,P_MPAT,P_LN1);fclose(f);}
  track_t *t=TSEL;for(unsigned k=0;k<5;k++)trk[k].p[P_MUTE]=1;

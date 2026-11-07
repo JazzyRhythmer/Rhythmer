@@ -8,7 +8,7 @@ static int visible(unsigned note){int y=pr_row_y(note);return y>=PR_Y0&&y+PR_RH<
 static void save_project(const char *dir,const char *name){char p[1024];snprintf(p,sizeof p,"%s/%s.project",dir,name);project_capture(&proj_scratch);if(!proj_pack(&proj_wire,&proj_scratch))exit(3);FILE *f=fopen(p,"wb");if(!f)exit(2);fwrite(&proj_wire,1,sizeof proj_wire,f);fclose(f);}
 static void save(const char *dir,const char *name){char p[1024];snprintf(p,sizeof p,"%s/%s.ppm",dir,name);FILE *f=fopen(p,"wb");if(!f)exit(2);fprintf(f,"P6\n240 240\n255\n");for(unsigned i=0;i<57600;i++){unsigned p=swap16(host_screen[i]);unsigned char b[3]={(p>>11)*255/31,((p>>5)&63)*255/63,(p&31)*255/31};fwrite(b,1,3,f);}fclose(f);}
 int main(int argc,char **argv){
- ui_power_on();fm6_init();load_depth++;power_on_parts();load_depth--;six_native_init();trks_put(1);
+ ui_power_on();fm6_init();load_depth++;power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);
  song.sel=4;song.playing=0;for(unsigned t=0;t<6;t++)engine_block(&trk[t]);
  track_t *t=&trk[4];for(unsigned i=0;i<NSTEP;i++)step_clear(&t->step[i]);t->p[P_SLEN]=32;note_at(t,0,36);note_at(t,3,43);note_at(t,16,96);note_at(t,20,103);
  press(B_SEQ);ui.bank=ui.cursor=0;proll.init=0;ui.force=1;frame();

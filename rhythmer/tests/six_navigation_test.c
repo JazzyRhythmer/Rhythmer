@@ -3,7 +3,7 @@
 #include "ui_test.c"
 static int tabs_match(const char *machine){uint8_t cnt[16],gi[16];unsigned g,p,i,m,n=nav_groups(cnt,gi,&g,&p,&i,&m),found=0,other=0;for(unsigned k=0;k<n;k++){const char *name=nav_group_name(gi[k]);found+=!strcmp(name,machine);other+=!strcmp(name,!strcmp(machine,"ACID")?"BREAK":"ACID");}return found==1&&!other&&n==4;}
 int main(int argc,char **argv){
- int bad=0;ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trks_put(1);
+ int bad=0;ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);
  settings_fresh();rp_apply();bad+=check("fresh persisted settings start with four tracks",trk_live==4&&favorites.factory[15][15]==0x60);
  trks_put(0);cpt_cores=1;rp_apply();bad+=check("CPU-test result cannot overwrite track count",trk_live==4&&favorites.factory[15][15]==0x60&&cpt_cores==1);trks_put(1);
  trks_put(0);unsigned saved_notes=steps_sig(&trk[5]);

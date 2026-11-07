@@ -520,6 +520,7 @@ static void macro_dice(uint32_t mode)
                                                          * engine's, its first four twice as likely) */
     uint32_t k, j, n;
     for (k = 0; k < (mode == 4u ? SIX_GEN_TRACKS : NTRK); k++) {
+        if(mode==4u&&six_gen_next(k)!=k)continue;
         track_t *t = &trk[k];
         uint32_t has = 0, used = 0;
         for (j = 0; j < 4u; j++) {
@@ -534,7 +535,7 @@ static void macro_dice(uint32_t mode)
             continue;
         if (mode == 1u && !track_sounding(t))           /* (JIANT 0.5) a reroll: only the tracks that sound now */
             continue;
-        if (mode >= 3u && t->p[P_MUTE])                 /* mode 4: GEN ALL owns only T1..T4 */
+        if (mode >= 3u && t->p[P_MUTE])                 /* GEN ALL owns eligible active slots. */
             continue;
         for (j = 0, n = 0; j < 4u && n < 2u; j++) {
             int16_t *m = &t->p[P_M1SRC + 3u * j];
@@ -611,7 +612,6 @@ static void layer_key(uint32_t l, uint32_t k)
                 ui_message("UNDONE (AGAIN: REDO)");
         }
     } else if (l == LAYER_SCL) {
-        for(unsigned j=0;j<NTRK;j++)if(trk[j].eng_req==ENGI_ACID)trk[j].p[P_LN5]=64;
         TSEL->p[P_ROOT] = (int16_t)((k + 5u) % 12u);    /* the key's note name (F3 = F) */
     } else if (l == LAYER_MACRO && !key_black(k) && p < 2u) {   /* (JIANT 0.4) F3 DICE, G3 CLEAR */
         if (chain_busy()) {

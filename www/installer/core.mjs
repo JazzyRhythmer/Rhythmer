@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=ecb1d3113a63';
-import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=ecb1d3113a63';
-import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=ecb1d3113a63';
-import {parseInfo} from './midi.mjs?v=ecb1d3113a63';
+import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=3156538adfcd';
+import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=3156538adfcd';
+import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=3156538adfcd';
+import {parseInfo} from './midi.mjs?v=3156538adfcd';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
 const RHYTHMER_PRODUCTS=['FM-1_900','FM-1_748001','FM-1_748005'];
@@ -89,7 +89,7 @@ export async function backup(source,progress){
  try{return await captureBackup((r,o)=>c.request(r,o),String.fromCharCode(...source.info.slice(0,source.info.indexOf(0))),progress,{complete:true});}finally{c.close();}
 }
 export async function verifyRhythmer(up){
- const s=await inspect(up);ensure(s.kind==='rhythmer','Firmware returned but Rhythmer INFO/ABI did not match. Installation is not verified.');return s;
+ const s=await inspect(up);ensure(s.kind==='rhythmer'&&strictInfo(s.info)?.engines===22,'Firmware returned but the current Rhythmer INFO/ABI did not match (22 engine entries including EMPTY). Installation is not verified.');return s;
 }
 export async function verifyEmbeddedBanks(source){
  const c=new BackupConnection(source.input,source.output);

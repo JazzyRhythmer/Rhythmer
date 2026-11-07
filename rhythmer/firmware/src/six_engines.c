@@ -1,16 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
- * SIX integration: original X0X bass303 and Amenity jungle behind JIANT's engine/clock interface.
- * Both engines are owned by their assigned render track. Controls run before dispatch. */
-#include "../six/bass303.h"
+ * Rhythmer: Amenity Break behind the common track/clock interface.
+ * The native Acid engine is independent in eng_acid.c. */
 #include "../six/jungle.h"
-#include "hortator_acid.c"
-typedef union {bass303_t xox;ha_voice_t hort;} six_acid_state_t;
-_Static_assert(sizeof(ha_voice_t)<=sizeof(bass303_t),"Hortator Acid reuses the X0X state budget");
-static six_acid_state_t six_acid[NTRK];
-static union {float f[32];int32_t i[32];} six_acid_out[2];
-static uint8_t six_acid_model[NTRK];
-static int six_acid_note[NTRK];
-static uint8_t six_acid_gate[NTRK];
 static int8_t six_break_owner=-1;
 static const uint8_t *six_loops[2];
 static uint8_t six_loop_mask, six_loop_now, six_break_run;
@@ -67,7 +58,7 @@ static uint32_t six_filter_age,six_filter_q_age;
 static unsigned six_filter_q=8;
 static void six_native_init(void){
  drum_md_reset();
- for(unsigned k=0;k<NTRK;k++){bass303_init(&six_acid[k].xox);bass303_set_lite(&six_acid[k].xox,1);six_acid_model[k]=0;six_acid_note[k]=-1;six_acid_gate[k]=0;}
+ acid_reset_all();
  six_break_owner=(int8_t)six_break_track();
  if(six_break_owner>=0&&trk[(unsigned)six_break_owner].engine==ENGI_BREAK)memset(&trk[(unsigned)six_break_owner].v[0],0,sizeof(voice_t));
  jungle_init();jungle_play(0);six_break_run=0;six_roll_count=0;six_break_acc=six_break_ticks=six_break_keys=0;
@@ -78,61 +69,6 @@ static void six_native_init(void){
  if(six_loops[six_loop_now])jungle_bind(six_loops[six_loop_now],72000,48000);
 }
 void jungle_midi_out(unsigned status){(void)status; /* JIANT owns MIDI clock. */}
-static int six_acid_is_hort(const track_t *t){return t->p[P_E5]>=2;}
-static void six_acid_context(track_t *t,const voice_t *v,ha_track_t *ctx){
- ctx->p[0]=0;ctx->p[1]=t->p[P_E3];ctx->p[2]=t->p[P_E0];ctx->p[3]=t->p[P_E1];
- ctx->p[4]=t->p[P_E2];ctx->p[5]=t->p[P_E4];ctx->p[6]=t->p[P_E5]&1;ctx->p[7]=56;
- ctx->pitch16=v->pitch16;ctx->wow=six_acid[t-trk].hort.wow;
- /* Constant glide coefficients avoid a software 64-bit divide in every block. */
- static const uint32_t glide[128]={1521742,1217394,1014495,869567,760871,676330,608697,553361,507247,468228,434783,405798,380435,358057,338165,320366,304348,289855,276680,264650,253623,243478,234114,225443,217391,209895,202899,196353,190217,184453,179028,173913,169082,164512,160183,156076,152174,148462,144927,141557,138340,135266,132325,129510,126811,124223,121739,119352,117057,114848,112721,110672,108695,106788,104947,103169,101449,99786,98176,96618,95108,93645,92226,90850,89514,88216,86956,85731,84541,83383,82256,81159,80091,79051,78038,77050,76087,75147,74231,73337,72463,71611,70778,69965,69170,68392,67633,66889,66162,65451,64755,64073,63405,62752,62111,61484,60869,60267,59676,59096,58528,57971,57424,56887,56360,55843,55336,54837,54347,53867,53394,52930,52473,52025,51584,51151,50724,50305,49893,49487,49088,48695,48309,47928,47554,47185,46822,46465};
- ctx->glide=(int32_t)glide[clamp(t->p[P_E6],0,127)];
-}
-static void six_acid_prepare(track_t *t){unsigned k=(unsigned)(t-trk),h=(unsigned)six_acid_is_hort(t);
- if(six_acid_model[k]==h)return;
- memset(&six_acid[k],0,sizeof six_acid[k]);six_acid_model[k]=(uint8_t)h;
- if(!h){bass303_init(&six_acid[k].xox);bass303_set_lite(&six_acid[k].xox,1);}
- six_acid_note[k]=-1;six_acid_gate[k]=0;
-}
-static void six_acid_block(track_t *t){unsigned k=(unsigned)(t-trk);six_acid_prepare(t);if(six_acid_is_hort(t))return;bass303_t *acid=&six_acid[k].xox;
- static const uint8_t map[8]={BASS303_CUTOFF,BASS303_RESO,BASS303_ENVMOD,BASS303_DECAY,
- BASS303_ACCENT,BASS303_WAVE,BASS303_SLIDE,BASS303_DRIVE};
- for(unsigned i=0;i<8;i++)if(bass303_get(acid,map[i])!=t->p[P_E0+i])bass303_set(acid,map[i],t->p[P_E0+i]);
- /* Conservative 1x profile with the full ensemble; the X0X engine's own filter/envelope remain. */
- bass303_set_lite(acid,song.playing||song.cpu_q8>128);
-}
-static void six_acid_on(track_t *t,voice_t *v){unsigned k=(unsigned)(t-trk);six_acid_prepare(t);bass303_t *acid=&six_acid[k].xox;
- if(six_acid_is_hort(t)){
-  ha_voice_t *h=&six_acid[k].hort;ha_track_t ctx;six_acid_context(t,v,&ctx);h->vel=v->vel;h->active=1;
-  if(t->slide_glide&&six_acid_gate[k])ha_glide(&ctx,h);else ha_trigger(&ctx,h);
-  h->wow=ctx.wow;six_acid_note[k]=v->pitch16/16;six_acid_gate[k]=1;return;
- }
- six_acid_note[k]=v->pitch16/16;six_acid_gate[k]=1;
- bass303_note_on(acid,six_acid_note[k],v->vel>=120,t->slide_glide);
-}
-static int six_acid_done(track_t *t,voice_t *v){return !v->gate&&(six_acid_is_hort(t)?!six_acid[t-trk].hort.active:six_acid[t-trk].xox.idle);}
-static void six_acid_render(track_t *t,voice_t *v,int32_t *out,uint32_t n,const vmod_t *m){
- unsigned k=(unsigned)(t-trk);six_acid_prepare(t);bass303_t *acid=&six_acid[k].xox;float *audio=six_acid_out[MC_CPU()&1u].f;if(n>32)n=32;if(!n)return;
- if(six_acid_is_hort(t)){
-  ha_voice_t *h=&six_acid[k].hort;ha_track_t ctx;six_acid_context(t,v,&ctx);
-  if(v->gate&&six_acid_note[k]<0){h->vel=v->vel;h->active=1;ha_trigger(&ctx,h);six_acid_gate[k]=1;}
-  if(v->gate&&v->pitch16!=h->x[1]){h->vel=v->vel;ha_glide(&ctx,h);}
-  if(!v->gate&&six_acid_gate[k]){ha_gate(&ctx,h,0);six_acid_gate[k]=0;}
-  six_acid_note[k]=v->pitch16/16;h->wow=mulq16(ctx.wow,ACID_WOW);
-  int32_t *y=six_acid_out[MC_CPU()&1u].i;memset(y,0,n*sizeof *y);
-  if(h->active)ha_render(&ctx,h,y,n);
-  for(unsigned i=0;i<n;i++){int32_t x=mulq15(y[i],amp_at(m,i));if(t->p[P_E7])x=softclip(mulq15(x,32767+t->p[P_E7]*256));out[i]+=x;}
-  return;
- }
- int note=v->pitch16/16;
- if(v->gate&&note!=six_acid_note[k]){six_acid_note[k]=note;bass303_note_on(acid,note,v->vel>=120,1);}
- if(!v->gate&&six_acid_gate[k]){bass303_note_off(acid);six_acid_gate[k]=0;}
- bass303_render(acid,audio,(int)n);
- float gain=(float)m->amp0, dg=(float)(m->amp1-m->amp0)/(float)(n?n:1);
- for(unsigned i=0;i<n;i++,gain+=dg){
-  float x=audio[i]*gain;if(!(x>=-65536.0f&&x<=65536.0f))x=0;
-  out[i]+=(int32_t)x;
- }
-}
 static int six_break_select(unsigned slot,int immediate){
  if(slot>1||!six_loops[slot])return 0;
  trk[six_break_track()>=0?(unsigned)six_break_track():song.sel].p[P_E4]=(int16_t)slot;
@@ -201,30 +137,15 @@ static void six_break_clock(uint32_t advance,uint32_t frames,uint32_t beat){
 }
 static uint32_t six_break_render(track_t *t,int32_t *out,uint32_t n){
  if((int)(t-trk)!=six_break_track()){memset(out,0,n*sizeof *out);return 0;}if(n>32)n=32;memset(six_break_out,0,sizeof six_break_out);jungle_render(six_break_out,n);
- for(unsigned i=0;i<n;i++)out[i]=six_break_out[2*i]/256;
- return six_loop_mask!=0;
+ uint32_t audible=0;
+ for(unsigned i=0;i<n;i++){out[i]=six_break_out[2*i]/256;audible|=out[i]!=0;}
+ return audible; /* loaded banks are not sounding voices */
 }
-static const preset_t SIX_ACID_PRESETS[]={
- {"X0X ACID",{64,64,64,64,64,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- /* Hortator's four ACID colours adapted to the eight-control Rhythmer panel:
-  * cutoff/resonance/env/decay/accent exact; its tune and gate remain the
-  * track's pitch/SEQ gate; the final two controls retain SLIDE and DRIVE. */
- {"HT SQUELCH",{40,64,64,50,64,2,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT DEEPBASS",{20,30,30,30,40,2,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT SCREAMER",{60,115,100,80,100,2,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT SQUAREAC",{50,80,70,60,64,3,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0}
-};
 static const preset_t SIX_BREAK_PRESETS[]={
  {"BREAK A",{0,0,0,64,0,0,0,0},{0,0,127,0},0,1|TAG(DRUM),{0},0,0},
  {"BREAK B",{0,0,0,64,1,0,0,0},{0,0,127,0},0,1|TAG(DRUM),{0},0,0}
 };
 #define SIX_PD(n,hi,d) {n,F_INT,0,hi,d,0,0}
-static const char *const SIX_ACID_MODELS[]={"X0X SAW","X0X SQR","HT SAW","HT SQR"};
-static const engine_t ENG_ACID={.name="ACID 303",.page_title={"303 FILTER","303 VOICE"},
- .edit={SIX_PD("CUTOFF",127,64),SIX_PD("RESO",127,64),SIX_PD("ENV",127,64),SIX_PD("DECAY",127,64),
- SIX_PD("ACCENT",127,64),{"MODEL",F_ENUM,0,3,0,SIX_ACID_MODELS,0},SIX_PD("SLIDE",127,21),SIX_PD("DRIVE",127,0)},
- .presets=SIX_ACID_PRESETS,.npresets=NELEM(SIX_ACID_PRESETS),.knob={P_E0,P_E1,P_E2,P_E3},.poly=1,.ownenv=1,
- .note_on=six_acid_on,.render=six_acid_render,.block=six_acid_block,.done=six_acid_done};
 static const engine_t ENG_BREAK={.name="BREAK",.page_title={"AMENITY","BREAK LOOP"},
  .edit={SIX_PD("FDBK",127,0),SIX_PD("VAR",127,0),SIX_PD("WARP",127,0),SIX_PD("FILTER",127,64),
  SIX_PD("LOOP A/B",1,0),SIX_PD("FREEZE",1,0),SIX_PD("STRAIGHT",1,0),SIX_PD("AUTO ROLL",1,0)},

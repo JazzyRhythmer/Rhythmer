@@ -8,7 +8,7 @@ static void setup(unsigned gi,unsigned seed){
  gp.seed=(uint16_t)(seed%10000);gx.on=0;gx.eng=-1;gseed(GS_SOUND);
 }
 int main(int argc,char **argv){
- ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trks_put(1);
+ ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);
  FILE *out=argc>1?fopen(argv[1],"w"):0;if(out)fprintf(out,"genre,engine,preset,count\n");
  unsigned total=0;
  for(unsigned gi=0;gi<NGENRE;gi++){
@@ -16,7 +16,7 @@ int main(int argc,char **argv){
   for(unsigned seed=0;seed<512;seed++){
    setup(gi,seed*17+31);gen_sound(&trk[1],RL_BASS,gs.g->snd[GP_BASS]);
    unsigned e=trk[1].eng_req,p=trk[1].preset;
-   C("eligible light bass machine",gen_auto_synth_ok(e));
+   C("ordinary bass pool stays light; named Acid recipe uses native Hortator",gs.g->snd[GP_BASS]==SR_ACID?e==ENGI_ACID:gen_auto_synth_ok(e));
    C("bass tag or explicit BASS name, never arbitrary fallback",gen_bass_ok(e,p));
    C("no automatic FX/bytebeat bass",PR_TAG(&ENGINES[e]->presets[p])!=PT_FX);
    if(e==ENGI_ANALOG)C("original bass oscillator interval stays in tune",trk[1].p[P_E7]==ENGINES[e]->presets[p].e[7]);
@@ -27,9 +27,9 @@ int main(int argc,char **argv){
    different++;if(count[e][p]>top)top=count[e][p];
    if(out)fprintf(out,"%s,%s,%s,%u\n",GENRE[gi].name,ENGINES[e]->name,ENGINES[e]->presets[p].name,count[e][p]);
   }
-  C("genre keeps at least ten bass presets reachable in practice",different>=10);
+  C("ordinary genres keep ten bass presets; explicit Acid reaches all four native sounds",different>=(GENRE[gi].snd[GP_BASS]==SR_ACID?4:10));
   C("no single preset dominates half the results",top<256);
-  C("at least five sound colours per genre",__builtin_popcount(colours)>=5);
+  C("ordinary genres keep at least five sound colours",GENRE[gi].snd[GP_BASS]==SR_ACID||__builtin_popcount(colours)>=5);
  }
  /* A missing-role engine is rerouted rather than taking its pad/lead list. */
  setup(0,31);gx.eng=ENGI_M2SAW;gen_sound(&trk[1],RL_BASS,SR_SUB);

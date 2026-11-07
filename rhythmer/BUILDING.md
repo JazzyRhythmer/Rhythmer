@@ -1,4 +1,4 @@
-# Building JIANT
+# Building Rhythmer
 
 The build makes three files in `build/`:
 

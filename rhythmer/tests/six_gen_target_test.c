@@ -2,7 +2,7 @@
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
 static track_t baseline[NTRK];
-static void init(void){ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trks_put(1);gp.target=0;gp.form=0;gp.energy=55;gp.complex=65;gp.human=70;gp.swing=GA_AUTO;for(unsigned j=0;j<GP_N;j++)gp.amt[j]=GA_AUTO;
+static void init(void){ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);gp.target=0;gp.form=0;gp.energy=55;gp.complex=65;gp.human=70;gp.swing=GA_AUTO;for(unsigned j=0;j<GP_N;j++)gp.amt[j]=GA_AUTO;
  song.g[G_BPM]=87;song.g[G_SWING]=13;song.g[G_RTYPE]=2;song.g[G_DTYPE]=1;
  for(unsigned k=0;k<NTRK;k++){track_t *t=&trk[k];t->p[P_ROOT]=2;t->p[P_SCALE]=SC_DOR;t->p[P_SLEN]=32;t->p[P_SDIV]=2;t->p[P_LEVEL]=81+k;t->p[P_DLY]=k*7;for(unsigned i=0;i<NSTEP;i++)gclear(&t->step[i]);
  for(unsigned i=0;i<32;i+=4){step_t *s=&t->step[i];s->time=ST_NOTE;s->vel=90;if(!k){s->hit=i%8?2:1;}else{s->n=k==2?3:1;s->note[0]=(k==1||k==4)?38:k==5?i%16:62;if(k==2){s->note[0]=i<16?50:55;s->note[1]=i<16?53:59;s->note[2]=i<16?57:62;}}}}

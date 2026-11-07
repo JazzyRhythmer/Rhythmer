@@ -523,6 +523,12 @@ static int test_save(void)
     stop_transport();
     return bad;
 }
+/* Feature-test fixture, deliberately distinct from real unassigned defaults. */
+static void test_optional_machines(void){
+ set_engine_of(&trk[4],ENGI_ACID);set_engine_of(&trk[5],ENGI_BREAK);
+ for(unsigned k=4;k<6;k++){trk[k].engine=trk[k].eng_req;trk[k].xf=trk[k].xf_on=0;memset(trk[k].v,0,sizeof trk[k].v);}
+ trk[5].p[P_SLEN]=32;panic_req=0;xf_snap_t=0xff;
+}
 #ifndef UI_TEST_NO_MAIN
 int main(void){return test_save();}
 #endif

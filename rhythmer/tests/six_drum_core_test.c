@@ -2,7 +2,7 @@
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
 int main(int argc,char **argv){
- if(argc!=3)return 2;ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);song.master_q12=4096;
+ if(argc!=3)return 2;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);song.master_q12=4096;
  mc_host=atoi(argv[1]);mc_host_v12=1;mc_off=0;gov_cap=8; /* Equal voice cap for PCM parity, independent of core count. */
  for(unsigned k=0;k<NTRK;k++){set_engine_of(&trk[k],ENGI_DRUM);trk[k].engine=trk[k].eng_req;trk[k].xf=trk[k].xf_on=0;apply_preset_to(&trk[k],0);trk[k].xf=trk[k].xf_on=0;trk[k].p[P_DXIMG]=70;trk[k].p[P_DIST]=60;trk[k].p[P_CHOR]=90;trk[k].p[P_DLY]=80;trk[k].p[P_REV]=80;}
  for(unsigned l=0;l<8;l++)dx_snd[l]=(uint8_t)(((l%3+1)<<6)|35);

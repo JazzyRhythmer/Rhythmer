@@ -1,9 +1,11 @@
+#define TEST_ACID_TRACK 4u /* test fixture position, never a product role */
+#define TEST_BREAK_TRACK 5u
 /* SPDX-License-Identifier: GPL-3.0-only */
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
 int main(void){
  draw_splash(); /* Startup must also be safe before tracks, kits and samples exist. */
- ui_power_on();load_depth++;fm6_init();power_on_parts();load_depth--;six_native_init();trk_live=NTRK;
+ ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trk_live=NTRK;
  int bad=0;
  trks_put(1);dice_seq(&trk[4]);dice_seq(&trk[5]);
  /* Project storage canonicalizes unused note bytes on rests/ties. Keep the
@@ -19,12 +21,12 @@ int main(void){
   bad+=check("GEN keeps T5 pattern",steps_sig(&trk[4])==ac_saved);
   bad+=check("GEN keeps T6 pattern",steps_sig(&trk[5])==br_saved);
   bad+=check("GEN keeps six-track mode",six_machine_mask==3);
-  unsigned serum=0;for(unsigned k=1;k<SIX_GEN_TRACKS;k++){bad+=check("GEN excludes heavy automatic synths",gen_auto_synth_ok(trk[k].eng_req));serum+=trk[k].eng_req==ENGI_SERUM;}
+  unsigned serum=0;for(unsigned k=six_gen_next(1);k<SIX_GEN_TRACKS;k=six_gen_next(k+1u)){bad+=check("GEN excludes heavy automatic synths",gen_auto_synth_ok(trk[k].eng_req));serum+=trk[k].eng_req==ENGI_SERUM;}
   bad+=check("GEN allocates at most one Serum",serum<=1);
   for(unsigned k=0;k<4;k++)if(proj_import(&proj_scratch,&proj_slot[k],sizeof proj_slot[k])){
    int ok=!memcmp(proj_scratch.t[4].step,trk[4].step,sizeof trk[4].step)&&!memcmp(proj_scratch.t[5].step,trk[5].step,sizeof trk[5].step);
    bad+=check("generated section preserves T5/6 patterns",ok);
-   for(unsigned t=1;t<SIX_GEN_TRACKS;t++)bad+=check("stored GEN sections keep the safe synth pool",gen_auto_synth_ok(proj_scratch.t[t].engine));
+   for(unsigned t=six_gen_next(1);t<SIX_GEN_TRACKS;t=six_gen_next(t+1u))bad+=check("stored GEN sections keep the safe synth pool",gen_auto_synth_ok(proj_scratch.t[t].engine));
   }
  }
  /* The final sound-admission fence also covers EXPLORE's forced candidates. */
@@ -43,14 +45,14 @@ int main(void){
  /* UI reads boundary pitches and all break command classes without altering music. */
  static uint8_t sample[72000];static uint16_t pixels[240*150];
  six_loops[0]=six_loops[1]=sample;six_loop_mask=3;six_loop_now=0;
- trks_put(3);song.sel=SIX_ACID_TRACK;trk[4].p[P_SLEN]=64;
+ trks_put(3);song.sel=TEST_ACID_TRACK;trk[4].p[P_SLEN]=64;
  for(unsigned i=0;i<64;i++){step_clear(&trk[4].step[i]);trk[4].step[i].time=ST_NOTE;trk[4].step[i].n=1;trk[4].step[i].note[0]=i&1?127:0;}
  unsigned before=steps_sig(&trk[4]);ui_prefs|=PREF_ANIM_OFF;six_gen_fx_at=5000;six_gen_fx_kind=2;fm1_ms=5100;
  cv_begin(240,140,T_BG);six_graph_gen();memcpy(pixels,cv_px,240*140*2);
  fm1_ms=5900;cv_begin(240,140,T_BG);six_graph_gen();
  bad+=check("ANIM OFF gives stable acid diagram",!memcmp(pixels,cv_px,240*140*2));
  bad+=check("acid drawing never mutates pattern",before==steps_sig(&trk[4]));
- song.sel=SIX_BREAK_TRACK;trk[5].p[P_LN0]=1;trk[5].p[P_SLEN]=32;
+ song.sel=TEST_BREAK_TRACK;trk[5].p[P_LN0]=1;trk[5].p[P_SLEN]=32;
  for(unsigned i=0;i<32;i++){step_clear(&trk[5].step[i]);trk[5].step[i].time=ST_NOTE;trk[5].step[i].n=1;trk[5].step[i].note[0]=i==30?32:i==31?33:i;}
  before=steps_sig(&trk[5]);cv_begin(240,140,T_BG);six_wave_cache(0);six_wave_cache(1);six_graph_break();
  bad+=check("wave cache and chop roll A/B drawing preserve steps",before==steps_sig(&trk[5]));
@@ -82,7 +84,7 @@ int main(void){
   cv_begin(240,40,T_BG);six_machine_glyph(0,trk_def_engine(k),24,0u,8,4,62,22,T_TEXT);
   memcpy(pixels,cv_px,240*40*2);
   cv_begin(240,40,T_BG);six_machine_glyph(0,trk_def_engine(k),92,0x90000000u,8,4,62,22,T_TEXT);
-  bad+=check("each startup symbol uses animated instrument geometry",memcmp(pixels,cv_px,240*40*2)!=0);
+  bad+=check("each startup symbol uses animated instrument geometry",(memcmp(pixels,cv_px,240*40*2)!=0)==(trk_def_engine(k)!=ENGI_EMPTY));
   cv_begin(240,140,T_BG);memcpy(pixels,cv_px,240*140*2);
   six_machine_glyph(0,trk_def_engine(k),127,0x90000000u,8,93,30,24,T_TEXT);
   int bounded=1,visible=0;

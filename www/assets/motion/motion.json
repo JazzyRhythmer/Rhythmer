@@ -1,21 +1,19 @@
 [
   {
     "id": "acid-generate",
-    "frames": 48,
-    "uniqueFrames": 23,
-    "durationMs": 3840,
-    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 70288,
-    "gifSha256": "9ebb1ff67cb1fe41a453dfff87c3fc3cd5865bafa1196facac4425518ed8658c"
+    "frames": 42,
+    "uniqueFrames": 32,
+    "durationMs": 3360,
+    "capture": "Current native Hortator Acid firmware UI, host-rendered; not physical FM-1 footage",
+    "webpSha256": "944df1e9beb81a5bc3f8e955aa38194390826fc94ccd0280bee5525a31334f7e"
   },
   {
     "id": "acid",
-    "frames": 48,
-    "uniqueFrames": 4,
-    "durationMs": 3840,
-    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 165441,
-    "gifSha256": "24c12e8a68674414a7b48b0a4a2660a783cd69cfcc95e419e55a2c5da68c97d7"
+    "frames": 21,
+    "uniqueFrames": 16,
+    "durationMs": 1680,
+    "capture": "Current native Hortator Acid firmware UI, host-rendered; not physical FM-1 footage",
+    "webpSha256": "624d4cdf04eeb6ff6fcdda74532a1dfe5f1a5e3b27d5413540985ffd19da2e4f"
   },
   {
     "id": "analog",

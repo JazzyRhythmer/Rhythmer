@@ -86,6 +86,11 @@ static void ha_trigger(ha_track_t *t, ha_voice_t *v)
     if (acc)
         t->wow = ha_min(t->wow + (acc << 9) / 2, ENV1);      /* the wow charges on accents, across notes */
     v->k[1] = ha_decay(acc ? clamp(p[1], 0, 127) / 3 : p[1]);   /* DECAY; an accent: shorter */
+    /* Cache the exact five integer squarings for a normal 32-frame block.
+     * Spare native state slots avoid new RAM and preserve the original math. */
+    v->k[2]=v->k[1];
+    for(unsigned n=CTL;n>1u;n>>=1)v->k[2]=(uint32_t)(((uint64_t)v->k[2]*v->k[2])>>16);
+    v->ph[1]=ha_inc(v->x[0]);v->ph[2]=(uint32_t)v->x[0];
     v->f[0] = v->f[1] = v->f[2] = v->f[3] = 0;
 }
 
@@ -136,11 +141,13 @@ static void ha_render(ha_track_t *t, ha_voice_t *v, int32_t *out, uint32_t n)
         int32_t s = (int32_t)(((int64_t)d * t->glide + (1 << 23)) >> 24);
         v->x[0] += s ? s : d > 0 ? 1 : -1;
     }
-    inc = ha_inc(v->x[0]);
+    if(v->ph[2]!=(uint32_t)v->x[0]||!v->ph[1]){v->ph[1]=ha_inc(v->x[0]);v->ph[2]=(uint32_t)v->x[0];}
+    inc = v->ph[1];
     /* the ladder's coefficients at the block's end (the filter envelope n samples on: DECAY^n, n a power of two as
      * CTL) and the output gain (velocity x voice level x gain x the accent, <= 122332); each ramps from where the
      * last block ended (a new voice: from its value now) */
-    for (j = n; j > 1u; j >>= 1)
+    if(n==CTL)kn=v->k[2];
+    else for (j = n; j > 1u; j >>= 1)
         kn = (uint32_t)(((uint64_t)kn * kn) >> 16);
     k = clamp(t->p[P_E0 + 3], 0, 127) * (ACID_KMAX / 127);  /* RESO: 0 .. 4.4 (self-oscillation from ~4, 116) */
     G1 = ha_coef(t, v, mulq16(v->env[1], kn), k, &inv1);

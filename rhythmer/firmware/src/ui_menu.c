@@ -40,7 +40,7 @@ static const menu_credit_t MENU_CREDITS[] = {
     {"https://github.com/juanjiant-bit/JIANT", MC_URL},
     {"", MC_TEXT},
     {"ACID / BREAK", MC_TITLE},
-    {"fm1-x0x by Charles Vestal; Amenity by ejtb76. GPL-3.0-only. Original notices retained.", MC_TEXT},
+    {"TB-3PO MIDI generation via fm1-x0x by Charles Vestal; Amenity by ejtb76. GPL-3.0-only.", MC_TEXT},
     {"https://github.com/charlesvestal/fm1-x0x", MC_URL},
     {"https://github.com/ejtb76/amenity", MC_URL},
     {"GARDEN-FM / MONO2K", MC_TITLE},

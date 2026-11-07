@@ -5,18 +5,6 @@
  * generate_pattern / mutate_pattern, so a seed and settings give the same line on
  * both. */
 #pragma once
-#include "pattern.h"
+#include "acid_pattern.h"
 
-#define TB3PO_NSCALES 6
-extern const char *const TB3PO_SCALE_NAMES[TB3PO_NSCALES];
-
-void tb3po_defaults(tb3po_cfg_t *g, uint32_t seed);
-/* write a whole line (len steps) from g (g->seed) */
-void tb3po_generate(bpart_t *b);
-/* re-roll ~25 % of the steps, continuing the line's random stream from *rng
- * (pass the part's running state; 0 = start from the seed) */
-void tb3po_mutate(bpart_t *b, uint32_t *rng);
-/* a new seed from any entropy (time, key presses) */
-uint32_t tb3po_new_seed(uint32_t entropy);
-
-void tb3po_scale_mask(bpart_t *b,uint32_t *rng,uint16_t mask,int mutate);
+void tb3po_scale_mask(acid_gen_line_t *b,uint32_t *rng,uint16_t mask,int mutate);

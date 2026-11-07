@@ -3,16 +3,30 @@
  * Drum machine fork: 2026 DEADACTIVE
  * Rhythmer adapter for Hortator's MD synthesis bank, 2026 DEADACTIVE.
  * Pinned source 44c9ad4aa57bebf63f412bd552e57143c30b4065.
- * Three fixed MD hits per track, with hat choke and oldest-hit stealing.
+ * Eight fixed MD lanes per track, matching ordinary DRUM capacity, with hat choke.
  * All models share one union per hit; no heap or sample ROM. */
 #include "md_states.h"
 typedef struct {md_state_t ms; uint32_t t; int32_t rng,last; dx_voice_t *owner; uint8_t active,vel,kind;} md_voice_t;
 typedef struct {int16_t p[8];int8_t nt;} md_track_t;
-/* Fixed MD state stays in the pool; eight ordinary voices remain per part. */
-static md_voice_t md_pool[NPART][2] __attribute__((section(".pool")));
-static md_voice_t md_aux[NPART] __attribute__((section(".pool")));
-static md_voice_t *md_at(unsigned track,unsigned slot){return slot<2?&md_pool[track][slot]:&md_aux[track];}
-static void drum_md_reset(void){memset(md_pool,0,sizeof md_pool);memset(md_aux,0,sizeof md_aux);}
+/* DRUM and FM6 cannot render on the same part at once. Their first four
+ * runtime slots share RAM (not patches): engine switches finish the old
+ * engine's fade before calling the new engine. The engine tag clears stale
+ * pointers/phases once at that handoff, on the audio thread. This recovers
+ * the original 512-frame DMA margin without reducing eight MD lanes or stacks. */
+typedef union { md_voice_t md; fm6_note_t fm6; } md_fm6_runtime_t;
+static md_fm6_runtime_t md_shared[NPART][4];
+static md_voice_t md_pool[NPART][3] __attribute__((section(".pool")));
+static md_voice_t md_aux[NPART] __attribute__((section(".lowbuf")));
+static uint8_t md_shared_engine[NPART];
+static void md_memory(unsigned track,unsigned engine){
+ if(md_shared_engine[track]!=engine){
+  memset(md_shared[track],0,sizeof md_shared[track]);
+  if(engine==ENGI_DRUM){memset(md_pool[track],0,sizeof md_pool[track]);memset(&md_aux[track],0,sizeof md_aux[track]);}
+  md_shared_engine[track]=(uint8_t)engine;
+ }
+}
+static md_voice_t *md_at(unsigned track,unsigned slot){return slot<4?&md_shared[track][slot].md:slot<7?&md_pool[track][slot-4]:&md_aux[track];}
+static void drum_md_reset(void){memset(md_pool,0,sizeof md_pool);memset(md_aux,0,sizeof md_aux);memset(md_shared,0,sizeof md_shared);memset(md_shared_engine,0,sizeof md_shared_engine);}
 static uint32_t pow2_q16(int32_t d16) {
  uint32_t u=(uint32_t)(d16+192*16),oct=u/192u;
  uint32_t r=pitch_inc(1600+u%192u)/(pitch_inc(1600)>>16);
@@ -104,11 +118,12 @@ static void md_tail(dx_voice_t *x,int32_t *y,uint32_t n){
  x->hl=n?y[n-1]:x->hl;
 }
 static md_voice_t *md_find(unsigned track,dx_voice_t *x){
- for(unsigned j=0;j<3;j++){md_voice_t *v=md_at(track,j);if(v->owner==x)return v;}return 0;
+ for(unsigned j=0;j<NVOICE;j++){md_voice_t *v=md_at(track,j);if(v->owner==x)return v;}return 0;
 }
 static md_voice_t *md_claim(unsigned track,dx_voice_t *x,unsigned kind){
+ md_memory(track,ENGI_DRUM);
  md_voice_t *best=0,*same=0,*free=0;
- for(unsigned j=0;j<3;j++){
+ for(unsigned j=0;j<NVOICE;j++){
   md_voice_t *v=md_at(track,j);
   if(v->owner&&(!v->owner->live||!dx_is_md(v->owner->model)))v->active=0;
   if((md_base(kind)==0||md_base(kind)==10||md_base(kind)==11)&&v->active&&(md_base(v->kind)==0||md_base(v->kind)==10||md_base(v->kind)==11))return v;
@@ -156,17 +171,3 @@ static void md_patch_default(dx_lane_t *p,unsigned kind){
  p->a[1]=(uint8_t)m->def[m->ctl[0]];p->a[3]=(uint8_t)m->def[m->ctl[1]];p->a[4]=(uint8_t)m->def[m->ctl[2]];memcpy(p->b,p->a,5);
 }
 
-/* Measured MD reserve: three hits per DRUM part, two for the expensive TRX
- * cowbell/cymbal filters. This limits MD hits only, never ordinary polyphony. */
-static unsigned md_kit_poly(void){
- for(unsigned i=0;i<8;i++)if(dx_is_md(dx_kit[i].mode))return 3u;return 0;
-}
-static unsigned md_heavy_note(unsigned note){unsigned m=dx_kit[drum_lane(note)].mode;return dx_is_md(m)&&(md_base(md_kind(&dx_kit[drum_lane(note)]))==9u||md_base(md_kind(&dx_kit[drum_lane(note)]))==12u);}
-static unsigned md_costly_mode(unsigned m){unsigned k=md_base(dx_md_id(m));return dx_is_md(m)&&(k==3u||k==4u||k==9u||k==12u);}
-static unsigned md_voice_mode(const track_t *t,const voice_t *v){unsigned lane=drum_lane(v->note);dx_voice_t *x=&drum_kit[t-trk][lane].x;unsigned m=x->trig?dx_kit[lane].mode:x->model;if(!dx_is_md(m))return m;md_voice_t *h=md_find((unsigned)(t-trk),x);unsigned k=x->trig?md_kind(&dx_kit[lane]):h?h->kind:dx_md_id(m);return DX_MD(md_base(k));}
-
-static unsigned md_track_poly(const track_t *t){
- unsigned poly=md_kit_poly();if(!poly)return 0;
- for(unsigned i=0;i<NVOICE;i++)if(t->v[i].active&&t->v[i].stage!=4u&&dx_is_md(md_voice_mode(t,&t->v[i]))&&(md_base(dx_md_id(md_voice_mode(t,&t->v[i])))==9u||md_base(dx_md_id(md_voice_mode(t,&t->v[i])))==12u))return 2u;
- return poly;
-}

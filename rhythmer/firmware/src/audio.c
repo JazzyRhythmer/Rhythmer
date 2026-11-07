@@ -126,51 +126,43 @@ static uint32_t shed_count;
 #define TIGHT_1C() 0                                   /* (the host: as before) */
 #endif
 static uint8_t tight_calm;                             /* halves in a row under 60 % */
-/* Runtime governor: three over-budget halves first select LITE. Eight further
- * HOT halves (75%, not the soft FX threshold) reduce voices; an overload
- * shed after the fresh LITE window reduces it by two. Half a second calm restores
- * one voice; five seconds calm restores the normal FX path. */
-#define GOV_SECOND (FS / HALF_FRAMES)
+/* (0.9.13) the load governor (voice.c gov_cap, gov_lite), a half at a time: over the budget 3 halves in a row (0.9.14:
+ * was 6), a voice less for all parts (4 at least: the song thins out, its oldest released voices first, voice_room);
+ * (0.9.14) past GOV_HOT (75 %, ahead of the guard's 80 %) a voice less every half, and at 4 still past it 8 halves, LOAD
+ * LITE of its own; a shed (the guard at 80 %) two less; under the budget 172 halves (0.5 s), one back; two sheds in 344
+ * halves (1 s), LOAD LITE of its own (CLOUD / SHIMMER as ROOM, RESO as SPRING, the GRAIN delay plain, FM6 two voices)
+ * until 5 s under the budget */
 #define GOV_HOT ((HALF_FRAMES * 1000000u / FS) * 75u / 100u * FM1_TICKS_PER_US)
 #define GOV_HOT_ECO ((HALF_FRAMES * 1000000u / FS) * 62u / 100u * FM1_TICKS_PER_US)
 #define GOV_HOT_1C ((HALF_FRAMES * 1000000u / FS) * 70u / 100u * FM1_TICKS_PER_US)
 static uint16_t gov_hot, gov_calm, gov_win, gov_lcalm;
 static uint8_t gov_sheds, gov_floor;
+/* Preserve the original governor's wall times when DMA headroom changes.
+ * Only the interrupt grouping changes; the envelopes still run every CTL. */
+#define GOV_HALVES(n) (((n)*128u+HALF_FRAMES-1u)/HALF_FRAMES)
 static void gov_tick(int over, int hot, int under, int shed)
 {
-    /* Keep the JIANT voice ceiling. Expensive FX yield before chord notes.
-     * A fresh LITE transition gets a new overload window before any shedding. */
-    uint32_t budget = voice_budget(), c = gov_cap > budget ? budget : gov_cap;
+    uint32_t c = gov_cap > NVOICE + 4u ? NVOICE + 4u : gov_cap;
     if (shed) {
-        if (!gov_lite) {
-            gov_lite = LOAD_LITE; gov_lcalm = gov_hot = 0;
-            shed_req = shed_over = 0;
-        } else c = c > 6u ? c - 2u : 4u;
+        c = c > 6u ? c - 2u : 4u;
         if (!gov_win) gov_sheds = 0;
-        gov_win = GOV_SECOND;
-        gov_sheds++;
+        gov_win = GOV_HALVES(344u);
+        if (++gov_sheds >= 2u) { gov_lite = LOAD_LITE; gov_lcalm = 0; }
     }
     if (gov_win) gov_win--;
+    gov_floor = hot ? gov_floor : 0;
     if (over || hot) {
         gov_calm = 0;
-        /* Once FX are light, a 65% soft warning is not a reason to lose chord
-         * tones. Keep the 25% hot margin; real 80% overload shedding remains. */
-        if (gov_lite && !hot) gov_hot = 0;
-        else if (++gov_hot >= (gov_lite ? 8u : 3u)) {
+        if (hot || ++gov_hot >= GOV_HALVES(3u)) {
             gov_hot = 0;
-            if (!gov_lite) { gov_lite = LOAD_LITE; gov_lcalm = 0; }
-            else if (c > 4u) c--;
+            if (c > 4u) c--;
+            else if (hot && ++gov_floor >= GOV_HALVES(8u)) { gov_lite = LOAD_LITE; gov_lcalm = 0; }
         }
     } else {
         gov_hot = 0;
-        if (under && ++gov_calm >= GOV_SECOND / 2u) { gov_calm = 0; if (c < budget) c++; }
+        if (under && ++gov_calm >= GOV_HALVES(172u)) { gov_calm = 0; if (c < NVOICE + 4u) c++; }
     }
-    if (gov_lite && (under ? ++gov_lcalm >= GOV_SECOND * 5u : (gov_lcalm = 0, 0))) gov_lite = 0;
-    /* Light automatic relief: two fewer shared voices while the measured
-     * load guard is active. Normal dual-core operation keeps twelve; primary
-     * per-track notes retain voice_room's protection. No forced note cut on
-     * this transition: new admissions reclaim release/extra voices normally. */
-    if (gov_lite && c > 10u) c = 10u;
+    if (gov_lite && (under ? ++gov_lcalm >= GOV_HALVES(1720u) : (gov_lcalm = 0, 0))) gov_lite = 0;
     gov_cap = (uint8_t)c;
 }
 static __attribute__((noinline)) uint32_t shed_check(uint32_t all)
@@ -181,7 +173,7 @@ static __attribute__((noinline)) uint32_t shed_check(uint32_t all)
     if (r > (eco ? TIGHT_ON_ECO : one ? TIGHT_ON_1C : TIGHT_ON)) {   /* (voice.c load_tight: no voice added while set) */
         load_tight = 1;
         tight_calm = 0;
-    } else if (load_tight && r < (eco ? TIGHT_OFF_ECO : one ? TIGHT_OFF_1C : TIGHT_OFF) && ++tight_calm >= 16u) {
+    } else if (load_tight && r < (eco ? TIGHT_OFF_ECO : one ? TIGHT_OFF_1C : TIGHT_OFF) && ++tight_calm >= GOV_HALVES(16u)) {
         load_tight = 0;
     }
     shed_over = (uint8_t)(shed_over << 1 | (all > SHED_TICKS));
@@ -200,7 +192,7 @@ static void shed_voice(void)
     for (p = 0; p < NPART; p++)
         for (i = 0; i < NVOICE; i++) {
             voice_t *v = &trk[p].v[i];
-            if (v->active && !v->gate && v->stage != 4u && (!best || v->env < best->env))
+            if (v->active && !v->gate && v->stage != 4u && !drum_attack(&trk[p],v) && (!best || v->env < best->env))
                 best = v;
         }
     if (best) {
@@ -213,8 +205,8 @@ static void shed_voice(void)
         uint32_t mode = trk_vmode(t), low = mode == V_POLY ? lowest_held(t) : 0u;
         for (i = 0; i < NVOICE; i++) {
             voice_t *v = &trk[p].v[i];
-            if (v->active && v->gate && v->stage != 4u &&
-                ((mode == V_POLY && i != low) || (mode != V_POLY && i > 0u))) {
+            if (v->active && v->gate && v->stage != 4u && !drum_attack(t,v) &&
+                (t->engine == ENGI_DRUM || (mode == V_POLY && i != low) || (mode != V_POLY && i > 0u))) {
                 if (!best || v->age < best->age)
                     best = v;
             }

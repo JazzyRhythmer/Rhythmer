@@ -652,7 +652,7 @@ static const ggenre_t GENRE[] = {
      0,1,35,0,FM_LOOP,95,HF_JAZZY|HX_APPR,GF_DRUNK},
 };
 #define NGENRE (sizeof GENRE / sizeof GENRE[0])
-static const uint8_t GEN_ORDER[]={0,1,2,3,4,24,25,49,50,54,5,6,7,8,9,10,11,12,13,14,15,18,19,26,58,27,28,29,30,31,46,47,57,48,51,52,53,43,44,45,34,35,36,16,17,20,21,22,23,32,33,37,56,38,39,40,41,42,55};
+static const uint8_t GEN_ORDER[]={0,1,2,3,4,24,25,49,50,54,5,6,7,8,9,10,11,12,13,14,15,18,19,26,58,27,28,29,30,31,46,47,57,48,51,52,53,43,44,45,34,35,36,16,17,20,21,22,23,32,33,37,38,39,40,41,55,56,42};
 
 /* ------------------------------------------------------------------------------------------- (0.8.6) EXPLORE --- */
 /* GENRE's first choice and the dice's default: no genre's template, every one of its rules thrown (gen.c gx_genre).

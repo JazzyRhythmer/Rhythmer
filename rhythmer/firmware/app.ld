@@ -28,7 +28,7 @@ MEMORY
 SECTIONS
 {
     /* (0.9.12) what an interrupt reaches first, in name order (tools/build.py audio_sections): the UI cannot move it */
-    .text : { KEEP(*(.text.crt0)) *(.text.jungle*) *(.text.bass303*) *(.text.six303*) *(.text.tb3po*) *(SORT_BY_NAME(.text.a.*)) *(SORT_BY_NAME(.rodata.a.*)) *(.text*) *(.rodata*)
+    .text : { KEEP(*(.text.crt0)) *(.text.jungle*) *(.text.acid_generate*) *(.text.tb3po*) *(SORT_BY_NAME(.text.a.*)) *(SORT_BY_NAME(.rodata.a.*)) *(.text*) *(.rodata*)
               . = ALIGN(4); _etext = .; } > XIP
     .ram_text : { _rt_start = .; KEEP(*(.ram_text*)) . = ALIGN(4); _rt_end = .; } > RAMTEXT AT > XIP
     _rt_load = LOADADDR(.ram_text);

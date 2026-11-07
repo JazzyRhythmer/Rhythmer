@@ -555,6 +555,16 @@ static void confirm_open(uint32_t kind, uint32_t trk)
     ui.force = 1;
 }
 
+/* User-confirmed activation only: never rewrite a loaded project's machines
+ * while applying settings at boot. Empty slots keep their existing MIDI. */
+static void trks_activate(void)
+{
+    unsigned was=trk_live;
+    trks_put(1);
+    if(was>=6u)return;
+    if(trk[4].eng_req==ENGI_EMPTY)set_engine_of(&trk[4],ENGI_ACID);
+    if(trk[5].eng_req==ENGI_EMPTY&&six_break_track()<0)set_engine_of(&trk[5],ENGI_BREAK);
+}
 static void trks_request(uint32_t v)
 {
     if(v && trk_live<6u){
@@ -1301,10 +1311,6 @@ static void edit_param(uint32_t slot, int32_t steps)
         lfo2_dest_put(TSEL,slot,v);
         if(fresh)for(unsigned j=0;j<4;j++)knob_cap(TSEL,L2D_ID[j]);
         else knob_cap(TSEL,L2D_ID[slot]);return;
-    }
-    if(vp==&TSEL->p[P_ROOT]||vp==&TSEL->p[P_SCALE]){
-     /* scale_link shares the chosen key with melodic tracks; keep CHR explicit. */
-     for(unsigned j=0;j<NTRK;j++)if(trk[j].eng_req==ENGI_ACID)trk[j].p[P_LN5]=64;
     }
     if (vp == &trks_ui) {                               /* (0.6.18) GLO > SYSTEM's TRKS: the MENU's setting, saved */
         trks_request(v);
@@ -2100,9 +2106,7 @@ static void ui_input_frame(void)
          * note is sent to them (a key, MIDI, their steps) and when PLAY starts with steps on them: they were silent and
          * people did not know why (at most every 4 s) */
         static uint8_t sel0 = 0xFFu, play0;
-        static uint32_t said_ms;
-        uint32_t k, said = song.sel != sel0 && song.sel >= trk_live;
-        int quiet = !said_ms || fm1_ms - said_ms > 4000u;
+        uint32_t said = song.sel != sel0 && song.sel >= trk_live;
         if (song.playing && !play0 && song.g[G_STRN]) {   /* (0.6.45) PLAY with every sequence moved: say so (it
                                                          * looked like a bug: notes lower than the roll shows) */
             char b[24];
@@ -2112,14 +2116,11 @@ static void ui_input_frame(void)
             ui_say(b, " DEG");
             str_cpy(ui.msg2, "SCL > ALL TR: 0 = OFF", sizeof ui.msg2);   /* (0.7.6: SCL KNOB 4, was SCL 2) */
         }
-        if (song.playing && !play0 && quiet)
-            for (k = trk_live; k < NTRK; k++)
-                if (!seq_is_empty(&trk[k]) && !trk[k].p[P_MUTE]) said = 1;
-        if (asleep_hit) { asleep_hit = 0; said |= quiet; }
+        /* A disabled track's background sequence must never cover another
+         * track's editor. Only an explicit selection of that slot gets help. */
         if (said) {
-            ui_say("T5-T6 ASLEEP: ", "");
-            str_cpy(ui.msg2, "GLO>SYSTEM>6 TRACK", sizeof ui.msg2);
-            said_ms = fm1_ms | 1u;
+            ui_say("INACTIVE TRACK", "");
+            str_cpy(ui.msg2, "GLO > SYSTEM > TRACKS", sizeof ui.msg2);
         }
         sel0 = song.sel;
         play0 = song.playing;
@@ -2295,7 +2296,7 @@ static void ui_input_frame(void)
                 !dice_kind(kind) && kind != CF_DEL_ROW && kind != CF_CLEAR_SONG && !chain_busy())
                 undo_mark();                            /* (0.6.21) the music before a clear, INIT, RECALL, pattern */
             if (kind == CF_TRACKS6) {
-                trks_put(1);settings_save();ui_message("6 TRACK MODE");
+                trks_activate();settings_save();ui_message("6 TRACK MODE");
             } else if (kind == CF_OVR_PROJ) {                  /* overwrite: the NAME screen writes it */
                 name_open(NK_PROJ_SAVE, ui.confirm_trk & 3u);
             } else if (kind == CF_OVR_USER) {

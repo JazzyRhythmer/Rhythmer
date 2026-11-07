@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
-int main(void){int bad=0;ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);song.sel=5;
+int main(void){int bad=0;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);song.sel=5;
  static uint8_t a[72000],b[72000];six_loops[0]=a;six_loops[1]=b;six_loop_mask=3;six_loop_now=0;jungle_bind(a,72000,48000);
  track_t *t=TSEL;t->engine=t->eng_req;t->xf=t->xf_on=0;t->p[P_SLEN]=3;t->p[P_SGATE]=64;
  for(unsigned i=0;i<NSTEP;i++)step_clear(&t->step[i]);

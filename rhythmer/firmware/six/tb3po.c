@@ -4,16 +4,6 @@
 
 typedef struct { int8_t deg[12]; uint8_t len; } scale_t;
 
-static const scale_t SCALES[TB3PO_NSCALES] = {     /* schwung-tb3po's SCALES, same order */
-    {{0, 2, 3, 5, 7, 8, 10}, 7},                     /* Minor */
-    {{0, 1, 3, 5, 7, 8, 10}, 7},                     /* Phrygian */
-    {{0, 2, 3, 5, 7, 8, 11}, 7},                     /* HarmMinor */
-    {{0, 3, 5, 7, 10, 0, 0}, 5},                     /* MinPent */
-    {{0, 2, 3, 5, 7, 9, 10}, 7},                     /* Dorian */
-    {{0, 2, 4, 5, 7, 9, 11}, 7},                     /* Major */
-};
-const char *const TB3PO_SCALE_NAMES[TB3PO_NSCALES] = {"MIN", "PHRY", "HARM", "MPEN", "DOR", "MAJ"};
-
 static uint32_t rng_u32(uint32_t *r)                 /* xorshift32, as schwung-tb3po */
 {
     uint32_t x = *r;
@@ -29,19 +19,6 @@ static uint32_t rng_u32(uint32_t *r)                 /* xorshift32, as schwung-t
 static float rng_f(uint32_t *r)                      /* [0, 1) */
 {
     return (float)(rng_u32(r) & 0xFFFFFFu) / (float)0x1000000;
-}
-
-void tb3po_defaults(tb3po_cfg_t *g, uint32_t seed)
-{
-    g->density = 70;                                 /* schwung-tb3po: 0.7 / 0.4 / 0.25, 2 octaves, A minor */
-    g->accent = 40;
-    g->slide = 25;
-    g->oct_range = 2;
-    g->root = 9;
-    g->scale = 0;
-    g->base_oct = 1;                                 /* note 24 + root: schwung-tb3po's base */
-    g->mutate_bars = 0;
-    g->seed = seed ? seed : 0xBEEF;
 }
 
 static int clampi(int v, int lo, int hi) { return v < lo ? lo : v > hi ? hi : v; }
@@ -74,7 +51,7 @@ static uint8_t roll_kind(uint32_t *r, const tb3po_cfg_t *g)
     return f;
 }
 
-static void tb_generate_scale(bpart_t *b,const scale_t *sc)
+static void tb_generate_scale(acid_gen_line_t *b,const scale_t *sc)
 {
     tb3po_cfg_t *g = &b->gen;
     int range = clampi(g->oct_range, 1, 3), len = clampi(b->len, 1, NSTEPS), i, any = 0;
@@ -108,7 +85,7 @@ static void tb_generate_scale(bpart_t *b,const scale_t *sc)
     }
 }
 
-static void tb_mutate_scale(bpart_t *b,uint32_t *rng,const scale_t *sc)
+static void tb_mutate_scale(acid_gen_line_t *b,uint32_t *rng,const scale_t *sc)
 {
     tb3po_cfg_t *g = &b->gen;
     int range = clampi(g->oct_range, 1, 3), len = clampi(b->len, 1, NSTEPS), i;
@@ -134,19 +111,11 @@ static void tb_mutate_scale(bpart_t *b,uint32_t *rng,const scale_t *sc)
     *rng = r;
 }
 
-uint32_t tb3po_new_seed(uint32_t entropy)
-{
-    uint32_t r = entropy * 2654435761u + 0x9E3779B9u;
-    rng_u32(&r);
-    rng_u32(&r);
-    return r ? r : 1;
-}
+
 
 /* Rhythmer: share the exact TB-3PO rhythmic/random laws with JIANT's SCL.
  * The scale can have up to 12 degrees; no global mutable scale state. */
-void tb3po_generate(bpart_t *b){tb_generate_scale(b,&SCALES[b->gen.scale<TB3PO_NSCALES?b->gen.scale:0]);}
-void tb3po_mutate(bpart_t *b,uint32_t *rng){tb_mutate_scale(b,rng,&SCALES[b->gen.scale<TB3PO_NSCALES?b->gen.scale:0]);}
-void tb3po_scale_mask(bpart_t *b,uint32_t *rng,uint16_t mask,int mutate){
+void tb3po_scale_mask(acid_gen_line_t *b,uint32_t *rng,uint16_t mask,int mutate){
  scale_t sc={{0},0};for(unsigned i=0;i<12;i++)if(mask&(1u<<i))sc.deg[sc.len++]=(int8_t)i;
  if(!sc.len){sc.deg[0]=0;sc.len=1;}
  if(mutate)tb_mutate_scale(b,rng,&sc);else tb_generate_scale(b,&sc);

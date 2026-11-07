@@ -8,7 +8,7 @@ typedef struct {
 } favorites_t;
 static favorites_t favorites;
 /* Preserve Acid/Break favorites; new engines use retired rows. */
-static uint32_t favorite_row(uint32_t e) { return e == ENGI_ACID ? 3u : e == ENGI_BREAK ? 4u : e == ENGI_SERUM ? 5u : e == ENGI_LOFI ? 6u : e == ENGI_M2STAT ? 8u : e == ENGI_M2SAW ? 9u : e == ENGI_M2SID ? 11u : e; }
+static uint32_t favorite_row(uint32_t e) { return e == ENGI_EMPTY ? 14u : e == ENGI_ACID ? 3u : e == ENGI_BREAK ? 4u : e == ENGI_SERUM ? 5u : e == ENGI_LOFI ? 6u : e == ENGI_M2STAT ? 8u : e == ENGI_M2SAW ? 9u : e == ENGI_M2SID ? 11u : e; }
 static int favorite_has(uint32_t engine, uint32_t preset)
 {
     if (engine == NENGINES)

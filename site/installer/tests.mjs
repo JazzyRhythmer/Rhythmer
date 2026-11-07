@@ -32,7 +32,8 @@ async function runTests(){
   await rejects(()=>validateStockPackage(raw),'Reject Rhythmer masquerading as V15');
   await rejects(()=>validateStockPackage(new Uint8Array(699956)),'Reject correct-size counterfeit V15 by SHA-256');
   const badLoop=loops[0].slice();badLoop[550]^=1;await rejects(()=>validateLoop(badLoop,m.loops[0]),'Reject corrupt sample asset');
-  ok(strictInfo(infoOf())?.isRhythmer,'Exact Rhythmer INFO parameter counts and ABI');
+  ok(strictInfo(infoOf())?.engines===22,'Current Rhythmer INFO includes EMPTY');
+  ok(strictInfo(infoOf('Rhythmer v0.1.1-beta3',21))?.isRhythmer,'Previous 21-engine Rhythmer remains recognized as an upgrade source');
   const badInfo=infoOf();badInfo[badInfo.indexOf(0)+3]=70;ok(!strictInfo(badInfo),'Reject matching name with incompatible INFO layout');
   const recovery={product:'FM-1_015'},base={mode:'rhythmer',source:{kind:'v15'},recovery,target,backupSaved:true,ack:true};
   ok(authorize(base),'Explicitly acknowledged V15 source can install');

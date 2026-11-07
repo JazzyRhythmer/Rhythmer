@@ -1452,7 +1452,7 @@ static void set_engine_of(track_t *t, uint32_t ei)
     load_begin(t, LOAD_SOUND);
     fm1_irq_off();
     t->eng_req = (uint8_t)(ei % NENGINES);
-    if(changed&&ei==ENGI_ACID){for(unsigned j=0;j<8;j++)t->p[P_LN0+j]=SIX_GEN[j].def;t->p[P_LN5]=64;}
+    if(changed&&ei==ENGI_ACID){for(unsigned j=0;j<8;j++)t->p[P_LN0+j]=SIX_GEN[j].def;}
     if(changed&&ei==ENGI_BREAK){for(unsigned j=0;j<8;j++)t->p[P_LN0+j]=0;t->p[P_LN0]=1;}
     if(changed&&ei==ENGI_DRUM){for(unsigned j=0;j<8;j++)t->p[P_LN0+j]=127;}
     for (i = 0; i < 8u; i++)
@@ -1506,7 +1506,7 @@ static void init_sound_of(track_t *t, uint32_t ei)
         t->p[ENVP[i]] = TP[ENVP[i]].def;
     for (i = 0; i < 4u; i++)
         t->p[P_DIST + i] = 0;
-    if(trk_eng(t)==ENGI_ACID){int16_t explicit_scl=t->p[P_LN5]>=64?64:0;for(i=0;i<8;i++)t->p[P_LN0+i]=SIX_GEN[i].def;t->p[P_LN5]=explicit_scl;}
+    if(trk_eng(t)==ENGI_ACID)for(i=0;i<8;i++)t->p[P_LN0+i]=SIX_GEN[i].def;
     if(trk_eng(t)==ENGI_BREAK){t->p[P_LN0]=1;t->p[P_VOICE]=V_MONO;}
     fm6_init_voice(t);
     load_end(t);
@@ -1539,7 +1539,6 @@ static void power_on_parts(void)
         track_t *t = &trk[i];
         track_defaults(t);
         power_sound_of(t, i);
-        if(i!=SIX_DRUM_TRACK)t->p[P_SCALE]=2; /* New projects start in MIN. */
         t->engine = t->eng_req;
         track_defaults_steps(t);              /* (a sound load never touches them) */
         if (TRK_DEF[i][2])
@@ -1562,10 +1561,10 @@ static void select_engine(uint32_t e)
 
 /* the presets of every engine (in ENGINE_ORDER), then the used user presets, as one list (the PRESETS knob and the
  * PRESETS page browse it) */
-static int six_preset_engine(uint32_t e){return six_engine_available(song.sel,e);}
+static int six_preset_engine(uint32_t e){return e!=ENGI_EMPTY&&six_engine_available(song.sel,e);}
 static uint32_t preset_all_pos(uint32_t *total)
 {
- uint32_t n=0,cur=0;
+ uint32_t n=0,cur=0xFFFFFFFFu; /* EMPTY has no sound-list position. */
  for(unsigned r=0;r<NENG_SHOWN;r++){
   uint32_t e=ENGINE_ORDER[r];if(!six_preset_engine(e))continue;
   const engine_t *en=ENGINES[e];

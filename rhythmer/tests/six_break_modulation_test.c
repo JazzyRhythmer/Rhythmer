@@ -6,7 +6,7 @@ static uint8_t source[72000];
 static int bad;
 #define C(s,x) do{bad+=check(s,(x));}while(0)
 static track_t *reset(void){
- ui_power_on();fm6_init();power_on_parts();six_loops[0]=six_loops[1]=source;six_loop_mask=3;six_loop_now=0;six_native_init();trks_put(1);song.sel=5;song.playing=1;
+ ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_loops[0]=six_loops[1]=source;six_loop_mask=3;six_loop_now=0;six_native_init();trks_put(1);song.sel=5;song.playing=1;
  track_t *t=TSEL;t->engine=t->eng_req=ENGI_BREAK;t->xf=t->xf_on=0;
  memset(t->v,0,sizeof t->v);t->m_env=0;t->p[P_MUTE]=0;
  t->p[P_ATK]=t->p[P_DEC]=t->p[P_REL]=0;t->p[P_SUS]=127;
@@ -52,14 +52,14 @@ int main(int argc,char **argv){
  t=reset();seq_note_on(t,0,127);render(t,32,&dryhash);
  t=reset();t->p[P_M1SRC]=MS_ENV;t->p[P_M1DST]=MD_E1+3;t->p[P_M1AMT]=40;seq_note_on(t,0,127);render(t,32,&hash);C("ENV matrix changes Amenity FILTER audio without rewriting its knob",hash!=dryhash&&t->p[P_E3]==64&&t->m_env>0);
  power_on_parts();t=&trk[5];
- unsigned empty=t->p[P_E4]==0&&t->p[P_LN0]==1&&t->p[P_SLEN]==32;
+ unsigned empty=trk[4].eng_req==ENGI_EMPTY&&t->eng_req==ENGI_EMPTY;
  for(unsigned i=0;i<NSTEP;i++)empty&=t->step[i].time!=ST_NOTE&&!t->step[i].n;
- C("Fresh firmware starts Break A with an empty two-bar page",empty);
- t->p[P_E4]=1;t->step[0].time=ST_NOTE;t->step[0].n=1;t->step[0].vel=100;t->step[0].note[0]=7;project_capture(&proj_scratch);t->p[P_E4]=0;t->step[0].note[0]=2;
+ C("Fresh firmware leaves optional tracks unassigned",empty);
+ test_optional_machines();t=&trk[5];t->p[P_E4]=1;t->step[0].time=ST_NOTE;t->step[0].n=1;t->step[0].vel=100;t->step[0].note[0]=7;project_capture(&proj_scratch);t->p[P_E4]=0;t->step[0].note[0]=2;
  C("Loading a saved Break B and edited chop does not apply factory defaults",!project_restore_runtime(&proj_scratch)&&trk[5].p[P_E4]==1&&trk[5].step[0].note[0]==7);
- system_init();empty=trk[5].p[P_E4]==0&&trk[5].p[P_SLEN]==32&&trk[5].p[P_LN0]==1;
+ system_init();empty=trk[4].eng_req==ENGI_EMPTY&&trk[5].eng_req==ENGI_EMPTY;
  for(unsigned k=0;k<NTRK;k++)for(unsigned i=0;i<NSTEP;i++)empty&=trk[k].step[i].time!=ST_NOTE&&!trk[k].step[i].n;
- C("NEW PROJECT restores Amen with all sequences empty",empty);
+ C("NEW PROJECT leaves optional tracks unassigned and all sequences empty",empty);
  if(argc>1){
   for(unsigned kind=0;kind<5;kind++){t=reset();song.playing=0;for(unsigned k=0;k<5;k++)trk[k].p[P_MUTE]=1;t->p[P_LN0]=1;t->p[P_SLEN]=32;t->p[P_SGATE]=127;bs_straight(t,32);
    if(kind==1)t->p[P_FCUT]=35;

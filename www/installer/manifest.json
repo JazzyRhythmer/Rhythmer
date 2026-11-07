@@ -1,22 +1,24 @@
 {
   "version": "0.1.1-beta3",
   "channel": "public-beta",
-  "physicalHardwareTested": true,
+  "physicalHardwareTested": false,
   "localOnly": false,
   "ownerTest": {
     "date": "2026-11-08",
-    "firmwareSha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
-    "method": "Owner-reported listening on a physical FM-1",
-    "result": "Owner confirmed completing physical-device listening for build 20261108.2.",
+    "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
+    "buildRevision": "20261108.6",
+    "method": "Owner-reported physical FM-1 installation and listening",
+    "result": "Owner reports this native Hortator/buffer build works very well, without the earlier buffering issue.",
     "verifiedScope": [
-      "Physical-device listening, owner reported"
+      "Installed build 20261108.6",
+      "Physical playback/listening, owner reported"
     ],
     "migrationAndRecoveryMatrixVerified": false
   },
   "firmware": {
     "url": "../downloads/Rhythmer.fwsc",
     "product": "FM-1_748005",
-    "sha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
+    "sha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
     "bytes": 828061,
     "embeddedBreaks": true
   },
@@ -52,14 +54,14 @@
   "bundle": {
     "url": "../downloads/Rhythmer-with-breaks.rhythmer",
     "bytes": 2261425,
-    "sha256": "c0e2515b9cd7d8b7228a1e58a16cc0a0804d834382a4ed8d64a4570a5b0e8757"
+    "sha256": "5a9bb77a6dda19ad0cf3d41400b8f9ef523ab9124d2c53ec7378c3ceef13fcc2"
   },
   "archive": {
     "url": "../downloads/Rhythmer-0.1.1-beta3-install.zip",
-    "bytes": 3171988,
-    "sha256": "0eea28f3870a1c427cde786ee4f2af96cd97c5447aa4d19b97cc611c3014f524"
+    "bytes": 3158911,
+    "sha256": "c5c595169e42e36dbc66b06067e08bc82df90c8d5726d6382e70dc39aec4258c"
   },
   "audioRightsURL": "../audio-rights.json",
   "publicRedistributionCleared": false,
-  "buildRevision": "20261108.2"
+  "buildRevision": "20261108.7"
 }

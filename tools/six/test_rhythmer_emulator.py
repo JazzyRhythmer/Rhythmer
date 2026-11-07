@@ -79,6 +79,9 @@ def run(name,ms,keys='',flash=None,strict=False,usb_rate=44100):
  if strict:
   data=usb.read_bytes() if usb.exists() else b'';d['usb_capture_frames']=len(data)//4;d['usb_peak_pcm16']=max(map(abs,array.array('h',data)),default=0);d['usb_rate']=usb_rate
  d['audio_lost']=struct.unpack_from('<I',ram,SYM['audio_lost'])[0]
+ if 'audio_guard' in SYM:
+  d['audio_guard_hits'],d['audio_guard_frames']=struct.unpack_from('<2I',ram,SYM['audio_guard']+4)
+  d['adaptive_voice_cap']=ram[SYM['gov_cap']]
  pcm=(OUT/(name+'.pcm')).read_bytes();d['peak_pcm16']=max(map(abs,array.array('h',pcm)),default=0)
  with wave.open(str(OUT/(name+'.wav')),'wb') as w:w.setnchannels(2);w.setsampwidth(2);w.setframerate(44100);w.writeframes(pcm)
  report['runs'][name]=d;print(name,d,flush=True);return ram

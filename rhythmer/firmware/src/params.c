@@ -266,12 +266,10 @@ static const param_desc_t WROT_DESC[2] = {               /* (0.7.8) WHEEL's ROTO
     {"DEPTH", F_PCT, 0, 127, 127, 0, 0}, {"DUST", F_PCTINV, 0, 127, 127, 0, 0}};
 static const param_desc_t VLANG_DESC = {"LANG", F_ENUM, 0, LG_N - 1, 0, N_LANG, 0};   /* (0.8.5) VOICE's words: */
 static const param_desc_t VLYR_DESC = {"LYRIC", F_ENUM, 0, LYR_N - 1, 0, N_LYRIC, 0};  /* P_VLANG, P_VLYR (sing.c) */
-/* X0X generator settings use the eight drum-level slots on the dedicated acid track. */
-static const char *const SIX_SCALE[]={"MIN","PHRY","HARM","MPEN","DOR","MAJ"};
-static const char *const SIX_ROOT[]={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+/* MIDI generator controls reuse stored lane slots; common ROOT/SCALE remain authoritative. */
 static const param_desc_t SIX_GEN[8]={
  {"DENS",F_INT,0,100,70,0,0},{"ACCENT",F_INT,0,100,40,0,0},{"SLIDE",F_INT,0,100,25,0,0},{"OCTS",F_INT,1,3,2,0,0},
- {"ROOT",F_ENUM,0,11,9,SIX_ROOT,0},{"SCL SET",F_INT,0,127,0,0,0},{"OCTAVE",F_INT,0,4,1,0,0},{"MUT BARS",F_INT,0,16,0,0,0}};
+ {"-",F_INT,0,0,0,0,0},{"-",F_INT,0,0,0,0,0},{"OCTAVE",F_INT,0,4,1,0,0},{"MUT BARS",F_INT,0,16,0,0,0}};
 static const char *const SIX_SOURCE[]={"LOOP","CHOP"};
 static const param_desc_t SIX_BREAK_SOURCE={"SOURCE",F_ENUM,0,1,0,SIX_SOURCE,0};
 static const char *const SIX_BREAK_ACTIONS[]={"MUTATE","FILL","RANDOM"};
@@ -343,6 +341,9 @@ static int32_t enum_orig(const param_desc_t *d, int32_t v)
  * loaded */
 static int32_t param_fit(const param_desc_t *d, int32_t v)
 {
+    /* Previous Acid files stored HT SAW/SQR as 2/3. They now share the
+     * native two-wave engine; projects, user sounds and motion keep the wave. */
+    if(d==&ENG_ACID.edit[5]&&v>=2&&v<=3)v&=1;
     v = clamp(v, d->min, d->max);
     return d->names == N_FM6_PATCH && v > (int32_t)FM6_OWN ? (int32_t)FM6_OWN : v;
 }

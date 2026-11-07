@@ -69,6 +69,7 @@ static void six_dot_background(int h){
  * bounded visual preview: startup precedes track/kit/sample initialization. */
 static void six_machine_glyph(const track_t *t,unsigned engine,int en,unsigned ph,int x,int y,int w,int h,uint16_t ink){
  int amp=h*(10+en*30/127)/100,cy=y+h/2;
+ if(engine==ENGI_EMPTY){cv_frame(x+w/2-4,cy-4,8,8,T_DIM);return;}
  if(engine==ENGI_DRUM){
   const drum_lane_t *k=t?drum_kit_of(t):0;for(unsigned j=0;j<8;j++){
    int e=t?(k&&k[j].x.live?clamp(k[j].x.ea>>23,0,127):0):en*(osc_sine(ph+j*0x39000000u)+32768)/65536;
@@ -212,6 +213,12 @@ static void six_voice_list_graph(void){
  fmt_int(count,pos<0?0:pos+1);str_cpy(count+str_len(count)," / ",sizeof count-str_len(count));fmt_int(count+str_len(count),(int)n);cv_text_in(8,118,224,&AF_X,count,T_DIM,T_BG);cv_text_in(8,130,224,&AF_X,"PLAY LANE KEY / SAVE PROJECT",T_DIM,T_BG);
 }
 static void six_graph_surface(const track_t *t,const page_t *pg){
+ if(!ui.home&&pg->fam==FAM_EDIT&&!ui.confirm&&trk_eng(TSEL)==ENGI_EMPTY){
+  cv_text_in(8,24,224,&AF_S,"EMPTY TRACK",T_TEXT,T_BG);
+  cv_text_in(8,50,224,&AF_X,"SELECT AN ENGINE",T_TEXT,T_BG);
+  cv_text_in(8,72,224,&AF_X,"PRESETS / ENG",T_DIM,T_BG);return;
+ }
+
  cv_oy=0;cv_bg=T_BG;
  if(ui.confirm==CF_DICE_ALL){gen_panel();return;}
  if(ui.home){if(home_set())six_home_routes();else if(home_level())six_instrument(t);else six_home_cards();return;}

@@ -15,7 +15,9 @@ def build_installer(root, dist, release):
         html=html.replace('Development build · physical-device validation pending.','Public beta · limited creator hardware testing.').replace('Browser and native tests do not establish safe flashing, power-loss recovery or sustained operation on a real FM-1.','The creator confirmed playback and official V15 installation/return on this release. Cold power-loss recovery and sustained hardware reliability are not established.')
     if not local:
         html=html.replace('RHYTHMER / DEVELOPMENT PREVIEW','RHYTHMER / PUBLIC BETA')
-        if not release.get('physicalHardwareTested'):
+        if not release.get('physicalHardwareTested') and release.get('audioBaseTest'):
+            html=html.replace('Development build · physical-device validation pending.','Public beta · creator-tested audio base.').replace('This installer is for deliberate development testing.','The creator confirmed stable playback on the native Hortator audio base; this revision adds default instruments when six-track mode is confirmed. Exact build and test scope are recorded in the build notes.')
+        elif not release.get('physicalHardwareTested'):
             html=html.replace('Development build · physical-device validation pending.','Optimized public beta · this exact binary awaits physical FM-1 revalidation.').replace('This installer is for deliberate development testing.','The reported real-device audio-load issue is not yet confirmed resolved.')
     page.write_text(html)
     shutil.copy2(root/'site/src/midi.mjs',dest/'midi.mjs')
@@ -104,6 +106,8 @@ Read THIRD-PARTY-AUDIO.txt and audio-rights.json. Credits are not a license.
     if not local:
         readme=readme.replace('LOCAL DEVELOPMENT INSTALLATION','PUBLIC BETA INSTALLATION').replace('Open http://127.0.0.1:8766/installer/ in desktop Chrome or Edge and press','Open the installer linked in the repository README in Chrome or Edge. Press').replace('This bundle contains original Amen/Think recordings whose public redistribution\npermission is not documented. Do not publish the bundle on that basis.','This bundle contains original Amen/Think recordings. The owner directs their\ndistribution with credits; rights-holder redistribution permission has not\nbeen documented. This is not a blanket license for users.').replace('Hardware flashing, recovery and playback remain physically untested.','Read the release-specific test record and change log. Host and emulator\nchecks passed; this exact binary is not physically tested. Earlier owner\nhardware results do not automatically apply to this package.')
         page=dest/'index.html';text=page.read_text().replace('LOCAL DEVELOPMENT','PUBLIC BETA').replace('LOCAL INSTALL BUNDLE','INSTALL BUNDLE').replace('COMPLETE LOCAL INSTALLATION','COMPLETE INSTALLATION').replace('This build and its samples remain local.','The project owner directs distribution with credits; this is not rights-holder permission.').replace('complete local installation bundle','complete installation bundle');page.write_text(text)
+    if not local and release.get('audioBaseTest'):
+        readme=readme.replace('Host and emulator\nchecks passed; this exact binary is not physically tested. Earlier owner\nhardware results do not automatically apply to this package.','The creator confirmed stable playback on audio-base build 20261108.6.\nThis revision only fills empty optional slots on confirmed six-track activation.\nSee the exact hash-bound record for the scope of each test.')
     archive=downloads/('Rhythmer-dev-local-install.zip' if local else 'Rhythmer-'+release['version']+'-install.zip')
     with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
         z.write(bundle,bundle.name);z.write(downloads/'Rhythmer.fwsc','firmware/Rhythmer.fwsc')

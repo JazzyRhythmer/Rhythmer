@@ -35,7 +35,6 @@
  * State: per voice an fm6_note_t (fm6_note, 244 bytes, a side array as PHYS's slots: voice_t.s[] is too
  * small), per part the patch, the patch through the macros (fm6_eff, rebuilt in the audio ISR when either
  * changes) and the LFO (once a block). */
-#include "fm6_core.c"
 #include "felucca_fm6.h"         /* tools/gen_fm6_patches.py: FM6_INIT, FM6_FACTORY[] */
 
 #define ENGI_FM6 12u             /* engines.c ENGINES[] (append-only) */
@@ -58,7 +57,8 @@ static struct {                                  /* the patch through the macros
 } fm6_eff[NTRK];
 static fm6_lfo_t fm6_lfo[NTRK];
 static int32_t fm6_lfo_v[NTRK], fm6_lfo_d[NTRK]; /* this block's LFO value and delay (Q24) */
-static fm6_note_t fm6_note[NTRK][FM6_POLY];
+_Static_assert(sizeof(fm6_note_t)<=sizeof(md_shared[0][0]),"shared FM6/MD runtime slot too small");
+_Static_assert(_Alignof(fm6_note_t)<=_Alignof(md_voice_t),"shared FM6/MD runtime alignment");
 /* the voice bank (fm6_vbank.c; in the pool, zeroed at boot: no bank without the store) */
 static uint32_t fm6_bank_used __attribute__((section(".pool")));   /* bit k: B k+1 holds a voice */
 static int (*fm6_bank_read)(uint32_t k, uint8_t *pk) __attribute__((section(".pool")));   /* voice k -> pk, 0 = read */
@@ -396,7 +396,9 @@ static fm6_note_t *fm6_note_of(track_t *t, voice_t *v)
     if (t < &trk[0] || t >= &trk[NPART])
         return 0;
     i = (uint32_t)(v - t->v);
-    return i < FM6_POLY ? &fm6_note[t - trk][i] : 0;
+    if(i>=FM6_POLY)return 0;
+    md_memory((unsigned)(t-trk),ENGI_FM6);
+    return &md_shared[t-trk][i].fm6;
 }
 
 static void fm6_note_on(track_t *t, voice_t *v)

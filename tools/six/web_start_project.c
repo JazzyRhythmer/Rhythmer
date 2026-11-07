@@ -8,11 +8,9 @@ int main(int argc,char **argv){
  for(unsigned k=0;k<6;k++){
   track_t *t=&trk[k];motion_clear(t);t->p[P_MUTE]=0;
   for(unsigned i=0;i<NSTEP;i++)step_clear(&t->step[i]);
-  t->p[P_SLEN]=k==5?32:16;
+  t->p[P_SLEN]=16;
  }
- track_t *b=&trk[5];b->p[P_LN0]=1;b->p[P_E4]=0;
- b->p[P_E1]=b->p[P_E2]=0;b->p[P_SGATE]=127;
- /* All six sequences are empty; BREAK keeps Amen A and SEQ mode ready. */
+ /* All sequences are empty; extra slots have no assigned engine. */
  song.sel=0;song.g[G_BPM]=160;song.playing=0;
  project_capture(&proj_scratch);if(!proj_pack(&proj_wire,&proj_scratch))return 2;
  if(!proj_import(&proj_scratch,&proj_wire,sizeof proj_wire))return 3;
@@ -22,5 +20,5 @@ int main(int argc,char **argv){
  }
  FILE *f=fopen(argv[1],"wb");if(!f)return 5;
  if(fwrite(&proj_wire,1,sizeof proj_wire,f)!=sizeof proj_wire)return 6;
- fclose(f);puts("Web start: all six tracks empty, T6 Amen A / SEQ ready PASS");return 0;
+ fclose(f);puts("Web start: all six tracks empty, T5/T6 EMPTY, no assigned Acid/Break PASS");return 0;
 }

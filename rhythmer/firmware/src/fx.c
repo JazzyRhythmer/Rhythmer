@@ -1912,11 +1912,20 @@ static __attribute__((noinline)) void drum_mix(int32_t *ol, int32_t *or_, uint32
 
 /* one synth part into the dry mix and the sends; a part with no voice sounding costs
  * the LFO tick and a cleared buffer only (after the DIST tail has run out) */
+/* Small cold-path helper keeps the duplicated hot render loops within their
+ * existing RAM reserve. Pending engine fades and the USB route still run. */
+static __attribute__((noinline)) int mix_empty(track_t *t){
+ if(t->engine!=ENGI_EMPTY||t->xf_on)return 0;
+ unsigned k=(unsigned)(t-trk);
+ if(uin_on&&k==(six_track_enabled(5)?5u:six_track_enabled(4)?4u:3u))return 0;
+ mp_seen[k]=0;return 1;
+}
 static inline __attribute__((always_inline)) void mix_part(track_t *t, uint32_t n)   /* (0.6.78: inlined in both
                                                          * copies of mix_part_m, flash and RAM) */
 {
     uint32_t i, c1 = MC_CPU() & 1u;                     /* (0.6.71) on the second core: its own buffers */
     int32_t *b = c1 ? c1_buf : part_buf;
+    if (t->eng_req == ENGI_EMPTY && mix_empty(t)) return;
     if (!six_track_enabled((unsigned)(t-trk))) {              /* (0.6.18) TRACKS 4: asleep, nothing rendered. (0.6.19) Its
                                                          * voices first fade out over a block (voice_kill: they were
                                                          * cut at once, a click), its mute let go (perform.c) */
@@ -2208,10 +2217,11 @@ static uint32_t mc_cost(const track_t *t)               /* a part's share of the
     /* Break renders outside voice_t. It still consumes DSP/cache time and must
      * participate in the measured split, including its release/FX tail. */
     if (t->engine == ENGI_BREAK && six_loop_mask) return 7u;
+    if (t->engine == ENGI_EMPTY && t->eng_req == ENGI_EMPTY) return 0u;
     const engine_t *e = ENGINES[t->engine];
     /* Seed a newly struck expensive model realistically before measured timing
      * catches up. The actual per-track timings still drive steady-state split. */
-    uint32_t k, v = 0, w = e == &ENG_ACID ? (six_acid_is_hort(t)?6u:8u) : e == &ENG_SERUM ? 6u :
+    uint32_t k, v = 0, w = e == &ENG_ACID ? 6u : e == &ENG_SERUM ? 6u :
         e == &ENG_FM6 ? 4u : e == &ENG_LOFI || e == &ENG_NOISE ? 2u : 3u;
     for (k = 0; k < NVOICE; k++)
         v += t->v[k].active;
@@ -2422,6 +2432,9 @@ static __attribute__((noinline)) int mix_hush(void)
         return 0;
     for (k = 0; k < NPART; k++) {
         const track_t *t = &trk[k];
+        /* Break's envelope is control state, not a shared synthesis voice.
+         * Finish its release/source-off before the stopped silence shortcut. */
+        if(t->engine==ENGI_BREAK&&(t->v[0].stage||t->v[0].s[BENV_OFF]))return 0;
         if ((t->tail && t->p[P_DIST]) || t->xf_on || t->xin)   /* (tail: counted down only with DIST, mix_part) */
             return 0;
         for (i = 0; i < NVOICE; i++)
@@ -2434,7 +2447,7 @@ static __attribute__((noinline)) void mix_silent(int32_t *out, uint32_t n, uint3
 {
     uint32_t k;
     for (k = 0; k < NPART; k++) {
-        if(!six_track_enabled(k))continue;
+        if(!six_track_enabled(k)||trk[k].eng_req==ENGI_EMPTY)continue;
         track_lfo_tick(&trk[k]);six_lfo2_tick(&trk[k]);                        /* (the LFOs turn on: their pages, the next note's phase; */
         drift_clk[k] += ENGINES[trk[k].engine] != &ENG_DRUM && trk[k].p[P_DRIFT] < 127;   /* DRIFT's clock as well) */
         if (ENGINES[trk[k].engine]->block)

@@ -1469,17 +1469,24 @@ static unsigned gen_tag_weight(unsigned role,unsigned tag){
 #include "gen_bass_sound.c"
 static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
 {
+    /* Only the existing, explicitly named Acid recipe selects this machine.
+     * Ordinary bass, lead and chord pools never gain Acid as a candidate. */
+    if(role==RL_BASS&&ri==SR_ACID){
+        set_engine_of(t,ENGI_ACID);init_sound_of(t,ENGI_ACID);
+        apply_preset_to(t,gr()%ENG_ACID.npresets);t->p[P_VOICE]=V_LEGATO;return;
+    }
     const grecipe_t *r = &RECIPE[ri];
     static const uint8_t EW[3] = {55, 30, 15};
     uint32_t e = r->eng[gpickw(EW, 3)], i, k, n, nm = 0, na = 0;
     uint8_t m[32], w[32], any[32];
     const engine_t *en;
     if (gx.eng >= 0) e = (uint32_t)gx.eng;              /* (0.8.6) EXPLORE: any engine (gx_engine) */
-    if(t>trk&&t<trk+SIX_GEN_TRACKS&&(gx.eng<0||!gen_auto_synth_ok(e)||(e==ENGI_SERUM&&!gen_serum_free(t))||
-       (role==RL_BASS&&!gen_bass_engine_weight(e,16)))){
+    if(t>=trk&&t<trk+SIX_GEN_TRACKS&&(gx.eng<0||!gen_auto_synth_ok(e)||(e==ENGI_SERUM&&!gen_serum_free(t))||
+       (role==RL_BASS&&!gen_bass_engine_weight(e,16))||(e==ENGI_M2SID&&role!=RL_LEAD))){
         static const uint8_t engines[6]={ENGI_ANALOG,ENGI_PHASE,ENGI_LOFI,ENGI_WHEEL,ENGI_M2SID,ENGI_SERUM};
         uint8_t weight[6]={18,22,22,10,10,18};
         gen_guide(gs.g->feel,role,weight);
+        weight[4]=role==RL_LEAD?2u:0u; /* SID: rare mono lead, never chords/bass/texture. */
         if(role==RL_BASS)for(unsigned j=0;j<6;j++)weight[j]=(uint8_t)gen_bass_engine_weight(engines[j],weight[j]);
         if(!gen_serum_free(t))weight[5]=0;
         e=engines[gpickw(weight,6)];
@@ -1487,8 +1494,7 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
     if (e == ENGI_FM6 && gs.fm6 >= 2u) e = r->eng[0] == ENGI_FM6 ? EG_A : r->eng[0];
     gs.fm6 += e == ENGI_FM6;
     set_engine_of(t, e);
-    e = trk_eng(t); /* SIX fixed roles: recipes use the engine actually selected. */
-    if (e == ENGI_BREAK || e == ENGI_ACID) { init_sound_of(t, e); apply_preset_to(t, 0); return; }
+    e = trk_eng(t); /* Recipes follow the actual selected engine, never a track number. */
     en = trk_engp(t);
     n = en->npresets;
     if (!n) return;
@@ -1630,7 +1636,7 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
     else t->p[P_DIST] = 0;
     t->p[P_CHOR] = (int16_t)(r->chor[1] ? grr(r->chor[0], r->chor[1]) : 0);
     t->p[P_GLIDE] = (int16_t)(r->glide ? grr(r->glide - 10, r->glide + 10) : 0);
-    t->p[P_VOICE] = (int16_t)r->voice;
+    t->p[P_VOICE] = (int16_t)(e==ENGI_M2SID?V_MONO:r->voice);
     t->p[P_DETUNE] = (int16_t)(ri == SR_REESE || ri == SR_WALL || ri == SR_HOOVER ? grr(30, 60) : t->p[P_DETUNE]);
     if (ri == SR_GTR || ri == SR_DRONE) {               /* (a tremolo: AUTO PAN on the beat) */
         t->p[P_APDEP] = (int16_t)grr(30, 60); t->p[P_APSYNC] = 1; t->p[P_APRATE] = (int16_t)grr(4, 6); t->p[P_APWAVE] = (int16_t)(ri == SR_GTR ? 3 : 0);
@@ -1779,7 +1785,7 @@ static void gen_pitched(uint32_t rot, int32_t lift)
         for (i = 0; i < dlen(&trk[dr]); i++)
             if (trk[dr].step[i].time == ST_NOTE) { gs.kick |= (uint64_t)(trk[dr].step[i].hit & 1u) << i; gs.snare |= (uint64_t)((trk[dr].step[i].hit >> 1) & 1u) << i; }
     gplan(rot);
-    for (k = 0; k < SIX_GEN_TRACKS; k++) {
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
         track_t *t = &trk[k];
         if (k == dr) continue;
         load_begin(t, LOAD_PAT);
@@ -1790,7 +1796,7 @@ static void gen_pitched(uint32_t rot, int32_t lift)
     }
     gseed(GS_FORM);
     gen_post();
-    for (k = 0; k < SIX_GEN_TRACKS; k++) {
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
         track_t *t = &trk[k];
         t->p[P_ROOT] = (int16_t)((gs.root + lift + 12) % 12);
         if (k == dr || !lift) continue;
@@ -1859,7 +1865,7 @@ static void gen_parts(void)
         uint32_t rot = 0;
         int32_t lift = 0;
         /* back to the whole piece, then this section's cut */
-        for (i = 0; i < SIX_GEN_TRACKS; i++) trk[i].p[P_MUTE] = 0;
+        for (i = six_gen_next(0); i < SIX_GEN_TRACKS; i = six_gen_next(i+1u)) trk[i].p[P_MUTE] = 0;
         memcpy(gs.pdeg, pdeg, sizeof pdeg); memcpy(gs.pq, pq, sizeof pq); gs.pn = pn;
         if (dr < SIX_GEN_TRACKS) { load_begin(&trk[dr], LOAD_PAT); memcpy(trk[dr].step, gen_keep, sizeof gen_keep); motion_clear(&trk[dr]); load_end(&trk[dr]); }
         if (dr < SIX_GEN_TRACKS && gs.act[RL_DRUM]) {             /* (0.6.97) each section its own fill (the BUILD: a roll; the
@@ -2066,7 +2072,7 @@ static void gx_comps(void)
 {
     static const uint8_t EV[7] = {EV_1_2, EV_2_2, EV_1_3, EV_1_4, EV_3_4, EV_FIRST, EV_NOT1};
     uint32_t k;
-    for (k = 0; k < SIX_GEN_TRACKS; k++) {
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
         uint32_t r = gs.role[k], len = dlen(&trk[k]), n, j, tries;
         if (!gs.act[r] || r == RL_DRUM || (r == RL_TEX && k != gs.trk_of[RL_TEX]) || !gxw(r == RL_TEX ? 30 : 75)) continue;
         n = (uint32_t)grr(1, 2 + (int32_t)gs.complex / 30);
@@ -2101,7 +2107,8 @@ static void gx_heads(void)
     static const int8_t IV[10] = {-7, -5, -4, -3, -2, 2, 3, 4, 5, 7};
     uint32_t n = gxw(55) ? (gxw(40) ? 2u : 1u) : 0u, tries;
     for (tries = 0; tries < 16u && n; tries++) {
-        uint32_t ti = gr() % SIX_GEN_TRACKS, r = gs.role[ti];
+        uint32_t ti = gr() % trk_live, r = gs.role[ti];
+        if(six_gen_next(ti)!=ti)continue;
         fg_set_t *f = &fg_set[ti][0];
         if (!gs.act[r] || r == RL_DRUM || r == RL_TEX || f->rate || (r == RL_BASS && gch(70))) continue;
         f->rate = (uint8_t)(1u + gr() % (trk[ti].p[P_SDIV] == 3 ? 5u : gch(15) ? 8u : 7u));   /* (1/4 .. x2; x3 now and
@@ -2116,7 +2123,8 @@ static void gx_mutate(void)
 {
     uint32_t n = gxw(45) ? (gxw(30) ? 2u : 1u) : 0u, tries;
     for (tries = 0; tries < 16u && n; tries++) {
-        uint32_t ti = gr() % SIX_GEN_TRACKS;
+        uint32_t ti = gr() % trk_live;
+        if(six_gen_next(ti)!=ti)continue;
         track_t *t = &trk[ti];
         if (!gs.act[gs.role[ti]] || t->p[P_MSND] || t->p[P_MPAT]) continue;
         if (gs.role[ti] == RL_DRUM || gch(50)) t->p[P_MPAT] = (int16_t)grr(2, 5); else t->p[P_MSND] = (int16_t)grr(2, 5);
@@ -2170,7 +2178,7 @@ static uint32_t gc_cost(int steps)                      /* steps 0: before the p
     uint32_t k, i, h, bpm = steps ? (uint32_t)song.g[G_BPM] : (g->bpm_lo + g->bpm_hi) / 2u;
     uint32_t c = (mc_two() ? 295u : 380u) + GC_REV[(uint32_t)(steps ? song.g[G_RTYPE] : g->rtype) % 5u];
     if (steps && (song.g[G_DPIT] || song.g[G_DSPRY])) c += GC_GRAIN;
-    for (k = 0; k < SIX_GEN_TRACKS && k < trk_live; k++) {
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS && k < trk_live; k = six_gen_next(k+1u)) {
         const track_t *t = &trk[k];
         uint32_t r = gs.role[k], e = t->eng_req % NENGINES, len = dlen(t), on = 0, ns = 0, tie = 0, v, f, cap;
         if (!gs.act[r] || (r == RL_TEX && k != gs.trk_of[RL_TEX])) continue;
@@ -2208,7 +2216,7 @@ static void gx_fit_sounds(void)
     uint32_t n, k;
     for (n = 0; n < SIX_GEN_TRACKS && gc_cost(0) > gc_budget(); n++) {
         uint32_t best = NTRK, r, e;
-        for (k = 0; k < SIX_GEN_TRACKS && k < trk_live; k++)
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS && k < trk_live; k = six_gen_next(k+1u))
             if (gs.role[k] != RL_DRUM && gs.act[gs.role[k]] && GC_ENG[trk[k].eng_req % NENGINES] > GC_ENG[EG_A] &&
                 (best == NTRK || GC_ENG[trk[k].eng_req % NENGINES] > GC_ENG[trk[best].eng_req % NENGINES])) best = k;
         if (best == NTRK) break;
@@ -2231,11 +2239,11 @@ static void gx_fit_piece(void)
     if (gc_cost(1) <= gc_budget()) return;
     song.g[G_DPIT] = song.g[G_DSPRY] = 0;
     for (h = FG_HEADS; h--;)
-        for (k = 0; k < SIX_GEN_TRACKS; k++)
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u))
             if (fg_set[k][h].rate && gc_cost(1) > gc_budget()) fg_set[k][h].rate = 0;
     while (gc_cost(1) > gc_budget() && gx.nmax > 2u) {
         gx.nmax--;
-        for (k = 0; k < SIX_GEN_TRACKS; k++) {
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
             track_t *t = &trk[k];
             load_begin(t, LOAD_PAT);
             for (i = 0; i < NSTEP; i++) if (t->step[i].n > gx.nmax) { t->step[i].note[gx.nmax] = 0; t->step[i].n = gx.nmax; }
@@ -2243,7 +2251,7 @@ static void gx_fit_piece(void)
             pat_sig[k] = steps_sig(t);
         }
     }
-    for (k = 0; k < SIX_GEN_TRACKS; k++)
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u))
         if (gc_cost(1) > gc_budget() && gs.role[k] != RL_DRUM && trk[k].p[P_REL] >= 90) trk[k].p[P_REL] = 84;
     k = gs.trk_of[RL_TEX];
     if (gc_cost(1) > gc_budget() && k < SIX_GEN_TRACKS && gs.act[RL_TEX]) {
@@ -2266,7 +2274,7 @@ static void gen_post(void)
     }
     /* (0.8.3: the lead's clashes with the bass are avoided as it is written, against the chord's root: so turning
      * BASS leaves the lead as it was) */
-    for (k = 0; k < SIX_GEN_TRACKS; k++) {                        /* the breath: each fourth bar's last two steps softer */
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {                        /* the breath: each fourth bar's last two steps softer */
         track_t *t = &trk[k];
         uint32_t len = dlen(t);
         if (len < 64u || k == dr) continue;
@@ -2277,7 +2285,7 @@ static void gen_post(void)
     if (gs.complex > 30u) {                             /* step components (0.6.97: more of them, some every other loop):
                                                          * the lead echoed, an octave up or bent, the arp jumping its
                                                          * octave, ratcheted or pulsed, a chord arpeggiated or echoed */
-        for (k = 0; k < SIX_GEN_TRACKS; k++) {
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
             uint32_t r = gs.role[k], tries, want = 1u + (gs.complex > 60u) + (gs.complex > 85u), got = 0;
             if (!gs.act[r] || r == RL_DRUM || r == RL_TEX || r == RL_BASS || !gch(40 + gs.complex / 3u)) continue;
             for (tries = 0; tries < 12u && got < want; tries++) {
@@ -2327,9 +2335,9 @@ static void gen_scale_page(void)
 {
     uint32_t k, pd = gs.trk_of[RL_PAD];
     int16_t qn = QN_OFF;
-    for (k = 0; k < SIX_GEN_TRACKS; k++) if (!drum_track(&trk[k])) { qn = trk[k].p[P_QUANT]; break; }
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) if (!drum_track(&trk[k])) { qn = trk[k].p[P_QUANT]; break; }
     if (qn == QN_OFF) qn = QN_SNAP;
-    for (k = 0; k < SIX_GEN_TRACKS; k++) {
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
         track_t *t = &trk[k];
         t->p[P_ROOT] = gs.root; t->p[P_SCALE] = gs.scale; t->p[P_QUANT] = qn;
         t->p[P_CHRD] = 0; t->p[P_CVOI] = CV_CLOSE; t->p[P_CSTR] = 0;
@@ -2438,15 +2446,20 @@ static void gen_pick(const track_t *follow)
 static void gen_make(void)
 {
     const ggenre_t *g;
-    uint32_t k, dr = NTRK, nlive = SIX_GEN_TRACKS, nmel, drums, next, wet;
+    uint32_t k, dr = NTRK, nlive = trk_live, nmel, drums, next, wet;
+    /* A newly generated Acid must still receive its MIDI, mix and A-D sections
+     * in this transaction; pre-existing Acid/Break remain outside its mask. */
+    uint8_t eligible=0;
+    for(k=six_gen_next(0);k<NTRK;k=six_gen_next(k+1u))eligible|=(uint8_t)(1u<<k);
+    six_gen_work_mask=eligible;
     /* the choices from the seed: the genre (RANDOM), the root, the scale, the progression, the bass */
     gseed(GS_PICK);
     gx.on = (uint8_t)(dice_force_style < 0 && gp.genre == GEN_EXPLORE);
     gx.nan = gx.nvo = gx.np = 0; gx.eng = -1; gx.w = gp.complex; gx.nmax = 4;
     if (!gx.on && gx.dirty) {                           /* (0.8.6) after an EXPLORE piece: DIV and PLAYHEADS as a genre's
                                                          * piece has them (1/16, none) */
-        for (k = 0; k < SIX_GEN_TRACKS; k++) trk[k].p[P_SDIV] = 2;
-        memset(fg_set, 0, SIX_GEN_TRACKS * sizeof fg_set[0]);
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) trk[k].p[P_SDIV] = 2;
+        for(unsigned j=six_gen_next(0);j<NTRK;j=six_gen_next(j+1u))memset(&fg_set[j],0,sizeof fg_set[j]);
         gx.dirty = 0;
     }
     if (gx.on) {                                        /* (0.8.6) EXPLORE: a genre of its own a seed */
@@ -2454,8 +2467,8 @@ static void gen_make(void)
         gs.mutant = 0;
         gx_genre(&gmut);
         gx.dirty = 1;
-        for (k = 0; k < SIX_GEN_TRACKS; k++) trk[k].p[P_SDIV] = 2;
-        memset(fg_set, 0, SIX_GEN_TRACKS * sizeof fg_set[0]);
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) trk[k].p[P_SDIV] = 2;
+        for(unsigned j=six_gen_next(0);j<NTRK;j=six_gen_next(j+1u))memset(&fg_set[j],0,sizeof fg_set[j]);
         g = gs.g = &gmut;
     } else {
         gs.gi = dice_force_style >= 0 ? (uint32_t)dice_force_style % NGENRE : gp.genre ? (gp.genre - 1u) % NGENRE : gr() % NGENRE;
@@ -2499,7 +2512,7 @@ static void gen_make(void)
         g = gs.g = &gmut;
     }
     gen_pick(0);
-    for(k=SIX_GEN_TRACKS;k<NTRK;k++)gs.role[k]=RL_TEX;
+    for(k=0;k<NTRK;k++)gs.role[k]=RL_TEX;
     gs.fm6 = 0;
     /* the orchestration: the drums (unless the genre or the knob leaves them out), then the melodic roles with an
      * amount, the most important first; the drums on the DRUM track (none: the fourth, or the last live) */
@@ -2520,11 +2533,12 @@ static void gen_make(void)
          * of always losing the fourth slot. User-zeroed roles stay silent. */
         if(g->feel&&np>=4&&gch(gs.amt[GP_LEAD]*100u/(gs.amt[GP_ARP]+gs.amt[GP_LEAD]))){uint8_t z=pri[2];pri[2]=pri[3];pri[3]=z;}
         for (k = 0; k < GP_N - 1u; k++) if (!gs.act[PRI[k + 1u]]) pri[np++] = PRI[k + 1u];   /* (the silent ones after) */
-        dr=0; /* HOME GEN's four-track arrangement always starts with DRUM. */
+        dr=six_gen_next(0);
+        for(k=six_gen_next(0);k<NTRK;k=six_gen_next(k+1u))if(drum_track(&trk[k])){dr=k;break;}
         if(!drum_track(&trk[dr]))set_engine_of(&trk[dr],ENGI_DRUM);
         for (k = 0; k < RL_N; k++) gs.trk_of[k] = NTRK;
         next = 0;
-        for (k = 0; k < SIX_GEN_TRACKS; k++) {
+        for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
             if (k == dr) { gs.role[k] = RL_DRUM; gs.trk_of[RL_DRUM] = (uint8_t)k; continue; }
             gs.role[k] = next < 4u ? pri[next] : RL_TEX;
             if (gs.trk_of[gs.role[k]] == NTRK) gs.trk_of[gs.role[k]] = (uint8_t)k;
@@ -2538,7 +2552,7 @@ static void gen_make(void)
      * arp (reads the voicing), lead (reads the bass) */
     gseed(GS_SOUND);
     gs.nsnd = 0;
-    for (k = 0; k < SIX_GEN_TRACKS; k++) {
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
         track_t *t = &trk[k];
         uint32_t r = gs.role[k];
         if (r == RL_DRUM) gen_kit(t);
@@ -2552,8 +2566,8 @@ static void gen_make(void)
     if (gx.on) gx_fit_sounds();                         /* (0.9.13) EXPLORE: inside the CPU budget */
     gen_scale_page();
     gseed(GS_MIX);
-    for (k = 0; k < SIX_GEN_TRACKS; k++) gen_mix(&trk[k], gs.role[k]);
-    for (k = 0; k < SIX_GEN_TRACKS && gx.on; k++) {               /* (0.8.6) EXPLORE: wider, a track's own swing */
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) gen_mix(&trk[k], gs.role[k]);
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS && gx.on; k = six_gen_next(k+1u)) {               /* (0.8.6) EXPLORE: wider, a track's own swing */
         uint32_t r = gs.role[k];
         if (r != RL_DRUM && r != RL_BASS) trk[k].p[P_PAN] = (int16_t)grr(-45, 45);
         if (gch(25)) trk[k].p[P_SSWING] = (int16_t)grr(10, 60);
@@ -2563,7 +2577,7 @@ static void gen_make(void)
         uint32_t o;
         for (o = 0; o < 6u; o++) {
             uint32_t r = o < 5u ? ORDER[o] : RL_TEX;
-            for (k = 0; k < SIX_GEN_TRACKS; k++) {
+            for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) {
                 track_t *t = &trk[k];
                 uint32_t len = gs.len;
                 if (gs.role[k] != r) continue;
@@ -2618,7 +2632,7 @@ static void gen_make(void)
         for (j = 0; j < n; j++)
             motion_set_event(t, j * len / n, P_E0, (int16_t)clamp(base + (j == 0u ? 0 : j == n / 2u ? sw : sw / 2), 0, 127));
     }
-    for (k = 0; k < SIX_GEN_TRACKS; k++) pat_sig[k] = steps_sig(&trk[k]);
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) pat_sig[k] = steps_sig(&trk[k]);
     /* the tempo (the genre's range, the energy in it; always moved), the swing, the space, the master */
     if (!(ui_prefs & PREF_BPM_LOCK)) {                  /* the genre's range, the energy's place in it (from the seed:
                                                          * the same piece, the same tempo) */
@@ -2665,22 +2679,23 @@ static void gen_make(void)
          * piece, MUTATE, CHANCE the seed's, the same after the same seed in every session) */
         uint32_t keep = rng_state;
         rng_state = gq | 1u;
-        macro_dice(4);                                 /* ALL never edits T5/T6 matrix routes */
+        macro_dice(4); /* Eligible active tracks only; no fixed Acid/Break slots. */
         rng_state ^= keep * 2654435761u;
         if (!rng_state) rng_state = 0x1234567u;
     }
-    for (k = 0; k < SIX_GEN_TRACKS; k++) trk[k].p[P_MSND] = trk[k].p[P_MPAT] = 0;   /* (0.6.96) a new piece: MUTATE off on every
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) trk[k].p[P_MSND] = trk[k].p[P_MPAT] = 0;   /* (0.6.96) a new piece: MUTATE off on every
                                                          * track, its anchor the piece (a reroll kept the lanes and
                                                          * orbited the old piece's sounds) */
     if (gx.on) { gx_mutate(); gx_heads(); gx_fit_piece(); }   /* (0.8.6) EXPLORE: MUTATE, PLAYHEADS (before the sections:
                                                          * each holds them); 0.9.13: inside the CPU budget */
-    /* SIX leaves render headroom for the reserved acid and break tracks.
+    /* SIX leaves render headroom for the extra track slots, regardless of their assigned engines.
      * Generative songs use the musical ROOM/plain delay profile; all FX remain
      * available to edit manually. No randomly selected granular/pitched tails. */
     song.g[G_RTYPE]=0;song.g[G_RSIZE]=64;
     song.g[G_DTYPE]=0;song.g[G_DPIT]=song.g[G_DSPRY]=0;
     mut_keep();
     gen_parts();
+    six_gen_work_mask=0;
 }
 /* the piece made from the settings (UNDO brings back what was there); the message */
 static const char *gen_track(track_t *t);
@@ -2689,6 +2704,7 @@ static void gen_go(void)
     uint32_t k;
     char b[8];
     int stay=gen_on();uint8_t page=gp.page;
+    if(!gp.target&&six_gen_next(0)>=NTRK){ui_message("NO GEN TRACKS");return;}
     int ti=gen_target_index();if(gp.target&&ti<0){ui_message("NO BREAK TRACK");return;}
     undo_mark();
     if(gp.target)gen_track(&trk[(unsigned)ti]);else gen_make();
@@ -2700,7 +2716,7 @@ static void gen_go(void)
     b[3] = (char)('0' + gp.seed / 10u % 10u); b[4] = (char)('0' + gp.seed % 10u); b[5] = 0;
     str_cpy(gp.last + k, b, sizeof gp.last - k);
     ui_say("GEN: ", gp.last);
-    str_cpy(ui.msg2, gp.target ? "MIDI ONLY / OTHER TRACKS KEPT" : "ALL: T1-T4 / T5-T6 KEPT", sizeof ui.msg2);
+    str_cpy(ui.msg2, gp.target ? "MIDI ONLY / OTHER TRACKS KEPT" : (trk_live==6?"ALL: 6 TRACKS / SPECIAL KEPT":"ALL: 4 TRACKS / OTHERS KEPT"), sizeof ui.msg2);
     ui.force = 1;
 }
 static uint32_t gen_sig(void)                           /* the settings that make the piece */
@@ -2746,7 +2762,7 @@ static void dice_all(void)
 static uint32_t dice_print(void)                        /* a fingerprint of the piece (the tests) */
 {
     uint32_t k, h = 2166136261u ^ (uint32_t)song.g[G_BPM];
-    for (k = 0; k < SIX_GEN_TRACKS; k++) h = (h ^ steps_sig(&trk[k]) ^ trk[k].eng_req) * 16777619u;
+    for (k = six_gen_next(0); k < SIX_GEN_TRACKS; k = six_gen_next(k+1u)) h = (h ^ steps_sig(&trk[k]) ^ trk[k].eng_req) * 16777619u;
     return h;
 }
 
@@ -2798,12 +2814,16 @@ static const char *gen_track(track_t *t)
     }
     for(unsigned i=0;i<len;i++)if(t->step[i].time==ST_NOTE&&t->step[i].n){lo+=t->step[i].note[0];cnt++;chords+=t->step[i].n>1;}
     const engine_t *en=trk_engp(t);unsigned tag=t->preset<en->npresets?PR_TAG(&en->presets[t->preset]):PT_LEAD;
-    r=e==ENGI_DRUM||e==ENGI_BREAK?RL_DRUM:e==ENGI_ACID?RL_BASS:chords*3u>cnt&&cnt?RL_PAD:cnt&&lo/cnt<48?RL_BASS:!cnt&&tag==PT_BASS?RL_BASS:!cnt&&(tag==PT_PAD||tag==PT_KEYS)?RL_PAD:gs.amt[GP_ARP]>gs.amt[GP_LEAD]?RL_ARP:RL_LEAD;
+    r=e>=ENGI_M2STAT&&e<=ENGI_M2SID?RL_LEAD:e==ENGI_DRUM||e==ENGI_BREAK?RL_DRUM:e==ENGI_ACID?RL_BASS:chords*3u>cnt&&cnt?RL_PAD:cnt&&lo/cnt<48?RL_BASS:!cnt&&tag==PT_BASS?RL_BASS:!cnt&&(tag==PT_PAD||tag==PT_KEYS)?RL_PAD:gs.amt[GP_ARP]>gs.amt[GP_LEAD]?RL_ARP:RL_LEAD;
+    /* Native Hortator Acid consumes the existing bass/acid MIDI archetypes,
+     * including accent/slide. Target GEN keeps its sound; ALL never assigns it
+     * through the ordinary lead/chord sound pool. No fixed T5 association. */
     gs.role[k]=(uint8_t)r;for(unsigned i=0;i<RL_N;i++){gs.act[i]=0;gs.trk_of[i]=NTRK;}gs.act[r]=1;gs.trk_of[r]=(uint8_t)k;
     for(unsigned i=0;i<NSTEP;i++)gclear(&draft.step[i]);gen_role(&draft,k,len);gfeel_melodic(&draft,r,len);if(e==ENGI_BREAK)gen_break_midi(&draft,len);
     for(unsigned i=0;i<len;i++){
         step_t *p=&draft.step[i];if(p->time!=ST_NOTE)continue;
         if(e==ENGI_BREAK||e==ENGI_DRUM)continue;
+        if(e==ENGI_ACID&&p->n>1)p->n=1; /* Bass only, even if a future archetype adds chord tones. */
         unsigned allowed=0,m=scale_mask(t);for(unsigned n=0;n<12;n++)if((m>>((n+12u-(unsigned)t->p[P_ROOT])%12u))&1u)allowed|=1u<<n;
         if(ref<NTRK&&(r==RL_BASS||r==RL_PAD||!(i&3u))){
             const track_t *c=&trk[ref];unsigned period=div_samples(c->p[P_SDIV]);unsigned at=(period?i*div_samples(t->p[P_SDIV])/period:i)%dlen(c);

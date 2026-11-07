@@ -3,7 +3,7 @@ import base64, hashlib, json, os, struct, subprocess, zlib
 
 def build_web_start(root, build, downloads, firmware_hash):
     tool=build/'web_start_project'
-    sources=[root/'tools/six/web_start_project.c',*[root/('rhythmer/firmware/six/'+n+'.c') for n in ('bass303','jungle','tb3po','six303_bridge')]]
+    sources=[root/'tools/six/web_start_project.c',*[root/('rhythmer/firmware/six/'+n+'.c') for n in ('jungle','tb3po','acid_generate')]]
     subprocess.run(['clang','-w','-O1','-fwrapv','-DJUNGLE_AUDIO_CODE=', '-I'+str(build/'gen'),'-I'+str(root/'rhythmer/firmware/src'),*map(str,sources),'-lm','-o',str(tool)],check=True)
     project=build/'web-start.project';subprocess.run([str(tool),str(project)],check=True)
     saved=json.loads((build/'Rhythmer-six-track-test.fm1save').read_text())
@@ -23,5 +23,5 @@ def build_web_start(root, build, downloads, firmware_hash):
         sector['data']=base64.b64encode(raw).decode();projects+=1
     assert projects>=2
     saved['name']='Rhythmer — Empty start'
-    saved['startingProject']={'revision':2,'tempo':160,'tracksWithNotes':[],'breakSource':'A / Amen','breakSteps':32}
+    saved['startingProject']={'revision':3,'tempo':160,'tracksWithNotes':[],'unassignedTracks':[5,6]}
     (downloads/'Rhythmer-start.fm1save').write_text(json.dumps(saved)+'\n')

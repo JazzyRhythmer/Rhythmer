@@ -6,7 +6,7 @@
 
 Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhythmer). Optional support: [Ko-fi](https://ko-fi.com/jazzyrhythmer).
 
-**Built on [JIANT](https://github.com/juanjiant-bit/JIANT).** Rhythmer keeps its sequencing, project management and system foundation, with a new monochrome interface and additional machines. The Acid engine/generator comes from X0X; Break manipulation comes from Amenity. Original authors and licenses remain credited.
+**Built on [JIANT](https://github.com/juanjiant-bit/JIANT).** Rhythmer keeps its sequencing, project management and system foundation, with a new monochrome interface and additional machines. The native Acid synth comes from Hortator, paired with X0X-derived TB-3PO MIDI generation; Break manipulation comes from Amenity. Original authors and licenses remain credited.
 
 ## Watch Rhythmer
 
@@ -40,11 +40,11 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 ## Machines and sequencing
 
-- Six assignable tracks; fresh projects start DRUM / SERUM / PHASE / LOFI / ACID / BREAK.
+- Six assignable tracks; fresh settings start with four active tracks: DRUM / SERUM / PHASE / LOFI. T5/T6 start EMPTY. Confirm six-track mode with OCT+ to fill empty T5/T6 with ACID / BREAK; existing sounds and notes are kept and a Break on another track is never duplicated.
 - Synths: Serum, Phase, LoFi, Analog, FM6, Wheel, FM+STAT, SWAV-SAW and SID-6581. All 41 selected Garden model presets remain; MONO2K-derived models add 17 starting sounds.
-- Drums include the complete 55-preset Hortator MD bank (57 articulations / 21 kernels), 19 kits including two experimental MD LAB kits, and individual lane sound replacement. Their model-specific voice limits are separate from the normal synth voice pool.
+- Drums include the complete 55-preset Hortator MD bank (57 articulations / 21 kernels), 19 kits including two experimental MD LAB kits, and individual lane sound replacement. Drum attacks are protected for about 40 ms; tails then use the ordinary shared voice/CPU policy, without a separate MD-only cap.
 - Multiple Acid tracks; one Break machine per project, assignable anywhere. Machine-specific EDIT/SEQ pages follow the selected machine.
-- Acid NEW/MUTATE always follows the root/scale in SCL; untouched scale defaults to minor.
+- Acid NEW/MUTATE always follows the root/scale in SCL; the same shared SCL default is CHR.
 - Break: 16 chops, 16 performance/repeat commands, source A/B and return commands in the real sequence. Hold SEQ for STRAIGHT / MUTATE / RANDOM, tail fills, beat shuffle, reverse order, shifts and A/B sequencing. Saved periodic mutation supports ORBIT/DRIFT.
 - Break follows the normal track filter, ADSR and both LFOs. Fresh Break tracks select A / Amen with an empty two-bar sequence. Hold SEQ + F3 for a straight loop; saved edits remain intact.
 - Four projects, A–D sections, two LFOs per track, modulation slots, shared distortion/phaser/delay/reverb and performance effects. Four-/six-track modes preserve inactive tracks.
@@ -52,17 +52,15 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 ## Release and compatibility
 
-The current beta is **v0.1.1-beta3 / build 20261108.2 / FM-1_748005**. [Download this maintenance build](https://github.com/JazzyRhythmer/Rhythmer/releases/tag/v0.1.1-beta3-build.20261108.2). This maintenance revision keeps the version label; use the installer SHA-256 to identify the exact binary. The package includes its update loader and both prepared A/B banks. Installing restores those factory loops. Project/settings protection applies only to the documented layout and does not make foreign firmware projects compatible.
+The current beta is **v0.1.1-beta3 / FM-1_748005**. This maintenance revision keeps the version label; use the installer SHA-256 to identify the exact binary. The package includes its update loader and both prepared A/B banks. Installing restores those factory loops. Project/settings protection applies only to the documented layout and does not make foreign firmware projects compatible.
 
-**Maintenance build 20261108.2:** restores the audio renderer and overload behavior of public build 20261107.2 after the experimental protection builds caused worse real-device artifacts. Starts in **4-track mode**; T5/T6 music is preserved. Enabling six tracks shows the CPU notice and requires **OCT+**; **OCT−** cancels. [Illustrated track-mode guide](https://jazzyrhythmer.github.io/Rhythmer/#guide/tracks). Both per-track LFOs now have independent PITCH/FILTER/SHAPE/AMP destinations, with adjacent LFO 1 / LFO 2 source choices. Genre-aware bass-preset selection and GEN synth levels are improved. The updated 16-section manual and browser editor ship together. The owner confirmed listening to this exact build on a physical FM-1.
+New in this release: 59 GEN genres; targeted MIDI and genre-aware BREAK GEN; all 55 Hortator MD presets and per-lane drum replacement; four Hortator Acid sounds; revised Think level matching; guided user-sample conversion/upload; empty initial sequences; and a detailed English manual. ALL fills eligible active slots in four-/six-track mode and keeps pre-existing Acid/Break parts. Only the explicitly named SR_ACID recipe assigns native Acid for its mono bass part; ordinary bass, lead and chord pools exclude it, and Break is excluded from automatic assignment. Target MIDI remains available at every track position. Curated genres keep preset tuning, use role-appropriate sounds and leave melodic space. CPU work replaces sample-rate phaser float math, streamlines packed Break reads and removes unused legacy Break processing. The normal voice budget, clocks, synchronization and memory guards remain.
 
-Retained features: 59 GEN genres; targeted MIDI and genre-aware BREAK GEN; all 55 Hortator MD presets and per-lane drum replacement; four Hortator Acid sounds; revised Think level matching; guided user-sample conversion/upload; empty initial sequences; and a detailed English manual. ALL generates only T1–T4 and leaves T5/T6 music and settings intact. Explicit T5 MIDI remains available. Curated genres keep preset tuning, use role-appropriate sounds and leave melodic space. CPU work replaces sample-rate phaser float math, streamlines packed Break reads and removes unused legacy Break processing. The normal voice budget, clocks, synchronization and memory guards remain.
-
-The owner tested the earlier same-version `aa90f340…` package and reported working functions as well as overload under a busy six-track ensemble. Read-only PROFILE confirmed missed deadlines; muting either Acid or Drum improved playback. That is not a test of the revised package. The current exact package's automated checks and physical-test scope are recorded in `RELEASE-VALIDATION.json`; the owner has confirmed physical-device listening for build 20261108.2. Native/community-emulator timing does not reproduce all physical flash-cache contention. Back up before installing.
+The owner installed build **20261108.6** and reported stable, very good playback without the earlier buffering issue. Build **20261108.7** keeps that audio DSP, buffer, voice management and core scheduling; its firmware change only adds default instruments on confirmed six-track activation. Automated checks and the exact hashes/test scopes are recorded in `RELEASE-VALIDATION.json`. Busy patterns can still exceed hardware capacity: mute tracks, reduce simultaneous notes or simplify effects when necessary. Back up before installation.
 
 Use official V15 between different custom firmware families. A previous unit became unresponsive after power was interrupted during an update; its recovery remains unconfirmed. Cold power-loss recovery and UC25HQ80 hardware validation are not established.
 
-The normal synthesis ceiling is twelve shared voices, with the existing public-build measured-load and overload protections. Monophonic machines and MD models have their own constraints. No guarantee of unlimited polyphony is made.
+The restored JIANT shared voice/CPU policy and new-engine dual-core scheduling remain. Drum attacks have a short protection window and older tails participate normally; there is no separate MD-only cap. The 512-frame half-buffer restores approximately 11.6 ms of scheduling margin at 44.1 kHz. No guarantee of unlimited polyphony is made.
 
 ## Samples, credits and license
 
