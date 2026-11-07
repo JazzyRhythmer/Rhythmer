@@ -31,7 +31,8 @@ def build():
         if f.is_file(): shutil.copy2(f, dist/f.name)
     app=dist/'app.js'
     landing_version=hashlib.sha256((dist/'landing.mjs').read_bytes()).hexdigest()[:12]
-    app.write_text(app.read_text().replace("'./landing.mjs'","'./landing.mjs?v="+landing_version+"'"))
+    newsletter_version=hashlib.sha256((dist/'newsletter.mjs').read_bytes()).hexdigest()[:12]
+    app.write_text(app.read_text().replace("'./landing.mjs'","'./landing.mjs?v="+landing_version+"'").replace("'./newsletter.mjs'","'./newsletter.mjs?v="+newsletter_version+"'"))
     # Preserve browser cache efficiency without showing a stale UI after local rebuilds.
     document=(dist/'index.html').read_text()
     if config.get('localOnly') is False:
