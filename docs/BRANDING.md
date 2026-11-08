@@ -6,4 +6,4 @@ Rhythmer is a groovebox with up to six assignable tracks. Fresh settings activat
 
 The six-machine visual panels, actual engine animations and their order are retained. Acid and Break remain documented as individual machines alongside drums and synths. Upstream credits and licenses remain unchanged.
 
-This website branding refresh keeps firmware build 20261108.8 and its exact package unchanged. Revised device startup copy/animation is prepared separately and has not been added to this package.
+Build 20261108.9 applies the same direction to the device startup and About copy. All six boot panels are fixed, with Analog in the second slot, and never alter the actual project or engine assignments. The bounded 2.1-second animation respects ANIM OFF; no audio, memory-budget or core-scheduling changes are included.

@@ -9,7 +9,7 @@
       "license": "GPL-3.0",
       "repo": "../#releases",
       "package": "../downloads/Rhythmer.fwsc",
-      "about": "A hands-on groovebox firmware for the FM-1. Sound into motion."
+      "about": "Hands-on groovebox firmware for the FM-1. Public beta candidate; see release-specific test scope."
     }
   ]
 }

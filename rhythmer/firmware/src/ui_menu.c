@@ -255,7 +255,7 @@ static int32_t menu_document(int32_t y, int draw)
         cv_text_r(232, y + 61, &AF_S, __DATE__, T_MID, T_BG);
         cv_text(6, y + 82, &AF_S, "by Jazzy Rhythmer", T_TEXT);   /* (0.6.96: the project's own) */
         cv_text(6, y + 100, &AF_S, "Free, GPL-3.0-only, no warranty", T_TEXT);
-        cv_text(6, y + 118, &AF_S, "Independent six-track groovebox", T_TEXT);
+        cv_text(6, y + 118, &AF_S, "Sound into motion.", T_TEXT);
         cv_text(6, y + 138, &AF_S, "YOUTUBE", T_MID);
         cv_text(6, y + 156, &AF_S, "@jazzyrhythmer", T_MID);
         cv_text(6, y + 174, &AF_S, "INSTAGRAM / SAME", T_MID);

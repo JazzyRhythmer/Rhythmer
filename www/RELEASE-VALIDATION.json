@@ -1,8 +1,8 @@
 {
   "version": "0.1.1-beta3",
-  "buildRevision": "20261108.8",
+  "buildRevision": "20261108.9",
   "product": "FM-1_748005",
-  "firmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
+  "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
   "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-08",
@@ -20,62 +20,428 @@
     "ownerConfirmed": true,
     "buildRevision": "20261108.6",
     "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.8",
+    "finalRevision": "20261108.9",
     "firmwareSourceDifferences": [
       "rhythmer/firmware/src/ui.c",
       "rhythmer/firmware/src/ui_draw.c",
-      "rhythmer/firmware/src/ui_input.c"
+      "rhythmer/firmware/src/ui_input.c",
+      "rhythmer/firmware/src/ui_menu.c"
     ],
-    "change": "UI-only maintenance including a fixed startup machine display. Audio DSP, buffer, voice management and core algorithms unchanged."
+    "change": "Display and identity-copy maintenance only; audio DSP, buffers, voice management and core algorithms unchanged."
   },
   "maintenanceDelta": {
-    "previousBuild": "20261108.7",
-    "previousFirmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "previousBuild": "20261108.8",
+    "previousFirmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
     "firmwareFilesChanged": [
-      "rhythmer/firmware/src/ui_draw.c"
+      "rhythmer/firmware/src/ui_draw.c",
+      "rhythmer/firmware/src/ui_menu.c"
     ],
-    "scope": "Startup display only; no audio, sequencing or track-assignment changes."
+    "scope": "Startup renderer and About-page product copy only; no audio, sequencing, voice-budget, buffer, core or track-assignment changes."
   },
   "startup": {
     "fixedMachines": [
       10,
-      17,
+      0,
       2,
       3,
       16,
       15
     ],
+    "fixedMachineNames": [
+      "DRUM",
+      "ANALOG",
+      "PHASE",
+      "LOFI",
+      "ACID",
+      "BREAK"
+    ],
+    "scope": "Boot display only; actual T2 remains SERUM. No track assignments changed.",
+    "durationMs": 2100,
     "independentOfAssignmentsAndMode": true,
-    "bothSpecialGlyphsAnimate": true,
+    "allSixGlyphsAnimate": true,
     "animationOffRespected": true,
     "trackSongMidiUnchanged": true,
-    "focusedAssertions": 14,
+    "focusedAssertions": 16,
     "hostSanitizers": "ASan + UBSan"
   },
-  "nativeScenarios": 2,
+  "nativeScenarios": 6,
   "nativeResults": {
-    "startupFrame": {
-      "emulatedMs": 1400,
-      "actualFwsc": true,
-      "visualInspection": "Acid and Break both visible"
+    "half_frames": 512,
+    "sample_manifest": [
+      {
+        "name": "amen-160",
+        "source_url": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
+        "source_sha256": "6a750fc1722773749fa2f6783c85f3a17b1291a54c4b033ed5636884ba2e0025",
+        "source_rate": 48000,
+        "source_frames": 144000,
+        "crop_frames": [
+          0,
+          144000
+        ],
+        "crop_seconds": 3.0,
+        "bars": 2,
+        "beats": 8,
+        "bpm": 160,
+        "output_rate": 16000,
+        "output_frames": 48000,
+        "bits": 12,
+        "payload_bytes": 72000,
+        "slot_bytes": 81920,
+        "slot_sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
+        "processing": "mono, DC removal, Kaiser polyphase anti-alias repitch, 0.5ms/3ms endpoint fades, -1dBFS peak, PCM12",
+        "pitch_semitones": 0.0,
+        "seam_jump_pcm16": 0,
+        "peak_pcm16": 29200,
+        "rms_pcm16": 6280.791897417607,
+        "quantization_max_error": 8.0
+      },
+      {
+        "name": "think-160",
+        "edit": "Think drums / two complementary assembled bars",
+        "source": "user-supplied Classic Break Pack",
+        "sources": [
+          {
+            "name": "lyncollins_think_1.wav",
+            "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
+            "rate": 44100,
+            "frames": 93761,
+            "source_beats": 4
+          },
+          {
+            "name": "lyncollins_think_2.wav",
+            "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
+            "rate": 44100,
+            "frames": 92698,
+            "source_beats": 4
+          }
+        ],
+        "edit_segments": [
+          {
+            "source": 1,
+            "beats": [
+              0,
+              3
+            ]
+          },
+          {
+            "source": 2,
+            "beats": [
+              3,
+              4
+            ]
+          },
+          {
+            "source": 1,
+            "beats": [
+              0,
+              1
+            ]
+          },
+          {
+            "source": 2,
+            "beats": [
+              1,
+              4
+            ]
+          }
+        ],
+        "excluded_segments": [
+          {
+            "source": 1,
+            "beats": [
+              3,
+              4
+            ],
+            "reason": "pitched tail"
+          },
+          {
+            "source": 2,
+            "beats": [
+              0,
+              1
+            ],
+            "reason": "pitched carry-in"
+          }
+        ],
+        "bars": 2,
+        "beats": 8,
+        "bpm": 160,
+        "output_rate": 16000,
+        "output_frames": 48000,
+        "bits": 12,
+        "payload_bytes": 72000,
+        "slot_bytes": 81920,
+        "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
+        "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12; offline 4x circular look-ahead level match, no hard clipping",
+        "boundaries": [
+          0,
+          18000,
+          24000,
+          30000,
+          48000
+        ],
+        "seam_jump_pcm16": 0,
+        "peak_pcm16": 27968,
+        "rms_pcm16": 4978.657262087172,
+        "level_match": {
+          "source_slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
+          "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
+          "gain_db": 9.0,
+          "max_peak_attenuation_db": 9.674933884213901,
+          "amen_rms": 0.19167527341802548,
+          "think_before_rms": 0.08451214112044729,
+          "think_after_rms": 0.15193656195334387,
+          "rms_difference_db": -2.0180759309055034,
+          "true_peak_dbfs": -1.3702431050771096,
+          "clipped_samples": 0,
+          "frames": 48000,
+          "seam_jump_pcm16": 0,
+          "runtime_cpu_cost_added": 0
+        }
+      }
+    ],
+    "firmware_sha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
+    "physical_hardware_tested": false,
+    "runs": {
+      "startup-fresh": {
+        "magic": 1145194289,
+        "halves": 215,
+        "max_us": 2493,
+        "nested": 3348,
+        "in_audio": 0,
+        "late": 0,
+        "timer_irqs": 24855,
+        "ui_frames": 3,
+        "last_us": 740,
+        "cpu_q8": 16,
+        "boots": 1,
+        "stage": 6,
+        "page": 0,
+        "home": 1,
+        "six_loop_mask": 3,
+        "six_machine_mask": 0,
+        "fm1_mc_on": 1,
+        "fm1_mc_lost": 0,
+        "core1_track_mask": 0,
+        "selected_track": 0,
+        "track_engines": [
+          10,
+          17,
+          2,
+          3,
+          21,
+          21
+        ],
+        "usb_starts": 1,
+        "usb_packets": 2330,
+        "usb_frames": 102791,
+        "usb_underruns": 0,
+        "usb_overruns": 0,
+        "usb_missed": 0,
+        "usb_capture_frames": 103143,
+        "usb_peak_pcm16": 0,
+        "usb_rate": 44100,
+        "audio_lost": 0,
+        "peak_pcm16": 0
+      },
+      "startup-frame-480": {
+        "magic": 1145194289,
+        "halves": 29,
+        "max_us": 1452,
+        "nested": 379,
+        "in_audio": 1,
+        "late": 0,
+        "timer_irqs": 3263,
+        "ui_frames": 0,
+        "last_us": 1217,
+        "cpu_q8": 26,
+        "boots": 1,
+        "stage": 0,
+        "page": 0,
+        "home": 0,
+        "six_loop_mask": 3,
+        "six_machine_mask": 3,
+        "fm1_mc_on": 1,
+        "fm1_mc_lost": 0,
+        "core1_track_mask": 0,
+        "selected_track": 0,
+        "track_engines": [
+          10,
+          17,
+          2,
+          3,
+          21,
+          21
+        ],
+        "usb_starts": 0,
+        "usb_packets": 0,
+        "usb_frames": 0,
+        "usb_underruns": 0,
+        "usb_overruns": 0,
+        "usb_missed": 0,
+        "audio_lost": 0,
+        "peak_pcm16": 0
+      },
+      "startup-frame-1200": {
+        "magic": 1145194289,
+        "halves": 91,
+        "max_us": 1452,
+        "nested": 1179,
+        "in_audio": 0,
+        "late": 0,
+        "timer_irqs": 10431,
+        "ui_frames": 0,
+        "last_us": 1227,
+        "cpu_q8": 27,
+        "boots": 1,
+        "stage": 0,
+        "page": 0,
+        "home": 0,
+        "six_loop_mask": 3,
+        "six_machine_mask": 3,
+        "fm1_mc_on": 1,
+        "fm1_mc_lost": 0,
+        "core1_track_mask": 0,
+        "selected_track": 0,
+        "track_engines": [
+          10,
+          17,
+          2,
+          3,
+          21,
+          21
+        ],
+        "usb_starts": 0,
+        "usb_packets": 0,
+        "usb_frames": 0,
+        "usb_underruns": 0,
+        "usb_overruns": 0,
+        "usb_missed": 0,
+        "audio_lost": 0,
+        "peak_pcm16": 0
+      },
+      "startup-frame-1800": {
+        "magic": 1145194289,
+        "halves": 143,
+        "max_us": 1452,
+        "nested": 1735,
+        "in_audio": 0,
+        "late": 0,
+        "timer_irqs": 16477,
+        "ui_frames": 0,
+        "last_us": 305,
+        "cpu_q8": 10,
+        "boots": 1,
+        "stage": 0,
+        "page": 0,
+        "home": 0,
+        "six_loop_mask": 3,
+        "six_machine_mask": 3,
+        "fm1_mc_on": 1,
+        "fm1_mc_lost": 0,
+        "core1_track_mask": 0,
+        "selected_track": 0,
+        "track_engines": [
+          10,
+          17,
+          2,
+          3,
+          21,
+          21
+        ],
+        "usb_starts": 0,
+        "usb_packets": 0,
+        "usb_frames": 0,
+        "usb_underruns": 0,
+        "usb_overruns": 0,
+        "usb_missed": 0,
+        "audio_lost": 0,
+        "peak_pcm16": 0
+      },
+      "startup-play-4": {
+        "magic": 1145194289,
+        "halves": 516,
+        "max_us": 8644,
+        "nested": 20329,
+        "in_audio": 0,
+        "late": 0,
+        "timer_irqs": 59772,
+        "ui_frames": 39,
+        "last_us": 4469,
+        "cpu_q8": 98,
+        "boots": 1,
+        "stage": 6,
+        "page": 0,
+        "home": 1,
+        "six_loop_mask": 3,
+        "six_machine_mask": 0,
+        "fm1_mc_on": 1,
+        "fm1_mc_lost": 0,
+        "core1_track_mask": 12,
+        "selected_track": 0,
+        "track_engines": [
+          10,
+          17,
+          2,
+          3,
+          16,
+          15
+        ],
+        "usb_starts": 1,
+        "usb_packets": 5824,
+        "usb_frames": 256929,
+        "usb_underruns": 0,
+        "usb_overruns": 0,
+        "usb_missed": 0,
+        "usb_capture_frames": 257237,
+        "usb_peak_pcm16": 18034,
+        "usb_rate": 44100,
+        "audio_lost": 0,
+        "peak_pcm16": 9017
+      },
+      "startup-play-6": {
+        "magic": 1145194289,
+        "halves": 516,
+        "max_us": 10120,
+        "nested": 26880,
+        "in_audio": 0,
+        "late": 0,
+        "timer_irqs": 59773,
+        "ui_frames": 34,
+        "last_us": 6344,
+        "cpu_q8": 143,
+        "boots": 1,
+        "stage": 4,
+        "page": 0,
+        "home": 1,
+        "six_loop_mask": 3,
+        "six_machine_mask": 3,
+        "fm1_mc_on": 1,
+        "fm1_mc_lost": 0,
+        "core1_track_mask": 14,
+        "selected_track": 0,
+        "track_engines": [
+          10,
+          17,
+          2,
+          3,
+          16,
+          15
+        ],
+        "usb_starts": 1,
+        "usb_packets": 5824,
+        "usb_frames": 256930,
+        "usb_underruns": 0,
+        "usb_overruns": 0,
+        "usb_missed": 0,
+        "usb_capture_frames": 257238,
+        "usb_peak_pcm16": 18528,
+        "usb_rate": 44100,
+        "audio_lost": 0,
+        "peak_pcm16": 9264
+      }
     },
-    "freshBoot": {
-      "engines": [
-        10,
-        17,
-        2,
-        3,
-        21,
-        21
-      ],
-      "sampleMask": 3,
-      "trackMode": 4,
-      "late": 0,
-      "audioLost": 0,
-      "coreLost": 0,
-      "cores": 2,
-      "peak": 0
-    }
+    "scope": "Actual-FWSC startup frames, virgin four-track/EMPTY defaults and embedded banks, four-/six-track controlled MD ensemble playback with USB; no physical device writes."
   },
   "editorActualCStorageChecks": 130,
   "samplePreparationChecks": 30,
@@ -83,9 +449,9 @@
   "manualInteractions": 9,
   "emulatorCacheChecks": 6,
   "inheritedAudioValidation": {
-    "buildRevision": "20261108.7",
-    "firmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
-    "scope": "Previous complete audio/GEN regression and USB stress retained; only startup renderer changed."
+    "buildRevision": "20261108.8",
+    "firmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
+    "scope": "Audio/GEN/voice/core code unchanged; this image also passed fresh native four/six playback and USB checks."
   },
   "sourceFiles": {
     "rhythmer/firmware/app.ld": "93fe3f811a8c0badbd48f827e04d7a2da6fdbc5921be6537354a1af0525a23a6",
@@ -228,7 +594,7 @@
     "rhythmer/firmware/src/uac_fir.h": "10f3b8f54f175302c8bfa5503cb2bb99d252d214a37ee758a405837d6064c5a3",
     "rhythmer/firmware/src/ui.c": "5db0c0fa57af421020f3adf492815559f5171d16b30f52d3c69d74504d35871b",
     "rhythmer/firmware/src/ui_break_tools.c": "310e694b025091ba269847198c5a2d496d5def54de7bfde8976bb9ad6c541ad9",
-    "rhythmer/firmware/src/ui_draw.c": "ba1597f813fb9adfa888b7ed4ecb10b0eb684b311db47dbb992b9950ade220d6",
+    "rhythmer/firmware/src/ui_draw.c": "c83a4d51fac1a6cfce292687813546b3d65e8aff4fbec1aaf00fa4d8065b0654",
     "rhythmer/firmware/src/ui_dx.c": "9889c850a9b709ae2f89514109f065cf190e2cc2b9204d330a153e0d509ab5e9",
     "rhythmer/firmware/src/ui_events.c": "7f836347f1e97318c7dd406eacaa2bd3b330d9112bd09d23cda4232ef1be31c3",
     "rhythmer/firmware/src/ui_fm6op.c": "b824865e7f82abdff1ee63094d4604da299093f2b87e92e4097ae0e0f9dc255a",
@@ -242,7 +608,7 @@
     "rhythmer/firmware/src/ui_lzfx.c": "e15d75cfdf622dfdd8e52a594f41be03e54e4197733ee6a5c4549d41b6c990fd",
     "rhythmer/firmware/src/ui_lzpage.c": "bc6abc6b4a37c54e2a4532a30c0573955b650cd04329c03605e80413f21ff12f",
     "rhythmer/firmware/src/ui_lzsave.c": "d95453d72f0d967eba149aa9040161abe0fea21245ab6e0fa6293d3ee32d8afd",
-    "rhythmer/firmware/src/ui_menu.c": "2835db0efb48661c3b1fbce14b25bf137a8ce1df5ec8a423eb94e4df29f06b4a",
+    "rhythmer/firmware/src/ui_menu.c": "27f829b2fc3add55edcc86b6823c71c3f53ad631acfd4d0e7e8c8f2c426295ef",
     "rhythmer/firmware/src/ui_motion.c": "cf291aefd3709c9884cd61ff8058621452d62df91ee6cdab8bc1515bff330e04",
     "rhythmer/firmware/src/ui_name.c": "e0d8c1583c80a5422a9def79ea7020588d6248a6aa6a6cbdfe7d126d3d72361d",
     "rhythmer/firmware/src/ui_tech.c": "ed734d91d46fab29a75a579edc6acfd956cc3fb41e2b3ef90c74623e8e5c5621",
@@ -261,5 +627,49 @@
     "site-break_upload.log": "020fb6240f3da53997564854a895fa67cb7050764558858e1b635d4315e74dfd",
     "site-manual.log": "c6c1a54f700fb1fd78387d7171644ee1dda958421f6abf5d57576cffa63d1eb4",
     "site-emulator_cache.log": "ad4d0d3c593a99dab8f60c2ffe51a32434a965705bfe7e51a155b601270184f0"
+  },
+  "embeddedLoader": {
+    "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
+    "appSha256": "d6fda0d54e366aa61b7cf03ccc8d36fe45931733a20fee6c2e318ace003b70d2",
+    "appUnchanged": false,
+    "audioRegressionRequired": true,
+    "physicalHardwareTested": false,
+    "writeRanges": [
+      [
+        16384,
+        602112
+      ],
+      [
+        655360,
+        819200
+      ]
+    ],
+    "sampleHeaderSectorCommittedLast": true,
+    "powerInterruptionResumeCases": 5,
+    "negativePackagesRejectedBeforeErase": 4,
+    "legacyCodeOnlyPackageSupported": true,
+    "banks": [
+      "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
+      "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
+    ]
+  },
+  "memory": {
+    "appBytes": 570660,
+    "appSlotBytes": 584336,
+    "appFreeBytes": 13676,
+    "dataAndBssBytes": 93992,
+    "dataAndBssLimitBytes": 98304,
+    "poolBytes": 311284,
+    "spareBytes": 8192,
+    "ramCodeBytes": 23104,
+    "ramCodeLimitBytes": 25600,
+    "audioMemoryAllocationUnchanged": true,
+    "otaLoaderByteIdenticalToPrevious": true
+  },
+  "evidence": {
+    "genUiLogSha256": "ad3519d38d3f1be92facb1646e0007a9a2976d7429e34db3a094ab5647d878e9",
+    "startupTestLogSha256": "7c394ae181a638376c2675c7723ff5de5d9d0eaf63b2a47837cd8cb7f691db6f",
+    "buildLogSha256": "caa4575b68438bcfedea7e90d49e564f14441d7cb51d920ddcfde614f2c53d1c",
+    "installerSimulationScreenshotSha256": "0987eff1285d334d35300d30365f34cc0be7b58f201d60bd0f06de44c06be53e"
   }
 }

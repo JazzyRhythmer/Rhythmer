@@ -1,7 +1,7 @@
 {
   "version": "0.1.1-beta3",
   "product": "FM-1_748005",
-  "sha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
+  "sha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
   "physicalHardwareTested": false,
   "ownerTest": {
     "date": "2026-11-08",
@@ -24,28 +24,33 @@
     },
     {
       "name": "Rhythmer-0.1.1-beta3-install.zip",
-      "bytes": 3158959,
-      "sha256": "0e1f128ddbb429a0a90ff961517377ad3e26acafcc6ffd68f30386bc90823f5d"
+      "bytes": 3160199,
+      "sha256": "6887fe3c9c562545ed832939995a23ffcc9251e49b3132b53068910cdf0faf3e"
+    },
+    {
+      "name": "Rhythmer-Manual-v0.1.1-beta3.pdf",
+      "bytes": 182168,
+      "sha256": "50cd284640a9df594345ca2f5b4ebeeccf2a7aa3841e0bfa58542d8b5c34a001"
     },
     {
       "name": "Rhythmer-six-track-test.fm1save",
       "bytes": 1351502,
-      "sha256": "1f478d285165e0f33614a7dabf632064662e7029edf94a1c7524c2579ae33f7a"
+      "sha256": "9d4282041711d8f870323b2fce527e18516239c72fdb1975ad89db5e238960d2"
     },
     {
       "name": "Rhythmer-start.fm1save",
       "bytes": 1351517,
-      "sha256": "bffe09041162c4e3a27a2e50087a323ee32627910d65bc4f2c088d0dd332ce03"
+      "sha256": "1b7b81889c59c825deffe499e0d1f9f34d774fd1a9476a6acc87821949cb966f"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2261425,
-      "sha256": "b25eb71e5ac36a125de3fdcbcc4487ab1b55a38ca099c76995fc247ca641c74e"
+      "sha256": "1fa46d9d9597e025e681847b695edcfa8947f7dd963d540c5928817b694184c8"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5"
+      "sha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -105,20 +110,21 @@
   ],
   "sampleNotice": "Includes third-party break recordings; recording/composition rights are separate from the code license. Redistribution clearance is not documented.",
   "releaseHold": null,
-  "buildRevision": "20261108.8",
+  "buildRevision": "20261108.9",
   "audioBaseTest": {
     "ownerConfirmed": true,
     "buildRevision": "20261108.6",
     "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.8",
+    "finalRevision": "20261108.9",
     "firmwareSourceDifferences": [
       "rhythmer/firmware/src/ui.c",
       "rhythmer/firmware/src/ui_draw.c",
-      "rhythmer/firmware/src/ui_input.c"
+      "rhythmer/firmware/src/ui_input.c",
+      "rhythmer/firmware/src/ui_menu.c"
     ],
-    "change": "UI-only maintenance including a fixed startup machine display. Audio DSP, buffer, voice management and core algorithms unchanged."
+    "change": "Display and identity-copy maintenance only; audio DSP, buffers, voice management and core algorithms unchanged."
   },
-  "releaseCaution": "Startup-only maintenance: the boot screen always shows animated Acid and Break identities in slots 5/6, regardless of actual track assignments. Instruments, sequences, four/six-track behavior and the creator-tested native Hortator audio base are unchanged. Back up before installation.",
+  "releaseCaution": "Startup and identity copy maintenance: fixed Drum, Analog, Phase, LoFi, Acid and Break symbols animate independently of your track assignments. The boot is about 2.1 seconds and uses Sound into motion / Find your own groove. Audio DSP, sequences, buffers, voice management and core scheduling retain the creator-tested native Hortator audio base. Back up before installation.",
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.",
   "audioPublicRedistributionCleared": false
 }

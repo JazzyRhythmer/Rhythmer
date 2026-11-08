@@ -53,8 +53,8 @@
     }
   },
   "releaseHold": null,
-  "buildRevision": "20261108.8",
-  "releaseCaution": "Startup-only maintenance: the boot screen always shows animated Acid and Break identities in slots 5/6, regardless of actual track assignments. Instruments, sequences, four/six-track behavior and the creator-tested native Hortator audio base are unchanged. Back up before installation.",
+  "buildRevision": "20261108.9",
+  "releaseCaution": "Startup and identity copy maintenance: fixed Drum, Analog, Phase, LoFi, Acid and Break symbols animate independently of your track assignments. The boot is about 2.1 seconds and uses Sound into motion / Find your own groove. Audio DSP, sequences, buffers, voice management and core scheduling retain the creator-tested native Hortator audio base. Back up before installation.",
   "previousOwnerTests": [
     {
       "date": "2026-11-08",
@@ -93,20 +93,22 @@
     "ownerConfirmed": true,
     "buildRevision": "20261108.6",
     "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.8",
+    "finalRevision": "20261108.9",
     "firmwareSourceDifferences": [
       "rhythmer/firmware/src/ui.c",
       "rhythmer/firmware/src/ui_draw.c",
-      "rhythmer/firmware/src/ui_input.c"
+      "rhythmer/firmware/src/ui_input.c",
+      "rhythmer/firmware/src/ui_menu.c"
     ],
-    "change": "UI-only maintenance including a fixed startup machine display. Audio DSP, buffer, voice management and core algorithms unchanged."
+    "change": "Display and identity-copy maintenance only; audio DSP, buffers, voice management and core algorithms unchanged."
   },
   "maintenanceDelta": {
-    "previousBuild": "20261108.7",
-    "previousFirmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+    "previousBuild": "20261108.8",
+    "previousFirmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
     "firmwareFilesChanged": [
-      "rhythmer/firmware/src/ui_draw.c"
+      "rhythmer/firmware/src/ui_draw.c",
+      "rhythmer/firmware/src/ui_menu.c"
     ],
-    "scope": "Startup display only; no audio, sequencing or track-assignment changes."
+    "scope": "Startup renderer and About-page product copy only; no audio, sequencing, voice-budget, buffer, core or track-assignment changes."
   }
 }

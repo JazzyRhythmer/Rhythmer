@@ -3,9 +3,9 @@
   "site": "https://jazzyrhythmer.github.io/Rhythmer/",
   "version": "0.1.1-beta3",
   "product": "FM-1_748005",
-  "firmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
+  "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
   "ownerDistributionDecision": true,
   "rightsHolderClearanceDocumented": false,
   "introVideoSha256": "09880439da261b87dab245ac1e05db5e97ef6825f0f9c5ab522c3e51db8b3f88",
-  "buildRevision": "20261108.8"
+  "buildRevision": "20261108.9"
 }

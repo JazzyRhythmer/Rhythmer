@@ -12,16 +12,17 @@
     "migrationAndRecoveryMatrixVerified": false
   },
   "finalRevision": {
-    "buildRevision": "20261108.8",
-    "firmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
+    "buildRevision": "20261108.9",
+    "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
     "exactBinaryHardwareClaimed": false,
     "maintenanceDelta": {
-      "previousBuild": "20261108.7",
-      "previousFirmwareSha256": "4b0e035de7018885dd5f2ef92a8d82990523dce2777efa2581ad8379d2bb6d8e",
+      "previousBuild": "20261108.8",
+      "previousFirmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
       "firmwareFilesChanged": [
-        "rhythmer/firmware/src/ui_draw.c"
+        "rhythmer/firmware/src/ui_draw.c",
+        "rhythmer/firmware/src/ui_menu.c"
       ],
-      "scope": "Startup display only; no audio, sequencing or track-assignment changes."
+      "scope": "Startup renderer and About-page product copy only; no audio, sequencing, voice-budget, buffer, core or track-assignment changes."
     }
   }
 }

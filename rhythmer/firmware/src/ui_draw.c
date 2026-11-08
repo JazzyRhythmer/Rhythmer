@@ -1800,36 +1800,71 @@ static void draw_columns(void)
 
 /* Rhythmer startup: monochrome wordmark and the instrument renderer's six
  * animated machine glyphs. Two bounded strips, no extra framebuffer or DSP. */
-#define SPL_WRITE 800u
-#define SPL_HOLD 900u
+#define SPL_WRITE 1000u
+#define SPL_HOLD 1100u
 static uint8_t spl_anim;
 /* Startup is a fixed six-machine identity, independent of track assignments.
  * Keep EMPTY defaults and all live track rendering unchanged. */
-static unsigned splash_engine(unsigned k){return k==4u?ENGI_ACID:k==5u?ENGI_BREAK:trk_def_engine(k);}
+static unsigned splash_engine(unsigned k){
+ static const uint8_t machine[6]={ENGI_DRUM,ENGI_ANALOG,ENGI_PHASE,ENGI_LOFI,ENGI_ACID,ENGI_BREAK};
+ return machine[k%6u];
+}
 static void splash_sig(int32_t px,uint32_t ms){
- (void)px;unsigned progress=(ui_prefs&PREF_ANIM_OFF)?48u:clamp((int)(ms*48u/SPL_WRITE),0,48);
+ (void)px;unsigned off=!!(ui_prefs&PREF_ANIM_OFF);if(off)ms=SPL_WRITE;
+ unsigned progress=clamp((int)(ms*48u/SPL_WRITE),0,48);
  static const uint8_t g[8][7]={{30,17,17,30,20,18,17},{17,17,17,31,17,17,17},{17,17,10,4,4,4,4},{31,4,4,4,4,4,4},{17,17,17,31,17,17,17},{17,27,21,21,17,17,17},{31,16,16,30,16,16,31},{30,17,17,30,20,18,17}};
- static const char *const part[6]={"DRUM","SYN 1","SYN 2","SYN 3","ACID","BREAK"};
+ static const char *const part[6]={"DRUM","ANALOG","PHASE","LOFI","ACID","BREAK"};
  cv_begin(240,120,T_BG);
  cv_text_in(8,0,114,&AF_X,"RHYTHMER OS",T_TEXT,T_BG);
- cv_text_r(232,0,&AF_X,"STARTUP",T_DIM,T_BG);
- cv_line_t(8,16,232,16,T_TEXT,1);
- cv_text_in(8,33,224,&AF_X,"SIX TRACK GROOVE MACHINE",T_TEXT,T_BG);
- for(unsigned k=0;k<8;k++)for(unsigned y=0;y<7;y++)for(unsigned x=0;x<5;x++)
-  if(g[k][y]&(16u>>x))cv_rect(34+k*22+x*4,52+y*4,4,4,T_TEXT);
- for(unsigned j=0;j<48;j++)cv_rect(24+(int)j*4,99,3,3,j<progress?T_TEXT:T_DIM);
+ cv_text_r(232,0,&AF_X,progress==48u?"READY":"STARTUP",T_DIM,T_BG);
+ cv_line_t(8,16,232,16,T_DIM,1);
+ cv_line_t(8,16,8+(int)progress*224/48,16,T_TEXT,1);
+ cv_text_in(8,33,224,&AF_X,"SOUND INTO MOTION.",T_TEXT,T_BG);
+ /* Sparse scan field and eased pixel assembly. The seed is local geometry,
+  * never the song's RNG; this renderer owns no audio or track state. */
+ int sweep=24+(int)((ms/4u)%192u);
+ for(unsigned y=0;y<5;y++)for(unsigned x=0;x<26;x++)if(!((x+2u*y)&3u))
+  cv_rect(20+(int)x*8,46+(int)y*8,1,1,T_DIM);
+ if(!off&&ms<820u)cv_line_t(sweep,46,sweep,84,T_DIM,1);
+ for(unsigned k=0;k<8;k++)for(unsigned y=0;y<7;y++)for(unsigned x=0;x<5;x++)if(g[k][y]&(16u>>x)){
+  unsigned h=k*37u+x*17u+y*29u;
+  int age=(int)ms-80-(int)k*55-(int)(h%90u);if(age<0)continue;
+  int q=clamp(age*256/240,0,256);q=256-((256-q)*(256-q)>>8);
+  int d=(256-q)*(6+(int)((h>>2)&7u))/256;
+  int bx=34+(int)k*22+(int)x*4+((h&1u)?d/2:-d/2);
+  int by=52+(int)y*4+((h&2u)?d:-d);
+  if(d)cv_rect(bx,by+2,4,4,T_DIM);
+  cv_rect(bx,by,4,4,T_TEXT);
+ }
+ /* Stencil cut and pulse brackets keep the settled wordmark crisp. */
+ cv_rect(34,65,176,1,T_BG);
+ uint16_t edge=off||((ms/160u)&1u)?T_TEXT:T_DIM;
+ cv_rect(26,46,12,1,edge);cv_rect(26,46,1,5,edge);
+ cv_rect(204,46,12,1,edge);cv_rect(215,46,1,5,edge);
+ cv_rect(26,84,12,1,edge);cv_rect(26,80,1,5,edge);
+ cv_rect(204,84,12,1,edge);cv_rect(215,80,1,5,edge);
+ unsigned head=(ms/80u)%48u;
+ for(unsigned j=0;j<48;j++){
+  int hot=!off&&progress==48u&&(j==head||j==(head+1u)%48u);
+  cv_rect(24+(int)j*4,99-hot,3,3+hot,j<progress?T_TEXT:T_DIM);
+ }
+ cv_text_in(24,109,192,&AF_X,"FIND YOUR OWN GROOVE.",T_DIM,T_BG);
  cv_blit(0,24);
  cv_begin(240,82,T_BG);
  for(unsigned k=0;k<6;k++){
-  int x=8+(int)(k%3)*76,y=(int)(k/3)*42,ready=progress>k*8;
-  cv_frame(x,y,72,38,ready?T_TEXT:T_DIM);
+  int x=8+(int)(k%3)*76,y=(int)(k/3)*42,age=(int)ms-150-(int)k*80,ready=age>=0;
+  cv_frame(x,y,72,38,T_DIM);
+  if(ready){int w=clamp(age*72/160,0,71);cv_line_t(x,y,x+w,y,T_TEXT,1);cv_line_t(x+71-w,y+37,x+71,y+37,T_TEXT,1);}
   if(ready){
-   unsigned ph=(ui_prefs&PREF_ANIM_OFF)?0u:ms*0x300000u+k*0x2aaaaaaau;
-   int en=(ui_prefs&PREF_ANIM_OFF)?0:64+(osc_sine(ph)>>10);
+   unsigned ph=off?0u:ms*0x480000u+k*0x2aaaaaaau;
+   int en=off?0:clamp(64+(osc_sine(ph)>>9),12,127);
    six_machine_glyph(0,splash_engine(k),en,ph,x+5,y+3,62,22,T_TEXT);
+   cv_rect(x+66,y+3,2,2,off||((ms/120u+k)%6u<2u)?T_TEXT:T_DIM);
   }
   cv_text_in(x,y+28,72,&AF_X,part[k],ready?T_TEXT:T_DIM,T_BG);
  }
+ cv_line_t(10,40,230,40,T_DIM,1);
+ int packet=10+(int)((ms/8u)%216u);cv_rect(packet,40,5,1,T_TEXT);
  cv_blit(0,146);
 }
 

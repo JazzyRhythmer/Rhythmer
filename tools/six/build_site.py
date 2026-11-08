@@ -62,6 +62,12 @@ def build():
         for i in range(count): image.crop((w*i//count,0,w*(i+1)//count,h)).save(assets/f'{name}-{i+1}.png')
     for name in ['Rhythmer.fwsc','Rhythmer-six-track-test.fm1save']:
         shutil.copy2(b/name, downloads/name)
+    # Preserve the published print edition during a fresh firmware-site build.
+    manual_name = 'Rhythmer-Manual-v'+config.get('version','0.1.1-beta3')+'.pdf'
+    for candidate in (ROOT/'docs/manual'/manual_name, ROOT/'output/pdf'/manual_name):
+        if candidate.is_file():
+            shutil.copy2(candidate, downloads/manual_name)
+            break
     build_web_start(ROOT,b,downloads,digest)
     shutil.copy2(ROOT/'LICENSE', assets/'LICENSE.txt')
     shutil.copy2(ROOT/'rhythmer/firmware/hortator/MIT-Mutable-Instruments.txt', assets/'Hortator-MIT-Mutable-Instruments.txt')
