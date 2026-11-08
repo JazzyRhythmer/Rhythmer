@@ -17,5 +17,11 @@
     "BREAK GEN writes genre-aware chop sequences, retaining tempo, samples and other parts",
     "Hold SEQ on Break: F3 STRAIGHT, G3 MUTATE, A3 RANDOM",
     "Release SEQ for BRK PERF live gestures"
-  ]
+  ],
+  "brandingMaintenance": {
+    "date": "2026-11-08",
+    "change": "Intro brand label only; six engine visuals retained",
+    "audioBitstreamUnchanged": true,
+    "videoSha256": "6f8b27a13fc8dfa21b651751da46ec6ffb0dca7964e552ccb9e04267a7be15e8"
+  }
 }

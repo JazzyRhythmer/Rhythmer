@@ -92,7 +92,7 @@ def build():
     build_emulator(ROOT, dist, digest)
     if config.get('localOnly') is False:
         p=dist/'emulator/firmwares.json';catalog=json.loads(p.read_text())
-        catalog['firmwares'][0].update(version=release['version'],about='Six-track groovebox firmware. Public beta candidate; see release-specific test scope.')
+        catalog['firmwares'][0].update(version=release['version'],about='Hands-on groovebox firmware for the FM-1. Public beta candidate; see release-specific test scope.')
         p.write_text(json.dumps(catalog,indent=2)+'\n')
     build_editor(ROOT, dist)
     build_installer(ROOT, dist, release)

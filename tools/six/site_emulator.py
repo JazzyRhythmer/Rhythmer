@@ -81,6 +81,6 @@ def build_emulator(root, dist, firmware_hash):
     html=html.replace('src="main.js"','src="main.js?v='+hashlib.sha256(source.encode()).hexdigest()[:12]+'"')
     (target/'index.html').write_text(html)
     shutil.copy2(root/'site/emulator/rhythmer.css',target/'rhythmer.css')
-    catalog={'default':'rhythmer','firmwares':[{'id':'rhythmer','name':'Rhythmer','version':'dev','author':'Jazzy Rhythmer','license':'GPL-3.0','repo':'../#releases','package':'../downloads/Rhythmer.fwsc','about':'Six-track groovebox firmware. Local development build.'}]}
+    catalog={'default':'rhythmer','firmwares':[{'id':'rhythmer','name':'Rhythmer','version':'dev','author':'Jazzy Rhythmer','license':'GPL-3.0','repo':'../#releases','package':'../downloads/Rhythmer.fwsc','about':'Hands-on groovebox firmware for the FM-1. Local development build.'}]}
     (target/'firmwares.json').write_text(json.dumps(catalog,indent=2)+'\n')
     (target/'INTEGRATION.txt').write_text('Rhythmer integration: local-only catalog, exact-hash initial sample/project seed, existing-save preservation, accessible panel buttons, pause/resume, PCM output meter. Runtime: Joakim Eriksson, MIT. Original files: site/vendor/fm1-emu.\n')

@@ -1,8 +1,14 @@
 # Rhythmer
 
-![Rhythmer six-track workspace](docs/launch/card.png)
+![Rhythmer machines in motion](docs/launch/card.png)
 
-**Six assignable tracks for the M-VAVE FM-1.** Synthesized drums, nine musical synth models, 303-style acid generation and playable breakbeats, with one sequencer and a browser editor.
+**SOUND INTO MOTION.**
+
+A hands-on groovebox firmware for the M-VAVE FM-1. Shape sounds, build patterns, and find your own groove.
+
+Rhythmer is an alternative firmware made for exploring sound and developing ideas through play. Move between sound design, sequencing and performance. Keep what works, try a new direction, and make the groove your own.
+
+Up to six assignable tracks, with flexible machine choices, a shared sequencer and a browser editor.
 
 Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhythmer). Optional support: [Ko-fi](https://ko-fi.com/jazzyrhythmer).
 
@@ -10,9 +16,9 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 
 ## Watch Rhythmer
 
-[![Watch the Rhythmer OS opening — Acid Generator and Breakbeat Manipulator](site/media/video/rhythmer-opening-poster.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
+[![Watch Rhythmer — Sound into motion.](site/media/video/rhythmer-opening-poster.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
 
-[Watch the 36-second opening with sound](https://jazzyrhythmer.github.io/Rhythmer/#opening) · [Download the Amen mix MP4](https://github.com/JazzyRhythmer/Rhythmer/releases/download/v0.1.0-beta.2/Rhythmer-OS-Opening-36s-1080p-Amen.mp4). Original opening sound plus an Amen Break section; sample credits below. The film shows host-rendered firmware UI, not physical-device footage.
+[Watch the 36-second opening with sound](https://jazzyrhythmer.github.io/Rhythmer/#opening) · [Download the Amen mix MP4](https://jazzyrhythmer.github.io/Rhythmer/assets/video/rhythmer-opening-36s-amen.mp4). Original opening sound plus an Amen Break section; sample credits below. The film shows host-rendered firmware UI, not physical-device footage.
 
 ## Start here
 
@@ -20,7 +26,7 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 
 **Use official V15 when moving from another custom firmware to Rhythmer, or from Rhythmer to another custom firmware.** Direct foreign-custom transitions are unsupported. For a first install, official V15 is the recommended starting point. Back up the music you want to keep before changing firmware. The installer requires a final V15 recommendation acknowledgement, backup/risk acknowledgements and a separate audio-rights acknowledgement. Use Chrome or Edge and keep USB/power connected until verification finishes. A matching Rhythmer can be updated directly after backup.
 
-## Acid generation and Break performance
+## Explore the machines
 
 | Acid / NEW + MUTATE | Break / chops + repeats |
 | --- | --- |
@@ -40,7 +46,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 ## Machines and sequencing
 
-- Six assignable tracks; fresh settings start with four active tracks: DRUM / SERUM / PHASE / LOFI. T5/T6 start EMPTY. Confirm six-track mode with OCT+ to fill empty T5/T6 with ACID / BREAK; existing sounds and notes are kept and a Break on another track is never duplicated.
+- Up to six assignable tracks; fresh settings start with four active tracks: DRUM / SERUM / PHASE / LOFI. T5/T6 start EMPTY. Confirm six-track mode with OCT+ to fill empty T5/T6 with ACID / BREAK; existing sounds and notes are kept and a Break on another track is never duplicated.
 - Synths: Serum, Phase, LoFi, Analog, FM6, Wheel, FM+STAT, SWAV-SAW and SID-6581. All 41 selected Garden model presets remain; MONO2K-derived models add 17 starting sounds.
 - Drums include the complete 55-preset Hortator MD bank (57 articulations / 21 kernels), 19 kits including two experimental MD LAB kits, and individual lane sound replacement. Drum attacks are protected for about 40 ms; tails then use the ordinary shared voice/CPU policy, without a separate MD-only cap.
 - Multiple Acid tracks; one Break machine per project, assignable anywhere. Machine-specific EDIT/SEQ pages follow the selected machine.

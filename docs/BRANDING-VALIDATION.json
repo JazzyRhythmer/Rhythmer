@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-08",
+  "scope": "Marketing copy only; six engine panels and original animation assets retained. Opening video keeps the original AAC bitstream. Portrait manual films change only the first four seconds brand label.",
+  "firmwareUnchanged": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
+  "introVideoSha256": "09880439da261b87dab245ac1e05db5e97ef6825f0f9c5ab522c3e51db8b3f88",
+  "originalAACSha256": "37deb5889ba522f53160623eadc30ba22b1e968ec35ca1685a13ddab659687f6",
+  "nativeBootStatus": "Host-rendered source and 16 checks pass; native firmware build awaits dedicated build VM restart approval."
+}

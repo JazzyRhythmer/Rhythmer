@@ -72,7 +72,7 @@ def chrome(t):
  im=Image.new('L',(W,H),0);d=ImageDraw.Draw(im);show=smooth((t-.3)/.9)*(1-smooth((t-(17.1+INSERT))/.55))
  if show<=0:return im
  line(d,[(72,126),(1848,126)],55,1);line(d,[(72,956),(1848,956)],55,1)
- label(d,(72,77),'R / OS',28,220);label(d,(1848-420,81),'SIX TRACKS. ONE PULSE.',22,160)
+ label(d,(72,77),'R / OS',28,220);label(d,(1848-420,81),'SOUND INTO MOTION.',22,160)
  label(d,(72,991),'BY JAZZY RHYTHMER',22,145)
  ct=t if t<6.65 else max(6.65,t-INSERT)
  stage='SIGNAL' if ct<3.2 else 'MACHINES' if ct<6.8 else 'SYNC' if ct<10.4 else 'ASSEMBLY' if ct<13.8 else 'READY'
@@ -96,7 +96,7 @@ def signal(t):
  return opacity(im,smooth(t/.35)*(1-smooth((t-2.75)/.65)))
 def machines(t):
  im=Image.new('L',(W,H),0);d=ImageDraw.Draw(im);u=t-3.05
- label(d,(94,221),'THE MACHINES',72,245);label(d,(98,312),'ONE CLOCK / SIX CHANNELS',24,125)
+ label(d,(94,221),'THE MACHINES',72,245);label(d,(98,312),'SOUND / PATTERN / PERFORMANCE',24,125)
  for j,name in enumerate(NAMES):
   reveal=ease((u-j*.38)/.7);x=90+j*293;y=405+(1-reveal)*90
   if reveal<=0:continue
@@ -152,7 +152,7 @@ def logo(t):
  solid=smooth((t-12.9)/.7)
  if solid>0:im=ImageChops.lighter(im,opacity(MASK,solid));d=ImageDraw.Draw(im)
  if t>13.25:
-  k=smooth((t-13.25)/.55);label(d,(W/2,700),'SIX TRACKS. ONE PULSE.',30,int(220*k),True)
+  k=smooth((t-13.25)/.55);label(d,(W/2,700),'SOUND INTO MOTION.',30,int(220*k),True)
   d.rectangle((lx+lw-122,330,lx+lw,375),outline=int(180*k),width=2);label(d,(lx+lw-61,341),'OS',28,int(245*k),True)
   for j in range(6):glyph(d,j,560+j*142,823,90,44,t,ink=int(150*k))
   label(d,(W/2,265),'RHYTHMER',22,int(90*k),True)

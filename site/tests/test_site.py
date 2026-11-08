@@ -75,7 +75,7 @@ jsc.JSGlobalContextRelease(ctx)
 
 import base64
 seed=json.loads((DIST/'downloads/Rhythmer-start.fm1save').read_text())
-assert seed['startingProject']['tracksWithNotes']==[] and seed['startingProject']['breakSteps']==32
+assert seed['startingProject']['tracksWithNotes']==[] and seed['startingProject']['unassignedTracks']==[5,6]
 assert hashlib.sha256(base64.b64decode(seed['package'])).hexdigest()==release['sha256']
 sectors={s['at']:base64.b64decode(s['data']) for s in seed['sectors']}
 # Banks may be embedded in flash.bin rather than redundant save overrides.
