@@ -1,0 +1,400 @@
+{
+  "date": "2026-11-08",
+  "firmwareBuild": "20261108.9",
+  "firmwareChanged": false,
+  "capture": "Current firmware actions and real browser preparation; host UI is not physical-device footage",
+  "captures": [
+    {
+      "clip": "track-system",
+      "frames": 75,
+      "uniqueFrames": 39,
+      "sha256": "38332699aff190a793f39c26ed2047fd3c8cb865d89e309b6b767ac6a279c48f"
+    },
+    {
+      "clip": "cpu-confirm",
+      "frames": 75,
+      "uniqueFrames": 48,
+      "sha256": "8bb71f3e44b07d1292637168173b924358c45b395a97a2d547147afbd6bf5c74"
+    },
+    {
+      "clip": "drum-swap",
+      "frames": 63,
+      "uniqueFrames": 9,
+      "sha256": "c1440cd77a4e50d6a812b171d60a5bcd68d03107b296d5bd6d5e9bf2d6614d89"
+    },
+    {
+      "clip": "held-seq",
+      "frames": 100,
+      "uniqueFrames": 24,
+      "sha256": "59a63f9afcf14833ec59b2724644580f8aa6ddf6b5ac8f3e604171729b822ac0"
+    },
+    {
+      "clip": "break-gen",
+      "frames": 125,
+      "uniqueFrames": 53,
+      "sha256": "2752767edd1d2d40492ad0a97ce2497daf00c03680adf6382796117eba31d547"
+    },
+    {
+      "clip": "target-gen",
+      "frames": 125,
+      "uniqueFrames": 9,
+      "sha256": "8ce5e7edc23edc17fc87d5f5ce2ae7511aa791882ab44f76bcb9c08a0acc7469"
+    },
+    {
+      "clip": "acid-create",
+      "frames": 57,
+      "uniqueFrames": 29,
+      "sha256": "542288d97b282306259363c2dca2e450127b3759dc8f88c6f6628bdd9b9b295b"
+    },
+    {
+      "clip": "four-home",
+      "frames": 50,
+      "uniqueFrames": 46,
+      "sha256": "c532a1c315f34ec6e978c9ffc425df81160065ff1b7594a7197b9573fec2b1a7"
+    }
+  ],
+  "generatorSeed": 31,
+  "targetDemonstration": [
+    "T2 MIDI",
+    "T3 MIDI",
+    "T4 MIDI"
+  ],
+  "breakGenres": [
+    "BOOM BAP",
+    "JUNGLE",
+    "DRUNKEN HH"
+  ],
+  "differentBreakPatternSignatures": [
+    "1d65cc78",
+    "93846b7f",
+    "36a836ed"
+  ],
+  "newManualComposition": {
+    "title": "Quiet Circuit",
+    "bpm": 120,
+    "duration": 64,
+    "originalComposition": true,
+    "thirdPartyRecordings": false,
+    "description": "Warm electric keys, restrained broken-house percussion, rounded bass and sparse plucks; gentle action ticks. A new composition, distinct from the update-video score.",
+    "sha256": "9b827e807b43720d9e6ce0199dab0e538651b5f0af7631160d76137f66fd2a34",
+    "normalizationTargetLUFS": -17,
+    "truePeakCeilingDBTP": -1.5,
+    "preNormalization": {
+      "input_i": "-21.50",
+      "input_tp": "-6.63",
+      "input_lra": "7.30",
+      "input_thresh": "-31.97",
+      "output_i": "-16.29",
+      "output_tp": "-1.50",
+      "output_lra": "3.50",
+      "output_thresh": "-26.54",
+      "normalization_type": "dynamic",
+      "target_offset": "-0.71"
+    }
+  },
+  "manualAndUpdateAudioDifferent": true,
+  "films": [
+    {
+      "file": "Rhythmer-manual-instagram-1080x1920-64s.mp4",
+      "duration": 64,
+      "size": [
+        1080,
+        1920
+      ],
+      "fps": 30,
+      "sha256": "e35f10545597eec040b7fa87f8c4cd4166e8e6a87585b29c40768418e4fe559f",
+      "completeDecode": "PASS",
+      "actualUIActions": true,
+      "hardwareFootage": false,
+      "audio": "New original Quiet Circuit / 120 BPM",
+      "firmwareUnchanged": true,
+      "actualEncodedFrameChecks": [
+        {
+          "second": 10,
+          "frameMAE": 1.577
+        },
+        {
+          "second": 14,
+          "frameMAE": 1.553
+        },
+        {
+          "second": 20,
+          "frameMAE": 1.773
+        },
+        {
+          "second": 23,
+          "frameMAE": 1.589
+        },
+        {
+          "second": 26,
+          "frameMAE": 1.54
+        },
+        {
+          "second": 30,
+          "frameMAE": 1.728
+        },
+        {
+          "second": 33,
+          "frameMAE": 1.715
+        },
+        {
+          "second": 37,
+          "frameMAE": 1.814
+        },
+        {
+          "second": 40,
+          "frameMAE": 1.775
+        },
+        {
+          "second": 43,
+          "frameMAE": 1.771
+        },
+        {
+          "second": 50,
+          "frameMAE": 1.718
+        },
+        {
+          "second": 55,
+          "frameMAE": 2.024
+        }
+      ],
+      "measuredAudio": {
+        "input_i": "-17.01",
+        "input_tp": "-2.14",
+        "input_lra": "7.30",
+        "input_thresh": "-27.48",
+        "output_i": "-16.29",
+        "output_tp": "-1.50",
+        "output_lra": "3.50",
+        "output_thresh": "-26.54",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.71"
+      },
+      "sourceFiles": {
+        "tools/six/capture_manual_motion.c": "c219eb33777dcaed84433a05534a6f75235701f956a728d42784e14b967ac8f2",
+        "tools/six/score_manual_motion.py": "f0eac9e6f495750081ab44cd779b8c5043492014b307a08f0ab54a83be8c8e62",
+        "tools/six/render_motion_tours_v4.py": "aa4c3c7a38011a8d66bfd4ed6ce956dd3042927c30abd6e1695b70ea3c26c459"
+      }
+    },
+    {
+      "file": "Rhythmer-manual-youtube-1920x1080-64s.mp4",
+      "duration": 64,
+      "size": [
+        1920,
+        1080
+      ],
+      "fps": 30,
+      "sha256": "0bf82ab6c41c2ec299fdba74a379ed0b0f0bd6ad4f8480d20737a643cbb0ac69",
+      "completeDecode": "PASS",
+      "actualUIActions": true,
+      "hardwareFootage": false,
+      "audio": "New original Quiet Circuit / 120 BPM",
+      "firmwareUnchanged": true,
+      "actualEncodedFrameChecks": [
+        {
+          "second": 10,
+          "frameMAE": 1.62
+        },
+        {
+          "second": 14,
+          "frameMAE": 1.601
+        },
+        {
+          "second": 20,
+          "frameMAE": 1.797
+        },
+        {
+          "second": 23,
+          "frameMAE": 1.632
+        },
+        {
+          "second": 26,
+          "frameMAE": 1.589
+        },
+        {
+          "second": 30,
+          "frameMAE": 1.754
+        },
+        {
+          "second": 33,
+          "frameMAE": 1.739
+        },
+        {
+          "second": 37,
+          "frameMAE": 1.805
+        },
+        {
+          "second": 40,
+          "frameMAE": 1.754
+        },
+        {
+          "second": 43,
+          "frameMAE": 1.749
+        },
+        {
+          "second": 50,
+          "frameMAE": 1.833
+        },
+        {
+          "second": 55,
+          "frameMAE": 2.022
+        }
+      ],
+      "measuredAudio": {
+        "input_i": "-17.01",
+        "input_tp": "-2.14",
+        "input_lra": "7.30",
+        "input_thresh": "-27.48",
+        "output_i": "-16.29",
+        "output_tp": "-1.50",
+        "output_lra": "3.50",
+        "output_thresh": "-26.54",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.71"
+      },
+      "sourceFiles": {
+        "tools/six/capture_manual_motion.c": "c219eb33777dcaed84433a05534a6f75235701f956a728d42784e14b967ac8f2",
+        "tools/six/score_manual_motion.py": "f0eac9e6f495750081ab44cd779b8c5043492014b307a08f0ab54a83be8c8e62",
+        "tools/six/render_motion_tours_v4.py": "aa4c3c7a38011a8d66bfd4ed6ce956dd3042927c30abd6e1695b70ea3c26c459"
+      }
+    },
+    {
+      "file": "Rhythmer-update-instagram-1080x1920-52s.mp4",
+      "duration": 52,
+      "size": [
+        1080,
+        1920
+      ],
+      "fps": 30,
+      "sha256": "f1e6529b29a1186ad9cb5b715b455633d87cde5a10f926c9dbd03e77133a0497",
+      "completeDecode": "PASS",
+      "actualUIActions": true,
+      "hardwareFootage": false,
+      "audio": "Original update soundtrack retained",
+      "firmwareUnchanged": true,
+      "originalAACBitstreamIdentical": true,
+      "actualEncodedFrameChecks": [
+        {
+          "second": 21,
+          "frameMAE": 1.473
+        },
+        {
+          "second": 23,
+          "frameMAE": 1.466
+        },
+        {
+          "second": 25,
+          "frameMAE": 1.466
+        },
+        {
+          "second": 27,
+          "frameMAE": 1.466
+        },
+        {
+          "second": 29,
+          "frameMAE": 1.468
+        },
+        {
+          "second": 31,
+          "frameMAE": 1.439
+        },
+        {
+          "second": 33,
+          "frameMAE": 1.629
+        },
+        {
+          "second": 35,
+          "frameMAE": 1.629
+        }
+      ],
+      "measuredAudio": {
+        "input_i": "-15.15",
+        "input_tp": "-1.75",
+        "input_lra": "6.30",
+        "input_thresh": "-25.56",
+        "output_i": "-17.35",
+        "output_tp": "-3.31",
+        "output_lra": "4.10",
+        "output_thresh": "-27.39",
+        "normalization_type": "dynamic",
+        "target_offset": "0.35"
+      },
+      "sourceFiles": {
+        "tools/six/capture_manual_motion.c": "c219eb33777dcaed84433a05534a6f75235701f956a728d42784e14b967ac8f2",
+        "tools/six/score_manual_motion.py": "f0eac9e6f495750081ab44cd779b8c5043492014b307a08f0ab54a83be8c8e62",
+        "tools/six/render_motion_tours_v4.py": "aa4c3c7a38011a8d66bfd4ed6ce956dd3042927c30abd6e1695b70ea3c26c459"
+      }
+    },
+    {
+      "file": "Rhythmer-update-youtube-1920x1080-68s.mp4",
+      "duration": 68,
+      "size": [
+        1920,
+        1080
+      ],
+      "fps": 30,
+      "sha256": "3960ce8aae0eb638e2f592d4ec75c0e9d46dd1b2db81d06469251cbb8810f7b3",
+      "completeDecode": "PASS",
+      "actualUIActions": true,
+      "hardwareFootage": false,
+      "audio": "Original update soundtrack retained",
+      "firmwareUnchanged": true,
+      "originalAACBitstreamIdentical": true,
+      "actualEncodedFrameChecks": [
+        {
+          "second": 25,
+          "frameMAE": 1.697
+        },
+        {
+          "second": 27,
+          "frameMAE": 1.692
+        },
+        {
+          "second": 29,
+          "frameMAE": 1.691
+        },
+        {
+          "second": 31,
+          "frameMAE": 1.689
+        },
+        {
+          "second": 33,
+          "frameMAE": 1.623
+        },
+        {
+          "second": 35,
+          "frameMAE": 1.698
+        },
+        {
+          "second": 38,
+          "frameMAE": 1.674
+        },
+        {
+          "second": 41,
+          "frameMAE": 1.635
+        },
+        {
+          "second": 43,
+          "frameMAE": 1.758
+        }
+      ],
+      "measuredAudio": {
+        "input_i": "-15.11",
+        "input_tp": "-1.75",
+        "input_lra": "5.60",
+        "input_thresh": "-25.58",
+        "output_i": "-17.36",
+        "output_tp": "-3.31",
+        "output_lra": "3.50",
+        "output_thresh": "-27.47",
+        "normalization_type": "dynamic",
+        "target_offset": "0.36"
+      },
+      "sourceFiles": {
+        "tools/six/capture_manual_motion.c": "c219eb33777dcaed84433a05534a6f75235701f956a728d42784e14b967ac8f2",
+        "tools/six/score_manual_motion.py": "f0eac9e6f495750081ab44cd779b8c5043492014b307a08f0ab54a83be8c8e62",
+        "tools/six/render_motion_tours_v4.py": "aa4c3c7a38011a8d66bfd4ed6ce956dd3042927c30abd6e1695b70ea3c26c459"
+      }
+    }
+  ]
+}
