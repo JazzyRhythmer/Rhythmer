@@ -1,0 +1,11 @@
+{
+  "file": "Rhythmer-Manual-v0.1.1-beta3.pdf",
+  "pages": 23,
+  "chapters": 16,
+  "edition": "0.1.1-beta3 / 20261108.8",
+  "sha256": "50cd284640a9df594345ca2f5b4ebeeccf2a7aa3841e0bfa58542d8b5c34a001",
+  "manualSourceSha256": "7b020944c0349713b374cc14072a8cc0b5457961a6cbdaa60b67015ed5a82420",
+  "links": 50,
+  "scope": "Complete English print edition from current web manual chapters, with actual host-rendered UI and credits.",
+  "webManualChangeAfterRender": "Only the PDF download link was added; chapter bodies unchanged."
+}

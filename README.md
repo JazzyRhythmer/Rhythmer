@@ -22,7 +22,7 @@ Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhy
 
 ## Start here
 
-[Play](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Detailed manual](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [Web editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install / official V15 return](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
+[Play](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Detailed manual](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [PDF manual](https://jazzyrhythmer.github.io/Rhythmer/downloads/Rhythmer-Manual-v0.1.1-beta3.pdf) · [Web editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install / official V15 return](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
 
 **Use official V15 when moving from another custom firmware to Rhythmer, or from Rhythmer to another custom firmware.** Direct foreign-custom transitions are unsupported. For a first install, official V15 is the recommended starting point. Back up the music you want to keep before changing firmware. The installer requires a final V15 recommendation acknowledgement, backup/risk acknowledgements and a separate audio-rights acknowledgement. Use Chrome or Edge and keep USB/power connected until verification finishes. A matching Rhythmer can be updated directly after backup.
 
