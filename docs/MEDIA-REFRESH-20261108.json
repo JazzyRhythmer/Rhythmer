@@ -1,0 +1,65 @@
+{
+  "version": "v0.1.1-beta3",
+  "headline": "SOUND INTO MOTION.",
+  "capacity": "A groovebox with up to six assignable tracks.",
+  "firmware": "Media refresh only; no firmware write or hardware test performed.",
+  "source": "tools/six/render_brand_media.py",
+  "films": [
+    {
+      "file": "Rhythmer-update-youtube-1920x1080-68s.mp4",
+      "size": [
+        1920,
+        1080
+      ],
+      "duration": 68,
+      "fps": 30,
+      "sha256": "36fe62fb6e9706bd06d26606b3c02a359a36d5b41b2d27f2d7991d311a34657d",
+      "originalAACBitstreamIdentical": true,
+      "completeDecode": "PASS",
+      "visuals": "Existing host-rendered firmware UI and current website screenshot; not physical-device footage.",
+      "audioSource": "outputs/Rhythmer-update-2026-11-07-v2/Rhythmer-Update-YouTube-1920x1080-68s.mp4"
+    },
+    {
+      "file": "Rhythmer-update-instagram-1080x1920-52s.mp4",
+      "size": [
+        1080,
+        1920
+      ],
+      "duration": 52,
+      "fps": 30,
+      "sha256": "77f3559e16d0754cebc7c9e168f30a508f4278d2d9b9d75a7a7560237523e106",
+      "originalAACBitstreamIdentical": true,
+      "completeDecode": "PASS",
+      "visuals": "Existing host-rendered firmware UI and current website screenshot; not physical-device footage.",
+      "audioSource": "outputs/Rhythmer-update-2026-11-07-v2/Rhythmer-Update-Reels-1080x1920-52s.mp4"
+    },
+    {
+      "file": "Rhythmer-manual-youtube-1920x1080-64s.mp4",
+      "size": [
+        1920,
+        1080
+      ],
+      "duration": 64,
+      "fps": 30,
+      "sha256": "fbef2d13bb55c62946d87f6778b0c73f7726ac662024ef956869cb4e7ec1061c",
+      "originalAACBitstreamIdentical": true,
+      "completeDecode": "PASS",
+      "visuals": "Existing host-rendered firmware UI and current website screenshot; not physical-device footage.",
+      "audioSource": "outputs/Rhythmer-Manual-Launch-v3/Rhythmer-Manual-YouTube-1920x1080-64s.mp4"
+    },
+    {
+      "file": "Rhythmer-manual-instagram-1080x1920-64s.mp4",
+      "size": [
+        1080,
+        1920
+      ],
+      "duration": 64,
+      "fps": 30,
+      "sha256": "3220b1aa2e63aad15615b7775cbee1d4fd02eb790f6ab08182a5d9cea01c5fe0",
+      "originalAACBitstreamIdentical": true,
+      "completeDecode": "PASS",
+      "visuals": "Existing host-rendered firmware UI and current website screenshot; not physical-device footage.",
+      "audioSource": "outputs/Rhythmer-Manual-Launch-v3/Rhythmer-Manual-Reels-1080x1920-64s.mp4"
+    }
+  ]
+}

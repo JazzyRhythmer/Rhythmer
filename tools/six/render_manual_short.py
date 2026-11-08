@@ -60,7 +60,7 @@ def frame(t):
     im=background(t)
     if t<4:
         heading(im,'READ THE MANUAL.','BEFORE YOU PLAY.','RHYTHMER / SOUND INTO MOTION.')
-        text(im,86,648,'15',280)
+        text(im,86,648,'16',280)
         text(im,495,690,'GUIDED',65);text(im,495,775,'SECTIONS',65)
         text(im,88,1035,'BUTTON BY BUTTON.',49,True)
         text(im,88,1115,'FROM THE FIRST NOTE.',42,True,GRAY)
@@ -103,7 +103,7 @@ def frame(t):
         screen(im,'drum-sound',86,690,440,t);screen(im,'gen-target',554,690,440,t+.7)
         text(im,86,1160,'SWAP ONE DRUM',25,True)
         text(im,554,1160,'GENERATE ONE TRACK',25,True)
-        lines(im,['Keep the rest of your groove.','GEN ALL writes T1–T4 only.'],1390,36)
+        lines(im,['Keep the rest of your groove.','GEN ALL follows the active track mode.'],1390,36)
         text(im,86,1555,'59 GEN STYLES / STEP-BY-STEP RECIPES',23,True,GRAY)
     elif t<43:
         heading(im,'YOUR BREAKS.','YOUR WORKFLOW.','07 / SAMPLE UPLOAD + PROJECT BACKUPS')
@@ -114,8 +114,8 @@ def frame(t):
     else:
         heading(im,'LESS MENU HUNTING.','MORE MUSIC.','THE RHYTHMER USER MANUAL')
         glyphs(im,740,t)
-        text(im,86,955,'15 SECTIONS',66)
-        text(im,86,1050,'ACID / BREAK / GEN / SAVE',29,True,GRAY)
+        text(im,86,955,'16 SECTIONS',66)
+        text(im,86,1050,'SOUND / SEQUENCE / PERFORM / SAVE',29,True,GRAY)
         text(im,86,1190,'OPEN THE MANUAL',54)
         fitted(im,86,1325,'jazzyrhythmer.github.io',900,42,True)
         text(im,86,1393,'/Rhythmer/#guide',42,True)
