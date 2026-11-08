@@ -1,0 +1,23 @@
+/* Shared standalone-tool navigation. Instrument/editor styles stay scoped. */
+:root{--rhythmer-nav-height:83px}
+.rhy-site-header{box-sizing:border-box;display:block!important;position:sticky;top:0;z-index:100;margin:0!important;padding:0!important;width:100%;background:#101010f5;color:#e7e7e7;border:0;border-bottom:1px solid #3b3b3b;backdrop-filter:blur(12px);font:15px/1.5 Arial,sans-serif}
+.rhy-site-header *{box-sizing:border-box}
+.rhy-site-header .rhy-site-inner{min-height:var(--rhythmer-nav-height);display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 4.5%;margin:0;width:100%;max-width:none}
+.rhy-site-header a{color:#e7e7e7;text-decoration:none;background:none;border:0;border-radius:0}
+.rhy-site-header .rhy-site-brand{display:inline-flex;align-items:center;gap:9px;font:900 19px/1.4 Arial,sans-serif;letter-spacing:-.7px;white-space:nowrap}
+.rhy-site-header .rhy-site-brand span{font-size:27px}
+.rhy-site-header nav{display:flex;flex-wrap:nowrap;align-items:center;gap:27px;margin:0;padding:0;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:1px}
+.rhy-site-header nav a{display:inline-block;position:relative;padding:12px 0;white-space:nowrap}
+.rhy-site-header nav a[aria-current=page]:after{content:'';position:absolute;bottom:2px;left:0;right:0;height:2px;background:#e7e7e7}
+.rhy-site-header .rhy-site-support{font:10px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:nowrap}
+.rhy-site-header a:hover{color:#fff}
+.rhy-site-header a:focus-visible{outline:2px solid white;outline-offset:5px}
+.rhy-install-options{display:flex;justify-content:flex-end;gap:24px;margin:0;padding:14px 4.5%;border-bottom:1px solid #303030;font:10px/1.6 ui-monospace,monospace;letter-spacing:.7px}
+.rhy-install-options a{color:#b9b9b9;text-decoration:none}
+html:not([data-rhythmer-framed]){scroll-padding-top:calc(var(--rhythmer-nav-height) + 20px)}
+html:not([data-rhythmer-framed]) .transfer-status{scroll-margin-top:calc(var(--rhythmer-nav-height) + 20px)}
+html:not([data-rhythmer-framed]) body.jiant-editor header.top{top:var(--rhythmer-nav-height)}
+html:not([data-rhythmer-framed]) body:has(#panel) canvas{max-width:min(100%,calc((100svh - 135px - var(--rhythmer-nav-height))*1.5609756))}
+html[data-rhythmer-framed] .rhy-site-header,html[data-rhythmer-framed] .rhy-install-options{display:none!important}
+@media(max-width:640px){:root{--rhythmer-nav-height:112px}.rhy-site-header .rhy-site-inner{min-height:112px;flex-wrap:wrap;gap:0 16px;padding:12px 5% 10px}.rhy-site-header .rhy-site-brand{font-size:17px}.rhy-site-header .rhy-site-brand span{font-size:23px}.rhy-site-header nav{order:3;width:100%;justify-content:center;gap:22px;font-size:10px}.rhy-site-header .rhy-site-support{margin-left:auto}.rhy-install-options{justify-content:center;gap:20px}.rhy-site-header nav a{padding:11px 0}html:not([data-rhythmer-framed]) body:has(#panel) canvas{max-width:100%}}
+@media print{.rhy-site-header,.rhy-install-options{display:none!important}}

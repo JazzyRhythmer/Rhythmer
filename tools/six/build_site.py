@@ -7,6 +7,7 @@ from site_emulator import build_emulator
 from web_start_seed import build_web_start
 from site_editor import build_editor
 from site_installer import build_installer
+from site_navigation import apply_site_navigation
 from release_rights import public_audio_release_blockers
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / 'site'
@@ -102,6 +103,7 @@ def build():
         p.write_text(json.dumps(catalog,indent=2)+'\n')
     build_editor(ROOT, dist)
     build_installer(ROOT, dist, release)
+    apply_site_navigation(ROOT, dist)
     # The unified installer adds licensed recovery assets and a local-only audio bundle.
     release['files']=[{'name':str(f.relative_to(downloads)),'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()} for f in sorted(downloads.rglob('*')) if f.is_file()]
     release['installation']='One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery included under Apache-2.0.'

@@ -1,0 +1,25 @@
+{
+  "allPublicHTMLPagesAudited": [
+    "index.html",
+    "installer/index.html",
+    "installer/verify.html",
+    "editor/index.html",
+    "emulator/index.html"
+  ],
+  "standaloneToolsHaveMainNavigation": true,
+  "embeddedEditorAndEmulatorHeaderHidden": "Confirmed in browser",
+  "oldControlIDsAndScriptsPreserved": true,
+  "toolRuntimeAndDownloadBytesUnchanged": true,
+  "sectionOrder": [
+    "hero",
+    "opening",
+    "instrument and features",
+    "first-session routes and FAQ",
+    "updates",
+    "manual",
+    "release notes",
+    "newsletter and support"
+  ],
+  "idempotentBuildAdaptation": true,
+  "firmwareUnchanged": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1"
+}
