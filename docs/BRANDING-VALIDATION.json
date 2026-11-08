@@ -1,10 +1,13 @@
 {
   "date": "2026-11-08",
-  "scope": "Marketing copy only; six engine panels and original animation assets retained. Opening video keeps the original AAC bitstream. Portrait manual films change only the first four seconds brand label.",
+  "scope": "Branding and startup work retained. Media revision v4 replaces static manual display examples with changing controls and introduces a new original manual score; update TARGET and genre Break demonstrations are corrected. The opening film and firmware stay unchanged.",
   "introVideoSha256": "09880439da261b87dab245ac1e05db5e97ef6825f0f9c5ab522c3e51db8b3f88",
   "originalAACSha256": "37deb5889ba522f53160623eadc30ba22b1e968ec35ca1685a13ddab659687f6",
   "nativeBootStatus": "PASS: final FWSC, six native scenarios, 16 sanitized host assertions; fixed DRUM / ANALOG / PHASE / LOFI / ACID / BREAK, 2100 ms, ANIM OFF respected. Audio/core/memory budgets unchanged.",
   "previousFirmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
   "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
-  "buildRevision": "20261108.9"
+  "buildRevision": "20261108.9",
+  "latestMediaValidation": "www/assets/video/rhythmer-motion-tours-v4-validation.json",
+  "manualScore": "Quiet Circuit / original 120 BPM composition; different from the update soundtrack",
+  "updateScore": "Existing update AAC streams retained bit-identically"
 }
