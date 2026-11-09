@@ -133,3 +133,30 @@
 .hear-player audio{display:block;width:100%;height:42px;color-scheme:dark}
 .hear-player a{color:var(--paper);font-size:13px;text-underline-offset:.2em;justify-self:start}
 @media(max-width:700px){.hear-demo{grid-template-columns:1fr}}
+
+#companion {
+  row-gap: 24px;
+}
+#companion .companion-film {
+  grid-column: 1 / -1;
+}
+#companion .companion-film {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+.companion-film video {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid #393e41;
+}
+.companion-film figcaption {
+  margin-top: 10px;
+  color: #a4aeac;
+  font: 11px/1.5 var(--mono, monospace);
+  letter-spacing: .06em;
+}
