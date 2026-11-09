@@ -70,7 +70,6 @@ static uint32_t up_gen;                      /* bumped on every user bank change
 _Static_assert(PT_N == 10, "settings_persist.c checks the LIST type against 10");
 static const char *const N_LIST[PT_N + 1] = {"ALL", "FAV", "BASS", "LEAD", "PAD", "KEYS", "PLUCK", "BELL", "VOX", "DRUM",
                                               "FX"};
-static uint32_t list_get(void) { return list_type && list_type < PT_N ? list_type + 1u : favorites.filter ? 1u : 0u; }
 static void list_put(uint32_t v)
 {
     favorites.filter = v == 1u;
@@ -332,17 +331,20 @@ static struct {
     uint32_t knob_ms;            /* (0.8.9) when KNOB 1..4 last turned (SKIN HUD: the knob row fades while they rest) */
     uint32_t nav_sig, nav_at;    /* (0.9.2) ui_lens.c nav_cur's cache: what it last resolved, the entry */
 } ui;
+
 static uint16_t val_col(uint32_t c) { return c == ui.hot_col && ui.hot_t ? T_ACCENT : T_THEME; }
 
 enum { CF_NONE, CF_CLEAR_SEQ, CF_CLEAR_TRK, CF_OVR_PROJ, CF_OVR_USER, CF_LOAD_PAT,
        CF_DEL_ROW, CF_CLEAR_SONG, CF_INIT_SOUND, CF_CLEAR_MOTION, CF_ERASE_USER, CF_CLEAR_PFX,
        CF_RECALL_SOUND, CF_CLEAR_ALL, CF_DICE_ALL, CF_INIT_SYS, CF_DICE_SOUND, CF_DICE_SEQ, CF_DICE_LFO,
-       CF_DICE_FX, CF_CPU_TEST, CF_MUT_BACK, CF_LIVE_COMMIT, CF_TRACKS6 };   /* ui.confirm: TOOLS' clears; (0.6.21) HOME + SELECT:
+       CF_DICE_FX, CF_CPU_TEST, CF_MUT_BACK, CF_LIVE_COMMIT, CF_TRACKS6, CF_USB_HOST, CF_ERASE_SECTION, CF_ERASE_PROJECT };   /* ui.confirm: TOOLS' clears; (0.6.21) HOME + SELECT:
                                    * everything diced; (0.6.65) EDIT + SELECT: keep the diced sound?; (0.6.67) SEQ / LFO / FX + SELECT:
                                    * keep the diced sequence / LFO / effects?;
                                    * SAVE over a used slot; a pattern over the user's steps;
                                    * USER ERASE; (0.9.3) MUTATE turned OFF: BACK TO BEFORE MUTATE?; (0.9.11) LIVE's COMMIT */
 /* (0.9.11) GLO > LIVE: MANO, RIELES (ui_live.c, included by ui_layer.c) */
+static void confirm_open(uint32_t kind,uint32_t trk);
+static int library_erase(uint32_t project,uint32_t section,int whole);
 static int live_page(void);
 static int live_mano(void);
 static void live_frame(void);
@@ -479,6 +481,13 @@ static void scr_shown(void)                            /* after the frame: the r
 static const page_t *page_over;   /* a quick layer's own four knobs (ui_layer.c), while it edits or draws them */
 static const page_t *cur_page(void) { return page_over ? page_over : &PAGES[ui.page]; }
 
+static uint32_t list_get(void)
+{
+    if (ui.home || cur_page()->graph != GR_BROWSE)
+        return 0;
+    return list_type && list_type < PT_N ? list_type + 1u : favorites.filter ? 1u : 0u;
+}
+
 /* MENU > LARGE (#15, Discussion #80: what KNOB 1..4 do, in bigger type). Per page type:
  *   LK_TALL  HOME and the value pages (EDIT ENV LFO MOD FX SLICER SCL SHIFT ARP VOICE PATTERN STEP's knobs, MIXER,
  *            GLOBAL, SYSTEM, TOOLS, MOTION): tall cards (a K1..K4 keycap, the icon, the label in M, the value in L,
@@ -560,6 +569,7 @@ static uint32_t layer_btn(void);
  * LANES 2 a DRUM track's (its lane levels); SOUND / SOUND 2 a DRUM track's (DRUM-X: ui_dx.c) */
 static int page_visible(uint32_t i)
 {
+    if(PAGES[i].graph==GR_DGEN)return 1;
     if(PAGES[i].graph==GR_SIXGEN)return trk_eng(TSEL)==ENGI_ACID;
     if(PAGES[i].graph==GR_SIXBRK||PAGES[i].graph==GR_SIXBRKSEQ||PAGES[i].graph==GR_SIXRETURN||PAGES[i].graph==GR_SIXSTEP)return trk_eng(TSEL)==ENGI_BREAK;
     if (PAGES[i].graph == GR_SONG && PAGES[i].fam == FAM_SEQ)
@@ -620,7 +630,7 @@ static void page_flash(void);
 #define FX_NMOD 6u
 static const char *const FX_MOD[FX_NMOD] = {"DELAY", "REVERB", "PHASER", "SLICER", "MASTER", "PUNCH"};
 static const char *const FX_MHEAD[FX_NMOD] = {"DLY", "REVERB", "PHASER", "SLICER", "MASTER", "PUNCH"};   /* its first page */
-static const uint8_t FX_MN[FX_NMOD] = {3, 2, 1, 4, 1, 1};   /* its pages, one after another in PAGES */
+static const uint8_t FX_MN[FX_NMOD] = {3, 2, 1, 4, 2, 1};   /* its pages, one after another in PAGES */
 static int page_visible(uint32_t i);
 static int fx_on(void) { return !ui.home && !page_over && PAGES[ui.page].fam == FAM_FX; }
 static uint32_t fx_page(const char *title)
@@ -1095,7 +1105,7 @@ static void page_flash(void)
     pf_ms = fm1_ms;
     pf_on = 1;
 }
-/* a section's button (rule 2, ui_lens.c nav_button): its page last shown; on it, the next group's first */
+/* a section's button (rule 2, ui_lens.c nav_button): reopen the section or advance one page */
 static void open_family(uint32_t fam) { nav_button(sec_of_fam(fam)); }
 
 static void go_home(void)
@@ -1316,6 +1326,7 @@ static uint32_t preset_orig(const engine_t *e, uint32_t k) { (void)e; return k; 
 /* the presets of engine e that browsing shows before preset k (k = npresets: all of them) */
 /* (0.5.1) browsing order: LOFI's BYTE presets, then FLOAT's (appended in 0.5.1: the stored numbers stay), then the
  * rest; every other engine in its own order. preset_nth: the preset shown n-th */
+#if !RHYTHMER_SWAP_WLP
 static const uint8_t LOFI_ORDER[17] = {0, 1, 2, 8, 9, 10, 11, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16};
 _Static_assert(sizeof LOFI_ORDER == NELEM(LOFI_PRESETS), "LOFI's browsing order: every preset once");
 static uint32_t preset_rank(const engine_t *e, uint32_t k)
@@ -1331,6 +1342,10 @@ static uint32_t preset_nth(const engine_t *e, uint32_t n)
 {
     return e == &ENG_LOFI && n < sizeof LOFI_ORDER ? LOFI_ORDER[n] : n;
 }
+#else
+#define preset_rank(engine, slot) (slot)
+#define preset_nth(engine, slot) (slot)
+#endif
 #define preset_shown(e) (ENGINES[e]->npresets)
 
 #if !FELUCCA_FM4
@@ -1559,28 +1574,37 @@ static void select_engine(uint32_t e)
     ui.force = 1;
 }
 
-/* the presets of every engine (in ENGINE_ORDER), then the used user presets, as one list (the PRESETS knob and the
- * PRESETS page browse it) */
-static int six_preset_engine(uint32_t e){return e!=ENGI_EMPTY&&six_engine_available(song.sel,e);}
-static uint32_t preset_all_pos(uint32_t *total)
+/* EDIT > SOUND > PRESETS keeps browsing within the engine selected on that page. */
+static uint32_t preset_list_engine(void)
+{
+    const page_t *p = cur_page();
+    return !ui.home && p->fam == FAM_EDIT && p->graph == GR_BROWSE ? TSEL->eng_req : NENGINES;
+}
+
+/* Factory presets in engine order, followed by saved user presets. NENGINES selects the full catalog. */
+static int six_preset_engine(uint32_t e, uint32_t engine)
+{
+    return (engine == NENGINES || engine == e) && e != ENGI_EMPTY && six_engine_available(song.sel,e);
+}
+static uint32_t preset_all_pos(uint32_t engine, uint32_t *total)
 {
  uint32_t n=0,cur=0xFFFFFFFFu; /* EMPTY has no sound-list position. */
  for(unsigned r=0;r<NENG_SHOWN;r++){
-  uint32_t e=ENGINE_ORDER[r];if(!six_preset_engine(e))continue;
+  uint32_t e=ENGINE_ORDER[r];if(!six_preset_engine(e,engine))continue;
   const engine_t *en=ENGINES[e];
   if(e==TSEL->eng_req)cur=n+preset_rank(en,preset_orig(en,TSEL->preset%(en->npresets?en->npresets:1u)));
   n+=preset_shown(e);
  }
- for(unsigned k=0;k<UP_SLOTS;k++)if(up_used(k)&&six_preset_engine(up_engine(k))){if(k==user_of(TSEL))cur=n;n++;}
+ for(unsigned k=0;k<UP_SLOTS;k++)if(up_used(k)&&six_preset_engine(eng_live(up_engine(k)),engine)){if(k==user_of(TSEL))cur=n;n++;}
  *total=n;return cur;
 }
-static uint32_t preset_all_at(uint32_t n,uint32_t *k)
+static uint32_t preset_all_at(uint32_t engine,uint32_t n,uint32_t *k)
 {
  for(unsigned r=0;r<NENG_SHOWN;r++){
-  uint32_t e=ENGINE_ORDER[r];if(!six_preset_engine(e))continue;
+  uint32_t e=ENGINE_ORDER[r];if(!six_preset_engine(e,engine))continue;
   uint32_t count=preset_shown(e);if(n<count){*k=preset_nth(ENGINES[e],n);return e;}n-=count;
  }
- for(unsigned u=0;u<UP_SLOTS;u++)if(up_used(u)&&six_preset_engine(up_engine(u))&&!n--){*k=u;return NENGINES;}
+ for(unsigned u=0;u<UP_SLOTS;u++)if(up_used(u)&&six_preset_engine(eng_live(up_engine(u)),engine)&&!n--){*k=u;return NENGINES;}
  *k=UP_SLOTS;return NENGINES;
 }
 
@@ -1592,10 +1616,11 @@ static int preset_in(uint32_t e, uint32_t k)
 }
 static uint32_t preset_pos(uint32_t *total)
 {
-    uint32_t all, current = preset_all_pos(&all), n = 0, pos = 0xFFFFFFFFu;
+    uint32_t engine = preset_list_engine();
+    uint32_t all, current = preset_all_pos(engine, &all), n = 0, pos = 0xFFFFFFFFu;
     if (!list_get()) { *total = all; return current; }
     for (uint32_t i = 0; i < all; i++) {
-        uint32_t k, e = preset_all_at(i, &k);
+        uint32_t k, e = preset_all_at(engine, i, &k);
         if (!preset_in(e, k)) continue;
         if (i == current) pos = n;
         n++;
@@ -1605,11 +1630,11 @@ static uint32_t preset_pos(uint32_t *total)
 }
 static uint32_t preset_at(uint32_t n, uint32_t *k)
 {
-    uint32_t all;
-    if (!list_get()) return preset_all_at(n, k);
-    preset_all_pos(&all);
+    uint32_t engine = preset_list_engine(), all;
+    if (!list_get()) return preset_all_at(engine, n, k);
+    preset_all_pos(engine, &all);
     for (uint32_t i = 0; i < all; i++) {
-        uint32_t e = preset_all_at(i, k);
+        uint32_t e = preset_all_at(engine, i, k);
         if (preset_in(e, *k) && !n--) return e;
     }
     *k = UP_SLOTS;
@@ -1684,9 +1709,9 @@ static void midi_pc_poll(void)
             uint32_t n = midi_pc_req[i] - 1u, all, k, e;
             midi_pc_req[i] = 0;
             song.sel = (uint8_t)i;
-            preset_all_pos(&all);
+            preset_all_pos(NENGINES, &all);
             if (n < all) {
-                e = preset_all_at(n, &k);
+                e = preset_all_at(NENGINES, n, &k);
                 if (e == NENGINES) {
                     up_load(k);
                 } else {
@@ -1709,7 +1734,7 @@ static uint32_t eng_list_pos(uint32_t *total)
     uint32_t cur = np ? preset_rank(en, preset_orig(en, TSEL->preset % en->npresets)) : 0u;   /* (#124: the aliases
                                         * skipped, as on PRESETS: SAMPLE 1 loads as 0, so counting it stuck KNOB 2) */
     for (k = 0; k < UP_SLOTS; k++)
-        if (up_used(k) && up_engine(k) == e) {
+        if (up_used(k) && eng_live(up_engine(k)) == e) {
             if (k == u)
                 cur = np + n;
             n++;
@@ -1729,7 +1754,7 @@ static void eng_list_step(int32_t direction)         /* the next / previous soun
     } else {
         n -= np;
         for (k = 0; k < UP_SLOTS; k++)
-            if (up_used(k) && up_engine(k) == e && !n--) {
+            if (up_used(k) && eng_live(up_engine(k)) == e && !n--) {
                 up_load(k);
                 break;
             }
@@ -1740,7 +1765,7 @@ static void eng_list_step(int32_t direction)         /* the next / previous soun
 static void preset_step(int32_t direction)
 {
     uint32_t total, cur = preset_pos(&total);
-    if (!total) { ui_message("NO FAVORITES"); return; }
+    if (!total) { ui_message("NO MATCHES"); return; }
     preset_go(cur >= total ? (direction > 0 ? 0 : total - 1) :
               (cur + (direction > 0 ? 1u : total - 1u)) % total);
 }
@@ -1751,7 +1776,7 @@ static uint32_t preset_visible(uint32_t cur, uint32_t total, uint32_t row)
 {
     uint32_t first, last;
     if (!total || row >= 7u) return total;
-    if (!list_get())
+    if (total >= 7u && !list_get())
         return (cur + total * 4u + row - 3u) % total;
     first = cur < total && cur > 3u ? cur - 3u : 0u;
     last = total > 7u ? total - 7u : 0u;
@@ -1818,6 +1843,7 @@ static uint32_t act_cols(void)                   /* the columns that are actions
     uint32_t c, m = 0;
     if (ui.home)
         return 0;
+    if (pg->graph == GR_LIBCLEAR) return 12u;
     if (pg->graph == GR_MOTION || pg->graph == GR_PUNCH) return 8u;   /* (0.6.99) PUNCH: KNOB 4 CLEAR */
     if (pg->graph == GR_EVENTS) return 16u;     /* AUTO LIST: no knob is an action; OCT+ adds / toggles (ev_oct) */
     if (pg->graph == GR_TOOLS) return 15u;
@@ -1854,7 +1880,7 @@ static const char *act_name(uint32_t c)          /* column c's action (the foote
 {
     static const char *const UP_GO[3] = {"LOAD", "ERASE", "SAVE"};
     uint32_t id = cur_page()->id[c & 3u];
-    if (cur_page()->graph == GR_MOTION || cur_page()->graph == GR_PUNCH) return "CLEAR";
+    if (cur_page()->graph == GR_LIBCLEAR || cur_page()->graph == GR_MOTION || cur_page()->graph == GR_PUNCH) return "CLEAR";
     if (cur_page()->graph == GR_EVENTS) return ev_act_name();
     if (cur_page()->graph == GR_LYRIC) return "TYPE";
     if (cur_page()->graph == GR_TOOLS) {
@@ -1878,6 +1904,7 @@ static int act_ready(void)
     if (!c--)
         return 0;
     if (cur_page()->graph == GR_MOTION) return !chain_busy() && motion_count(TSEL);
+    if (cur_page()->graph == GR_LIBCLEAR) return !transport_busy();
     if (cur_page()->graph == GR_EVENTS) return ev_act_ready();
     if (cur_page()->graph == GR_LYRIC) return 1;
     if (cur_page()->graph == GR_TOOLS)                  /* one case per column: CLEAR PAT, INIT, DELETE ROW, CLEAR SONG */
@@ -1891,7 +1918,7 @@ static int act_ready(void)
         return c == 3u ? !song.playing : up_used(ui.uslot) && (c == 1u || !song.playing);
     id = cur_page()->id[c & 3u];
     if (id == G_LOAD)
-        return project_used((uint32_t)song.g[G_SLOT] - 1u);
+        return !transport_busy() && project_used((uint32_t)song.g[G_SLOT] - 1u);
     if (id == G_SAVE)
         return !song.playing;
     if (id == G_CLRSEQ)
@@ -1900,3 +1927,4 @@ static int act_ready(void)
 }
 
 #include "six_ui.c"
+#include "drum_gen.c"

@@ -122,7 +122,7 @@ typedef struct {
     uint8_t parts;                             /* NPART; 0: track 4 is the old GM drum part (see the top) */
     uint8_t phys;                              /* PROJ_PHYS: PHYS MODEL values as today; 1: MODEL 4 was DRUM;
                                                 * 0 (a reserved byte before 1.0): MODEL 2 was DUST */
-    uint8_t rsv;
+    uint8_t rsv;                               /* MD model bits and native kick-role overrides */
     proj_trk_t t[NTRK];
     chain_config_t chain;
     motion_store_t motion;
@@ -142,6 +142,7 @@ typedef struct {
     char lyr[NTRK][LYR_LEN];                   /* (0.8.5) VOICE's lyrics (sing.c lyr_txt): FUNC's 'L' 'Y' blocks, "" before */
     char name[PROJ_NAME_LEN];                  /* the project's name: upper-case ASCII 32..126, 0-padded; "" = none */
     uint8_t lfo2_mask;                         /* 'L2' tail marker: only tagged tracks use the reclaimed depths */
+    uint8_t dx_roles;                          /* the native bits in rsv already carry kick-role overrides */
     uint32_t sum;
 } project_t;
 /* Historical FUN5/6 types are frozen, independent of today's P_COUNT/step_t. */
@@ -841,6 +842,14 @@ static uint32_t proj_bits(uint32_t m)
         n += m & 1u;
     return n;
 }
+enum { PROJ_DUCK_N = 5 };                            /* DK: source, lane, note, threshold and attack */
+static int proj_duck_used(const project_t *q)
+{
+    for (uint32_t i = G_DSRC; i < G_DSRC + PROJ_DUCK_N; i++)
+        if (q->g[i] != GP[i].def)
+            return 1;
+    return 0;
+}
 static uint32_t proj_packed_size(const project_t *q)
 {
     uint32_t n = 68u + sizeof q->chain + 4u + q->motion.count * sizeof q->motion.event[0] + 2u + G_SL_N, t, i;
@@ -875,7 +884,8 @@ static uint32_t proj_packed_size(const project_t *q)
         for (i = 0; i < NSTEP; i++)
             n += proj_step_empty(&q->t[t].step[i]) ? 0u : proj_step_size(&q->t[t].step[i]);
     }
-    return n+(q->lfo2_mask?3u:0u);
+    return n + (q->lfo2_mask ? 3u : 0u) + (proj_duck_used(q) ? 2u + PROJ_DUCK_N : 0u)
+             + (q->g[G_DCH] ? 3u : 0u);
 }
 static int proj_pack(project_store_t *out, const project_t *q)
 {
@@ -1029,6 +1039,15 @@ static int proj_pack(project_store_t *out, const project_t *q)
         }
     }
     if(q->lfo2_mask){b[pos++]='L';b[pos++]='2';b[pos++]=q->lfo2_mask;}
+    if (proj_duck_used(q)) {
+        b[pos++] = 'D'; b[pos++] = 'K';
+        for (i = G_DSRC; i < G_DSRC + PROJ_DUCK_N; i++)
+            b[pos++] = (uint8_t)q->g[i];
+    }
+    if (q->g[G_DCH]) {                                  /* MIDI channel: keep the older DK block readable */
+        b[pos++] = 'D'; b[pos++] = 'C';
+        b[pos++] = (uint8_t)q->g[G_DCH];
+    }
     memcpy(b + PROJC_PFX_OFF, q->pfx_lane, sizeof q->pfx_lane);
     b[PROJC_PFX_OFF + sizeof q->pfx_lane] = q->pfx_ltgt > 2u ? 0u : q->pfx_ltgt;
     for (i = 0; i < 4u; i++)
@@ -1039,7 +1058,7 @@ static int proj_pack(project_store_t *out, const project_t *q)
     memcpy(b + PROJC_DX_OFF, q->dx, sizeof q->dx);
     b[PROJC_DX_OFF + sizeof q->dx] = (uint8_t)((q->dx_mute & DXG_ALL) | (q->dx_hands & 15u) << 4);   /* (0.7.9: HANDS) */
     b[PROJC_DX_OFF + sizeof q->dx + 1u] = (uint8_t)(q->dx_mute >> 8);
-    b[PROJC_DX_OFF + sizeof q->dx + 2u] = 4u;           /* (FUNB's marker 4: the values as today's) */
+    b[PROJC_DX_OFF + sizeof q->dx + 2u] = q->dx_roles ? 5u : 4u;   /* 5 adds kick roles to header byte 65 */
     memcpy(b + PROJC_DX_OFF + sizeof q->dx + 3u, q->dx_mot, sizeof q->dx_mot);
     b[PROJC_DX_OFF + sizeof q->dx + 7u] = q->dx_tone;   /* (0.6.36) TONE: 0 before it (off) */
     {   /* the name (0-padded; stops at the first 0) */
@@ -1311,7 +1330,15 @@ static int proj_unpack_c(project_t *q, const uint8_t *b)
     }
     if(pos+3u<=room&&b[pos]=='L'&&b[pos+1u]=='2'){
         q->lfo2_mask=b[pos+2u];if(!q->lfo2_mask||(q->lfo2_mask>>nt))return 0;
+        pos += 3u;
     }
+    if (pos + 2u + PROJ_DUCK_N <= room && b[pos] == 'D' && b[pos + 1u] == 'K') {
+        pos += 2u;
+        for (i = G_DSRC; i < G_DSRC + PROJ_DUCK_N; i++)
+            q->g[i] = (int16_t)clamp(b[pos++], GP[i].min, GP[i].max);
+    }
+    if (pos + 3u <= room && b[pos] == 'D' && b[pos + 1u] == 'C')
+        q->g[G_DCH] = (int16_t)clamp(b[pos + 2u], 0, 16);
     proj_new_tracks(q, nt);                             /* (a FUNC of fewer tracks: the rest at power-on) */
     for (t = nt; t < NTRK; t++)
         memcpy(q->fm6[t], FM6_INIT, FM6_PACKED);
@@ -1320,6 +1347,7 @@ static int proj_unpack_c(project_t *q, const uint8_t *b)
     for (i = 0; i < 4u; i++)
         q->macro[i] = b[PROJC_PFX_OFF + sizeof q->pfx_lane + 1u + i] & 127u;
     memcpy(q->dx, b + PROJC_DX_OFF, sizeof q->dx);
+    q->dx_roles = b[PROJC_DX_OFF + sizeof q->dx + 2u] == 5u;
     if ((!dx_kit_ok(q->dx)||!md_ext_ok(q->dx,q->rsv))) return 0;
     q->dx_mute = (uint16_t)((b[PROJC_DX_OFF + sizeof q->dx] & DXG_ALL) | b[PROJC_DX_OFF + sizeof q->dx + 1u] << 8);
     memcpy(q->dx_mot, b + PROJC_DX_OFF + sizeof q->dx + 3u, sizeof q->dx_mot);
@@ -1575,6 +1603,7 @@ static void project_capture(project_t *p)
     p->sel = song.sel;
     p->parts = NPART;
     p->phys = PROJ_PHYS;p->rsv=dx_md_hi;
+    p->dx_roles = 1;
     for(i=0;i<NTRK;i++)if(lfo2_dest_active(&trk[i]))p->lfo2_mask|=(uint8_t)(1u<<i);
     p->chain = chain_config;
     for (i = 0; i < NTRK; i++) {
@@ -1716,6 +1745,32 @@ static int project_recall_sound(uint32_t slot, uint32_t k)
     sound_put(p, k);
     return 0;
 }
+/* Resolve untagged catalog swaps when applying an old kit. A custom or
+ * ambiguous match keeps the lane's default. This runs before the audio ISR
+ * takes the section, never while evaluating a hit. */
+static uint8_t project_drum_bits(const project_t *p)
+{
+    uint8_t bits = p->rsv;
+    if (p->dx_roles)
+        return bits;
+    for (unsigned lane = 0; lane < DV_NLANE; lane++) {
+        if (dx_is_md(p->dx[lane].mode))
+            continue;
+        unsigned roles = 0;
+        for (unsigned kit = 0; kit < DX_NKIT && roles != 3u; kit++) {
+            if (kit >= 9u && kit < LXRX_BASE_KIT)
+                continue;                              /* these kits' sounds have MD model identities */
+            for (unsigned src = 0; src < DV_NLANE; src++)
+                if (!memcmp(&p->dx[lane], &DX_KITS[kit].lane[src], sizeof p->dx[lane]))
+                    roles |= src == DV_KICK ? 1u : 2u;
+        }
+        unsigned bit = 1u << lane;
+        unsigned opposite = lane == DV_KICK ? 2u : 1u;
+        bits = (uint8_t)((bits & ~bit) | (roles == opposite ? bit : 0u));
+    }
+    return bits;
+}
+
 /* track k's sound (engine, sound parameters, FM6 patch; DRUM: the DRUM-X kit) from project p; the rest plays on */
 static void sound_put(project_t *p, uint32_t k)
 {
@@ -1728,6 +1783,7 @@ static void sound_put(project_t *p, uint32_t k)
     proj_phys_gone(p);
     s = &p->t[k % NTRK];
     e = six_role_engine(k % NTRK, s->engine);
+    uint8_t kit_bits = e == ENGI_DRUM ? project_drum_bits(p) : 0u;
     load_begin(t, LOAD_SOUND);
     panic_req |= (uint8_t)(1u << (k % NTRK));
     fm1_irq_off();
@@ -1744,7 +1800,8 @@ static void sound_put(project_t *p, uint32_t k)
         fm6_adopt(k % NTRK);
     }
     if (e == ENGI_DRUM) {
-        memcpy(dx_kit, dx_kit_ok(p->dx) ? p->dx : DX_KIT_DEF, sizeof dx_kit);dx_md_hi=p->rsv;
+        memcpy(dx_kit, dx_kit_ok(p->dx) ? p->dx : DX_KIT_DEF, sizeof dx_kit);
+        dx_md_hi = kit_bits;
         memcpy(dx_mot, p->dx_mot, sizeof dx_mot);
         dx_tone = p->dx_tone;
         dx_hands = p->dx_hands & 15u;
@@ -1783,13 +1840,15 @@ static int project_restore_runtime(const project_t *input)
     proj_fm4(p);                                        /* .. that had DIGITAL tracks */
     proj_perc(p);                                       /* .. or SAMPLE PERC tracks (DRUM) */
     proj_phys_gone(p);                                  /* .. or tracks of a retired engine (core.h eng_gone: ANALOG) */
+    uint8_t kit_bits = project_drum_bits(p);
     transport_req = 2;
     panic_req = (1u << NTRK) - 1u;
     fm1_irq_off();                                      /* the audio ISR must not see half a project */
     seq_stop();
     transport_req = 0;
     chain.ended = 0;                                    /* (a song stopped by this load: the load wins, song_poll keeps out) */
-    memcpy(dx_kit, dx_kit_ok(p->dx) ? p->dx : DX_KIT_DEF, sizeof dx_kit);dx_md_hi=p->rsv;   /* (the section's DRUM-X kit) */
+    memcpy(dx_kit, dx_kit_ok(p->dx) ? p->dx : DX_KIT_DEF, sizeof dx_kit);
+    dx_md_hi = kit_bits;
     dx_mute_set(p->dx_mute);
     memcpy(dx_mot, p->dx_mot, sizeof dx_mot);           /* (0.5.1: the kit's X-MOD) */
     dx_tone = p->dx_tone;                               /* (0.6.36: its TONE) */

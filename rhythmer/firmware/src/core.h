@@ -18,7 +18,28 @@
 #define FELUCCA_FM4 0            /* the DIGITAL engine (eng_digital.c, four-operator FM): kept in the tree, not built
                                   * by default; replaced by FM6, its sounds convert (fm4_convert.c) */
 #endif
-#define NENGINES 22              /* stored engine IDs are append-only */
+#ifndef RHYTHMER_NEW_SYNTHS
+#define RHYTHMER_NEW_SYNTHS 1
+#endif
+#ifndef RHYTHMER_FMINI
+#define RHYTHMER_FMINI RHYTHMER_NEW_SYNTHS
+#endif
+#ifndef RHYTHMER_PROPHET
+#define RHYTHMER_PROPHET 0
+#endif
+#ifndef RHYTHMER_SWAP_WLP
+#define RHYTHMER_SWAP_WLP RHYTHMER_NEW_SYNTHS
+#endif
+#ifndef RHYTHMER_RETIRE_M2
+#define RHYTHMER_RETIRE_M2 0
+#endif
+#ifndef RHYTHMER_OBERVAVE
+#define RHYTHMER_OBERVAVE RHYTHMER_NEW_SYNTHS
+#endif
+#define ENGI_OBERVAVE 24u
+#define ENGI_FMINI 22u
+#define ENGI_PROPHET 23u
+#define NENGINES (22+2*RHYTHMER_NEW_SYNTHS+RHYTHMER_OBERVAVE)              /* stored engine IDs are append-only */
 #define ENGI_BREAK 15u
 #define ENGI_ACID 16u
 #define ENGI_SERUM 17u           /* Garden wavetable; 15 remains Rhythmer BREAK */
@@ -30,7 +51,7 @@
 #define ENGI_EMPTY 21u           /* append-only: unassigned, no synthesis or voice allocation */
 #define ENGI_FM6 12u
 #define ENGI_DIGITAL 1u          /* reserved without FELUCCA_FM4: never selectable (eng_ok), its sounds load as FM6 */
-#define NENG_SHOWN 13   /* the engines one can pick: PRESETS, the EDIT layer, the editor,
+#define NENG_SHOWN (13+2*RHYTHMER_NEW_SYNTHS+RHYTHMER_OBERVAVE)   /* the engines one can pick: PRESETS, the EDIT layer, the editor,
                                                 * in the display order of engines.c ENGINE_ORDER (PHYS 9, and in
                                                 * JIANT SAMPLE 4, GRAIN 8, SLICE 13: retired) */
 /* (JIANT 0.6.71) the second core (hal/fm1_multicore.h; fx.c mix_block hands it some synth tracks). MC_CPU(): the core
@@ -193,8 +214,11 @@ enum {                          /* global parameters */
     G_DTYPE, G_DPING,           /* (0.6.90) the delay's TYPE (ANALOG / DIGITAL) and PING-PONG (project.c: block 'DT') */
     G_PFXLEN, G_PFXRES,         /* (0.6.99) the punch-in lane's length (1..64 steps) and resolution (1/8 1/16 1/32)
                                  * (pfx.c; project.c: block 'PX') */
+    G_DSRC, G_DLANE, G_DNOTE, G_DTHR, G_DATK,  /* DUCK source, drum lane, MIDI note, threshold, attack */
+    G_DCH,                      /* MIDI trigger channel: 0 = any, 1..16 = a specific channel */
     G_COUNT
 };
+enum { DUCK_AUTO, DUCK_USB = NTRK + 1, DUCK_MIDI };  /* 1..NTRK select a local track */
 #define G_SL_N (G_SLP15 + 1 - G_SLMODE)     /* the SLICER's globals (stored together: project.c, song_chain.c) */
 #define G_CSTER G_DHPF                 /* (JIANT 0.6.9) CHORUS STEREO -64..63: 0 as before (G_DHPF's 0), - narrower .. mono */
 #define G_SYNC G_DREL                   /* (the old names, for the formats' importers and their tests) */
@@ -235,6 +259,10 @@ static void params_by_count(int16_t *out, const int16_t *in, uint32_t np, const 
  * set as DRUM first: drum_from_perc) */
 static inline int eng_gone(uint32_t e)
 {
+    if((e==ENGI_FMINI&&!RHYTHMER_FMINI)||(e==ENGI_PROPHET&&!RHYTHMER_PROPHET))return 1;
+    if(e==ENGI_OBERVAVE&&!RHYTHMER_OBERVAVE)return 1;
+    if(RHYTHMER_RETIRE_M2&&(e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID))return 1;
+    if(RHYTHMER_SWAP_WLP&&(e==ENGI_WHEEL||e==ENGI_LOFI||e==ENGI_PHASE))return 1;
     return e == ENGI_VOICE || e == ENGI_NOISE || e == ENGI_ANIMAL || e == ENGI_PHYS || e == ENGI_SAMPLE || e == ENGI_GRAIN || e == ENGI_SLICE || e == ENGI_TRIO;
 }
 /* (JIANT 0.4) a sound stored before 0.4 -> today's E values, in place: LOFI (3) {.., SWP, VIB, ARP, TONE} -> {.., CUT
@@ -739,12 +767,18 @@ static song_t song;
 static uint32_t six_role_engine(uint32_t track, uint32_t e) {
  (void)track;
  if(e==ENGI_DRUM||e==ENGI_ACID||e==ENGI_BREAK||e==ENGI_EMPTY)return e;
+#if RHYTHMER_FMINI
+ if(e==ENGI_FMINI)return e;
+#endif
+#if RHYTHMER_OBERVAVE
+ if(e==ENGI_OBERVAVE)return e;
+#endif
  return e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID||e==ENGI_SERUM||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_ANALOG||e==ENGI_FM6||e==ENGI_WHEEL?e:ENGI_SERUM;
 }
 /* BREAK is a project-wide singleton, including inactive tracks. Selection
  * availability is separate from stored-engine validity (project loading). */
 static int six_break_track(void){for(unsigned k=0;k<NTRK;k++)if(trk[k].eng_req==ENGI_BREAK)return (int)k;return -1;}
-static int six_engine_available(unsigned track,unsigned e){int owner=six_break_track();return e<NENGINES&&six_role_engine(track,e)==e&&(e!=ENGI_BREAK||owner<0||(unsigned)owner==track);}
+static int six_engine_available(unsigned track,unsigned e){int owner=six_break_track();return e<NENGINES&&!eng_gone(e)&&six_role_engine(track,e)==e&&(e!=ENGI_BREAK||owner<0||(unsigned)owner==track);}
 static const char *six_kind_label(unsigned e){return e==ENGI_EMPTY?"EMPTY":e==ENGI_DRUM?"DRUM":e==ENGI_ACID?"ACID":e==ENGI_BREAK?"BREAK":"SYNTH";}
 #define TSEL (&trk[song.sel])    /* the selected track */
 
@@ -765,6 +799,11 @@ static inline uint32_t swing_step_len(const track_t *t, uint32_t base, uint32_t 
 }
 
 /* ----------------------------------------------------------- system --- */
+/* Private USB MIDI SysEx: F0 7D 52 4B velocity F7 (Rhythmer/Jazzy kick link). */
+#define KICK_LINK_START 0x527DF004u
+#define KICK_LINK_END 0xF7004B07u
+#define KICK_LINK_END_MASK 0xFF80FF0Fu
+static uint8_t kick_link_local;
 #define RING_PUBLISH() __asm__ volatile("" ::: "memory")   /* slot store before the index update */
 static volatile uint32_t fm1_ms;  /* milliseconds since boot (TIMER4-based, TIMER5 ISR in main.c) */
 /* boot-loop guard (main.c): two boots in a row that die in the first 30 s -> UBOOT */

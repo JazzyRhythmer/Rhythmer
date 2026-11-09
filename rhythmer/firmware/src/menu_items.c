@@ -16,7 +16,7 @@
 enum { MI_COLOR, MI_SKIN, MI_SCOPE, MI_STYLE, MI_LARGE, MI_ANIM, MI_LEDS, MI_SCROFF, MI_HOLD, MI_ACCEL, MI_LATCH, MI_BPMLOCK, MI_SCLLED,
        MI_LOWCUT, MI_USB,
        MI_CLICK, MI_CLKLVL, MI_COUNTIN, MI_TRACKS, MI_LOAD, MI_MIDIOUT, MI_LEARN, MI_LCLEAR, MI_SERIAL, MI_RESTORE, MI_CPU,
-       MI_CLOCK, MI_PANEL, MI_ABOUT, MI_COUNT };   /* (1.1: the metronome's rows; 1.2: RESTORE LAST, SCALE LEDS; 0.9.12: MIDI
+       MI_CLOCK, MI_HOST, MI_PANEL, MI_ABOUT, MI_COUNT };   /* (1.1: the metronome's rows; 1.2: RESTORE LAST, SCALE LEDS; 0.9.12: MIDI
                       * OUT, LEARN, LEARN CLEAR; CPU, CPU CLOCK, cpu_safe.c; 0.9.18: INIT SYSTEM gone, SAVE > TOOLS > NEW
                       * PROJECT is the same) */
 #define MI_VALUES MI_PANEL
@@ -27,7 +27,7 @@ static const char *const MI_NAME[MI_COUNT] = {"COLOR", "SKIN", "SCOPE", "STYLE",
                                               "HOLD TIME", "KNOB SPEEDUP", "FX LATCH", "BPM LOCK", "SCALE LEDS",
                                               "SPEAKER EQ", "USB LEVEL", "CLICK", "CLICK LEVEL", "COUNT-IN", "TRACK MODE", "LOAD",
                                               "MIDI OUT", "LEARN", "LEARN CLEAR", "USB AUDIO",
-                                              "RESTORE LAST", "CPU CORES", "CPU CLOCK", "CALIBRATION", "ABOUT"};
+                                              "RESTORE LAST", "CPU CORES", "CPU CLOCK", "USB HOST", "CALIBRATION", "ABOUT"};
 /* (0.9.18) the MENU as the rest of the system (rule 1..6): pages of four knobs, KNOB n the page's setting n, SELECT walks
  * the pages, ALGORITHM jumps to the next / previous tab; the tabs the groups (a dot a page), the footer MENU . TAB . page
  * n/N (a page named as its tab, or its tab and a number: MENU . page). Each row on one page (tests/ui_test.c checks it); the editor gets a row's tab after its MENU_DESC reply (tab
@@ -44,7 +44,7 @@ static const menu_page_t MPAGE[MP_COUNT] = {   /* (a page opens on its first set
     {"AUDIO", MTAB_AUDIO, {MI_LOWCUT, MI_TRACKS, MI_LOAD, MI_BPMLOCK}},
     {"CLICK", MTAB_AUDIO, {MI_CLICK, MI_CLKLVL, MI_COUNTIN, MI_NONE}},
     {"MIDI", MTAB_MIDI, {MI_MIDIOUT, MI_LEARN, MI_LCLEAR, MI_NONE}},
-    {"USB", MTAB_USB, {MI_SERIAL, MI_USB, MI_NONE, MI_NONE}},
+    {"USB", MTAB_USB, {MI_SERIAL, MI_USB, MI_HOST, MI_NONE}},
     {"CONTROLS", MTAB_SYSTEM, {MI_HOLD, MI_ACCEL, MI_LATCH, MI_PANEL}},
     {"SYSTEM", MTAB_SYSTEM, {MI_RESTORE, MI_CPU, MI_CLOCK, MI_ABOUT}},   /* (RESTORE LAST, CPU CORES, CPU CLOCK: at power-on) */
 };
@@ -131,7 +131,7 @@ static const char *const COUNTIN_N[3] = {"OFF", "1 BAR", "2 BARS"};
 static const char *const SCROFF_N[5] = {"NEVER", "5 MIN", "15 MIN", "30 MIN", "60 MIN"};
 /* (JIANT 0.6.72) MIDI OUT over USB (ui.c midi_out_mode, seq.c MO_*): the keys; and the clock + START / STOP; and every
  * note the FM-1 plays; nothing */
-static const char *const MIDIOUT_N[4] = {"KEYS", "CLOCK", "ALL", "OFF"};
+static const char *const MIDIOUT_N[] = {"KEYS", "CLOCK", "ALL", "OFF", "KICK LINK"};
 
 /* MENU > USB SERIAL (#67). The serial console is a developer tool (README: FELUCCA_CDC). ON (the default) presents it,
  * the descriptors byte for byte as before; OFF re-enumerates as audio + MIDI only, device class 0 (the bytes of a
@@ -169,7 +169,7 @@ static const menu_flag_t *menu_flag(uint32_t row)
 static uint32_t menu_n(uint32_t row)
 {
     return row == MI_COLOR ? 4u : row == MI_SKIN ? SKIN_MENU_N : row == MI_LOWCUT || (row >= MI_CLICK && row <= MI_COUNTIN) || row == MI_LOAD ? 3u :
-           row == MI_HOLD || row == MI_MIDIOUT ? 4u : row == MI_USB ? 6u : row == MI_SERIAL ? 5u : row == MI_LEDS ? LEDS_COUNT : row == MI_SCROFF ? NELEM(SCROFF_N) : 2u;
+           row == MI_MIDIOUT ? NELEM(MIDIOUT_N) : row == MI_HOLD ? 4u : row == MI_USB ? 6u : row == MI_SERIAL ? 5u : row == MI_LEDS ? LEDS_COUNT : row == MI_SCROFF ? NELEM(SCROFF_N) : 2u;
 }
 static uint32_t menu_get(uint32_t row)
 {
@@ -178,6 +178,12 @@ static uint32_t menu_get(uint32_t row)
     if (f)
         return ((ui_prefs | (uint32_t)ui_rec_prefs << 8) & f->bit) != 0;
     switch (row) {
+    case MI_HOST:
+#if RHYTHMER_USB_HOST
+        return uh.want;
+#else
+        return 0;
+#endif
     case MI_COLOR: return color_pos(settings.palette);
     case MI_SKIN: return skin_pos(ui_skin);
     case MI_SCOPE: return ui_scope != 0u;
@@ -190,7 +196,7 @@ static uint32_t menu_get(uint32_t row)
     case MI_CLICK: case MI_CLKLVL: case MI_COUNTIN: return rp_get(row - MI_CLICK);
     case MI_TRACKS: return trk_live==6u;
     case MI_LOAD: return load_get();
-    case MI_MIDIOUT: return midi_out_mode & 3u;
+    case MI_MIDIOUT: return midi_out_mode;
     case MI_CPU: case MI_CLOCK: return cpu_get(row == MI_CLOCK);
     case MI_LEARN: return ml.on;
     case MI_LEDS:
@@ -208,6 +214,7 @@ static const char *menu_vname(uint32_t row, uint32_t v)
     switch (row) {
     case MI_COLOR: return UI_PALETTES[COLOR_MENU[v % 4u]].name;
     case MI_SKIN: return SKIN_NAME[v % SKIN_MENU_N];
+    case MI_HOST: return v?"ON":"OFF";
     case MI_SCOPE: case MI_LEARN: return SCOPEOPT_N[v & 1u];
     case MI_STYLE: return STYLE_N[v & 1u];
     case MI_LOWCUT: return SPK_EQ[v % 3u];
@@ -219,7 +226,7 @@ static const char *menu_vname(uint32_t row, uint32_t v)
     case MI_COUNTIN: return COUNTIN_N[v % 3u];
     case MI_TRACKS: return N_TRKS[v&1u];
     case MI_LOAD: return N_LOAD[v % 3u];
-    case MI_MIDIOUT: return MIDIOUT_N[v & 3u];
+    case MI_MIDIOUT: return MIDIOUT_N[v];
     case MI_CPU: case MI_CLOCK: return CPU_N[row == MI_CLOCK][v & 1u];
     case MI_SCROFF: return SCROFF_N[v % NELEM(SCROFF_N)];
     case MI_LEDS: return LEDS_NAME[LEDS_MENU[v % LEDS_COUNT]];
@@ -241,6 +248,17 @@ static void menu_put(uint32_t row, uint32_t v)
         return;
     }
     switch (row) {
+    case MI_HOST:
+#if RHYTHMER_USB_HOST
+        if(!v)uh.want=0;
+        else if(!uh.want){
+            if(transport_busy()){ui_message("STOP TO CHANGE USB MODE");break;}
+            ui.menu=0;confirm_open(CF_USB_HOST,0);
+        }
+#else
+        ui_message("HOST NOT IN THIS BUILD");
+#endif
+        break;
     case MI_TRACKS: trks_request(v); break;
     case MI_COLOR:
         settings.palette = COLOR_MENU[v % 4u];
@@ -267,7 +285,7 @@ static void menu_put(uint32_t row, uint32_t v)
     case MI_CLICK: case MI_CLKLVL: case MI_COUNTIN: rp_put(row - MI_CLICK, v); break;   /* (at once: click.c, seq.c) */
     case MI_LOAD: load_put(v % 3u); break;
     case MI_CPU: case MI_CLOCK: cpu_put(row == MI_CLOCK, v & 1u); break;   /* (0.9.12, cpu_safe.c) */
-    case MI_MIDIOUT: midi_out_mode = (uint8_t)(v & 3u); break;
+    case MI_MIDIOUT: midi_out_mode = (uint8_t)v; break;
     case MI_LEARN: ml_set(v); break;                   /* (0.9.12: armed, or off; not saved) */   /* (seq.c reads it every frame: ui_input) */         /* (at once: voice.c sys_load) */
     }
 }

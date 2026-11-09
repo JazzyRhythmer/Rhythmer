@@ -253,9 +253,12 @@ static void m2k_render(track_t *t,voice_t *v,int32_t *out,uint32_t n,const vmod_
  unsigned ti=(unsigned)(t-trk);uint32_t previous=m2_raw_inc_of(48*64);
  /* Only the previous track's stored note is read, never its DSP voice state. */
  if(e==ENGI_M2SID&&t->p[P_E5]>=64){const track_t *p=&trk[ti?ti-1:5];unsigned at=p->seq_idx%NSTEP;const step_t *s=&p->step[at];if(s->time==ST_NOTE&&s->n)previous=m2_raw_inc_of((int32_t)s->note[0]*64);}
+ /* The measured SWAV-SAW kernel has much lower output than the other
+  * machines. Match its level after the envelope and keep its waveform. */
+ int32_t gain=e==ENGI_M2SAW?2:1;
  for(unsigned off=0;off<n;off+=16){unsigned count=n-off<16?n-off:16;
   m2k_kernel(&a,kind,m->pitch16*4,(int)ti,previous,b,count);
-  for(unsigned i=0;i<count;i++)out[off+i]+=voice_amp(b[i],m,off+i);
+  for(unsigned i=0;i<count;i++)out[off+i]+=voice_amp(b[i],m,off+i)*gain;
  }
  m2k_store(&a,v,e);
 }
@@ -264,7 +267,7 @@ static void m2k_render(track_t *t,voice_t *v,int32_t *out,uint32_t n,const vmod_
 static const preset_t M2STAT_PRESETS[]={
  {"INIT STAT",{61,64,80,32,82,64,64,64},{0,85,96,65},0,1|TAG(KEYS)},
  {"FM KEYS",{98,63,105,8,109,19,55,64},{0,80,0,82},0,1|TAG(KEYS)},
- {"DX BASS",{80,64,98,24,101,24,80,64},{0,58,0,26},0,1|TAG(BASS)},
+ {"DX BASS",{80,64,98,24,101,24,80,64},{0,68,28,26},0,1|TAG(BASS)},
  {"FM BELL",{117,64,90,0,101,50,127,64},{0,86,0,70},0,1|TAG(BELL)},
  {"FM PAD",{101,66,30,30,112,40,110,64},{64,100,110,80},0,1|TAG(PAD)}
 };
@@ -282,7 +285,7 @@ static const preset_t M2SID_PRESETS[]={
  {"DUB TRI",{0,0,127,0,0,0,64,64},{4,100,127,50},0,1|TAG(BASS)},
  {"SID LEAD",{20,30,127,51,0,0,64,64},{2,90,127,30},0,1|TAG(LEAD)},
  {"SYNC BASS",{0,0,127,26,64,0,30,64},{0,100,127,20},0,1|TAG(BASS)},
- {"RING HIT",{0,0,127,0,32,0,64,64},{0,45,0,35},0,1|TAG(BELL)}
+ {"RING HIT",{0,0,127,0,32,0,64,64},{0,66,0,35},0,1|TAG(BELL)}
 };
 #define M2_PD(n,d) {n,F_INT,0,127,d,0,0}
 static const engine_t ENG_M2STAT={.name="FM+STAT",.page_title={"FM 1","FM 2"},

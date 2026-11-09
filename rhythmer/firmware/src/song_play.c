@@ -32,6 +32,7 @@ static void sec_apply(void)
     }
     motion = sec_stage.motion;
     memcpy(dx_kit, sec_stage.dx, sizeof dx_kit);
+    dx_md_hi = sec_stage.dx_md_hi;
     dx_mute_set(sec_stage.dx_mute);
     memcpy(pfx_lane, sec_stage.pfx_lane, sizeof pfx_lane);
     memcpy(&song.g[G_SLMODE], sec_stage.slg, sizeof sec_stage.slg);   /* (0.6.3) the SLICER's bus as the section has it */

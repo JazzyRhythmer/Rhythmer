@@ -410,9 +410,35 @@ static int test_save(void)
     int bad = 0;
     uint32_t i;
     ui_power_on();
-    trk[0].p[P_E0] = 5;
+    bad += check("SAVE tabs read SONG, PROJECT, SOUND",
+                 str_eq(CG_SAVE[0].nm, "SONG") && str_eq(CG_SAVE[1].nm, "PROJECT") &&
+                 str_eq(CG_SAVE[2].nm, "SOUND"));
     press(B_SAVE);
-    bad += check("SAVE opens USER with SAVE selected, without writing a slot",
+    bad += check("SAVE opens PROJECTS ready to load",
+                 cur_page()->graph == GR_SLOTS && save_level() == SV_LIB && ui.act == 3u);
+    turn(EN_K1, 2);
+    turn(EN_K2, 1);
+    bad += check("PROJECTS selects the project and section with K1 and K2",
+                 song_cur == 2u && song.g[G_SLOT] == 2 && ui.act == 3u);
+    trk[0].p[P_LEVEL] = 61;
+    (void)project_save(1);
+    trk[0].p[P_LEVEL] = 13;
+    press(B_OCTUP);
+    bad += check("OCT+ loads the chosen section directly from PROJECTS",
+                 live.cur == 1 && trk[0].p[P_LEVEL] == 61);
+    song.playing = 1;
+    turn(EN_K1, -1);
+    press(B_OCTUP);
+    bad += check("PROJECTS refuses a switch or load during playback",
+                 song_cur == 2u && msg_is("STOP TO LOAD"));
+    stop_transport();
+    (void)song_open(0);
+    song.g[G_SLOT] = 1;
+    turn(EN_SELECT, 4);                          /* PROJECTS -> SECTIONS -> CLEAR -> TOOLS -> USER */
+    trk[0].p[P_E0] = 5;
+    go_home();
+    press(B_SAVE);
+    bad += check("SAVE returns to SOUND > USER with SAVE armed",
                  !ui.home && cur_page()->graph == GR_USER && ui.act == 4u && !up_used(0));
     press(B_OCTUP);
     bad += check("SAVE then OCT+ opens NAME (the automatic name), writes nothing yet",
@@ -425,12 +451,20 @@ static int test_save(void)
         bad += check("..OCT+ again stores the edited sound with that name (SAVE, OCT+, OCT+)",
                      !name_on() && up_used(0) && up_value(up_rec(0), P_E0) == 5 && ui.act == 0u && str_eq(nmb, au));
     }
-    press(B_SAVE);                                        /* (0.9.2) a SAVE tap on SAVE: the next group (was the other set) */
-    bad += check("0.9.2 SAVE again: the next group, PROJECT's SECTIONS (was SOUND's other set, PRESETS)",
-                 cur_page()->graph == GR_SLOTS && save_level() == SV_PROJ && ui.act == 0u);
-    turn(EN_SELECT, -1);
-    bad += check("0.9.2 SELECT left: PRESETS (the chain: USER PRESETS SECTIONS ..)", cur_page()->graph == GR_BROWSE &&
-                 save_level() == SV_SOUND);
+    press(B_SAVE);
+    bad += check("SAVE advances from USER to PRESETS under SOUND",
+                 cur_page()->graph == GR_BROWSE && save_level() == SV_SOUND);
+    press(B_SAVE);
+    bad += check("SAVE wraps from PRESETS to SONG arrangement",
+                 cur_page()->graph == GR_SONG && nav_ch(SEC_SAVE)->e[nav_cur()].g == 0u);
+    press(B_SAVE);
+    bad += check("SAVE advances from SONG to PROJECTS",
+                 cur_page()->graph == GR_SLOTS && save_level() == SV_LIB && ui.act == 3u);
+    press(B_SAVE);
+    press(B_SAVE);
+    bad += check("SAVE reaches PROJECT's CLEAR after SECTIONS",
+                 cur_page()->graph == GR_LIBCLEAR);
+    turn(EN_SELECT, 3);                          /* CLEAR -> TOOLS -> USER -> PRESETS */
     go_home();
     press(B_SAVE);
     bad += check("0.9.2 SAVE from HOME: the page left, PRESETS (rule 2; was always USER)", cur_page()->graph == GR_BROWSE);
@@ -530,5 +564,58 @@ static void test_optional_machines(void){
  trk[5].p[P_SLEN]=32;panic_req=0;xf_snap_t=0xff;
 }
 #ifndef UI_TEST_NO_MAIN
-int main(void){return test_save();}
+static int test_page_cycles(void)
+{
+    static const uint8_t buttons[SEC_N] = {
+        B_HOME, B_EDIT, B_SEQ, B_FX, B_GLO, B_ENV, B_LFO, B_SCL, B_ARP, B_SAVE
+    };
+    int bad = 0;
+    ui_power_on();
+    fm6_init();
+    for (uint32_t engine = 0; engine < NENGINES; engine++) {
+        if (!eng_ok(engine))
+            continue;
+        set_engine_of(TSEL, engine);
+        for (uint32_t load = 0; load <= LOAD_ECO; load++) {
+            load_put(LOAD_ECO - load);
+            for (uint32_t sec = 0; sec < SEC_N; sec++) {
+                const ch_t *chain = nav_ch(sec);
+                uint32_t first = 0;
+                while (!nv_ok(sec, first))
+                    first++;
+                nav_go(sec, first, 0);
+                for (uint32_t i = first + 1u; i <= chain->n; i++) {
+                    uint32_t expected = i == chain->n ? first : i;
+                    if (!nv_ok(sec, expected))
+                        continue;
+                    press(buttons[sec]);
+                    if (nav_sec() != sec || nav_cur() != expected) {
+                        fprintf(stderr, "Page tap skipped %s entry %u (engine %u, load %u)\n",
+                                SEC_NAME[sec], expected, engine, load);
+                        bad++;
+                        break;
+                    }
+                }
+                for (uint32_t i = first + 1u; i < chain->n; i++) {
+                    if (!nv_ok(sec, i))
+                        continue;
+                    turn(EN_SELECT, 1);
+                    if (nav_sec() != sec || nav_cur() != i) {
+                        fprintf(stderr, "SELECT skipped %s entry %u (engine %u, load %u)\n",
+                                SEC_NAME[sec], i, engine, load);
+                        bad++;
+                        break;
+                    }
+                }
+                uint32_t last = nav_cur();
+                turn(EN_SELECT, 1);
+                bad += nav_cur() != last;
+            }
+        }
+    }
+    printf("All section button and SELECT page chains: %s\n", bad ? "FAIL" : "PASS");
+    return bad;
+}
+
+int main(void) { int bad = test_save(); return (bad + test_page_cycles()) != 0; }
 #endif

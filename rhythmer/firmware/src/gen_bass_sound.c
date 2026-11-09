@@ -33,10 +33,10 @@ static unsigned gen_bass_colour(unsigned e,unsigned p)
     const char *n=ENGINES[e]->presets[p].name;
     if(dname_has(n,"SUB")||dname_has(n,"TRI"))return GB_SUB;
     if(dname_has(n,"REESE")||dname_has(n,"GROWL"))return GB_REESE;
-    if(dname_has(n,"RESO")||dname_has(n,"SKEW"))return GB_RESO;
+    if(dname_has(n,"RESO")||dname_has(n,"SKEW")||dname_has(n,"WOBBLE"))return GB_RESO;
     if(e==ENGI_WHEEL)return GB_ORGAN;
     if(e==ENGI_M2SID)return GB_CHIP;
-    if(dname_has(n,"FB BASS")||dname_has(n,"SYN BASS"))return GB_PUNCH;
+    if(dname_has(n,"FB BASS")||dname_has(n,"SYN BASS")||dname_has(n,"SEQ BASS")||dname_has(n,"OCTAVE PUMP"))return GB_PUNCH;
     return GB_ROUND;
 }
 static unsigned gen_bass_weight(unsigned e,unsigned p)

@@ -4,7 +4,15 @@ import {pack7,unpack7} from './transport.mjs';
 import {bkU32,bkR32,bkPack,bkUnpack,bkCrc} from './fm1backup.js';
 const HS=[240,0,50,69,0,0,0,64,127,247],UPGRADE=[240,34,36,53,127,247];
 const eq=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
-export const infoOf=(name='Rhythmer v0.1.1-beta3',count=22)=>[...new TextEncoder().encode(name),0,count,127,71,64,119,...Array.from({length:count},()=>[65,0]).flat(),6,16,0x42,1,3];
+export const infoOf=(name='Rhythmer v0.1.1-beta3',count=22,globals=71)=>[...new TextEncoder().encode(name),0,count,127,globals,64,119,...Array.from({length:count},()=>[65,0]).flat(),6,16,0x42,1,3];
+export function infoForProduct(product){
+ if(['FM-1_748020','FM-1_748021','FM-1_748022','FM-1_748023'].includes(product))return infoOf('Rhythmer v0.1.2-dev1',25,77);
+ if(['FM-1_748018','FM-1_748019'].includes(product))return infoOf('Rhythmer v0.1.2-dev1',25,76);
+ if(['FM-1_748007','FM-1_748008','FM-1_748010','FM-1_748011','FM-1_748012','FM-1_748013','FM-1_748014','FM-1_748015','FM-1_748016','FM-1_748017'].includes(product))
+  return infoOf('Rhythmer v0.1.2-dev1',25);
+ return infoOf();
+}
+
 export class FakeFM1 {
   constructor(image, { unplugAfter = Infinity, ...o } = {}) {
     this.image = image; this.unplugAfter = unplugAfter; this.served = 0; this.bad = 0; this.o = o;
@@ -42,8 +50,9 @@ export class FakeFM1 {
   editorOriginal(cmd, a) {
     this.editorCmds.push(cmd);
     const reply = (body) => this.tx([240, 125, 70, 76, cmd, ...body, 247]);
-    if (!this.o.info || this.identity.startsWith("ota-")) return;      // an official firmware, a loader: silence
-    if (cmd === 1) return reply(this.o.info);
+    const info=this.identity===this.after&&this.o.afterInfo?this.o.afterInfo:this.o.info;
+    if (!info || this.identity.startsWith("ota-")) return;      // an official firmware, a loader: silence
+    if (cmd === 1) return reply(info);
     const objs = this.o.objs || [];
     if (cmd === 65) {
       const out = [1, 0, objs.length];

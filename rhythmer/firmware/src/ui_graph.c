@@ -1904,21 +1904,23 @@ static void draw_graph(void)
     /* The monochrome surface bypasses the legacy graph_sig(), which also
      * advanced the piano-roll register. Follow before caching, and include
      * its position so a stopped sequence can finish a smooth register move. */
-    int follow_roll=!ui.home&&!drum_track(t)&&(seq_roll_view(pg)||roll_view(pg)||pg->graph==GR_CHANCE);
+    int follow_roll=!ui.home&&!drum_track(t)&&(seq_roll_view(pg)||roll_view(pg)||pg->graph==GR_CHANCE||(pg->graph==GR_DGEN&&trk_eng(t)!=ENGI_BREAK));
     if(follow_roll)pr_follow(t);
     sig = ui.page*131u+song.sel*7u+ui.home*11u+ui.confirm*17u+ui.cursor*19u+ux.gen+six_machine_mask*65537u;
     if(follow_roll)sig^=((uint32_t)proll.lo+1u)*104729u;
     if(!(ui_prefs&PREF_ANIM_OFF)&&(pg->graph==GR_LFO||pg->graph==GR_MOD))
         sig^=(TSEL->lfo_ph>>24)*977u+(TSEL->lfo2_ph>>24)*7919u;
     if(pg->scope==SC_GLOBAL){for(unsigned k=0;k<4u;k++)if(pg->id[k]<G_COUNT)sig=sig*33u+(uint16_t)song.g[pg->id[k]];
-      if(!(ui_prefs&PREF_ANIM_OFF))sig^=fm1_ms/160u;}
+      if(pg->graph!=GR_BROWSE&&!(ui_prefs&PREF_ANIM_OFF))sig^=fm1_ms/160u;}
     for(unsigned k=0;k<P_COUNT;k++)sig=sig*33u+(uint16_t)TSEL->p[k];
     if(ui.confirm==CF_DICE_ALL)sig^=gen_draw_sig();
     if(trk_eng(TSEL)==ENGI_BREAK)sig^=six_loop_now*7919u+six_loop_mask*313u+(unsigned)(jungle_roll_active()+1)*977u;
     if(six_song_fx_at&&fm1_ms-six_song_fx_at<400&&!(ui_prefs&PREF_ANIM_OFF))sig^=fm1_ms/64u;
     if(ui.home){sig^=home_level()*7919u+home_set()*40503u;for(unsigned k=0;k<NTRK;k++)sig^=steps_sig(&trk[k])+trk[k].seq_idx*977u+(unsigned)six_visual_level(&trk[k])*131u;}
     else sig^=steps_sig(TSEL);
-    if(song.playing||ui.hot_t||six_visual_level(t))sig^=ui.frame/3u;
+    if(pg->graph==GR_BROWSE&&!ui.home)
+        sig^=TSEL->eng_req*1031u+TSEL->preset*977u+TSEL->user*313u+list_get()*17u+up_gen;
+    else if(song.playing||ui.hot_t||six_visual_level(t))sig^=ui.frame/3u;
     if(six_gen_fx_at&&fm1_ms-six_gen_fx_at<480&&!(ui_prefs&PREF_ANIM_OFF))sig^=fm1_ms/64u;
     if (!ui.force && sig == ui.graph_sig)
         return;

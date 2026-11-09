@@ -72,6 +72,7 @@ static struct {
     int16_t slg[G_SL_N];              /* .. (0.6.3) its SLICER (the globals G_SLMODE ..) */
     volatile uint8_t ready;           /* main: staged; ISR: taken (0) */
     uint8_t row, section;             /* the song row it is for (SEC_LIVE: a live jump), the section (0..3) */
+    uint8_t dx_md_hi;                 /* MD model bits and native kick roles */
 } sec_stage __attribute__((section(".lowbuf")));   /* (0.6.78: app.ld LOWBUF) */
 static struct {
     chain_config_t config;

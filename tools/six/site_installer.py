@@ -103,6 +103,8 @@ This bundle contains original Amen/Think recordings whose public redistribution
 permission is not documented. Do not publish the bundle on that basis.
 Read THIRD-PARTY-AUDIO.txt and audio-rights.json. Credits are not a license.
 '''
+    if local and release.get('installerURL'):
+        readme=readme.replace('http://127.0.0.1:8766/installer/',release['installerURL'])
     if not local:
         readme=readme.replace('LOCAL DEVELOPMENT INSTALLATION','PUBLIC BETA INSTALLATION').replace('Open http://127.0.0.1:8766/installer/ in desktop Chrome or Edge and press','Open the installer linked in the repository README in Chrome or Edge. Press').replace('This bundle contains original Amen/Think recordings whose public redistribution\npermission is not documented. Do not publish the bundle on that basis.','This bundle contains original Amen/Think recordings. The owner directs their\ndistribution with credits; rights-holder redistribution permission has not\nbeen documented. This is not a blanket license for users.').replace('Hardware flashing, recovery and playback remain physically untested.','Read the release-specific test record and change log. Host and emulator\nchecks passed; this exact binary is not physically tested. Earlier owner\nhardware results do not automatically apply to this package.')
         page=dest/'index.html';text=page.read_text().replace('LOCAL DEVELOPMENT','PUBLIC BETA').replace('LOCAL INSTALL BUNDLE','INSTALL BUNDLE').replace('COMPLETE LOCAL INSTALLATION','COMPLETE INSTALLATION').replace('This build and its samples remain local.','The project owner directs distribution with credits; this is not rights-holder permission.').replace('complete local installation bundle','complete installation bundle');page.write_text(text)
@@ -114,7 +116,17 @@ Read THIRD-PARTY-AUDIO.txt and audio-rights.json. Credits are not a license.
         for meta in loops:z.write(downloads/Path(meta['url']).name,'samples/'+Path(meta['url']).name)
         z.write(root/'site/LEGAL-NOTICE.txt','LEGAL-NOTICE.txt');z.writestr('README.txt',readme);z.writestr('THIRD-PARTY-AUDIO.txt',notice);z.writestr('audio-rights.json',json.dumps(rights,indent=2));z.write(root/'LICENSE','licenses/Rhythmer-GPL-3.0.txt');z.write(root/'rhythmer/firmware/hortator/MIT-Mutable-Instruments.txt','licenses/Hortator-MIT-Mutable-Instruments.txt')
         for f in recoveryDir.iterdir():z.write(f,'official-v15/'+f.name)
-    archives=Path('/Volumes/SSD/Development/Archives/rhythmer');archives.mkdir(parents=True,exist_ok=True);shutil.copy2(archive,archives/archive.name)
+        for folder in ('ported-fmini','ported-obervave'):
+            for notice_file in (root/'rhythmer/LICENSES'/folder).glob('*'):
+                if notice_file.is_file():
+                    z.write(notice_file,'licenses/'+folder+'/'+notice_file.name)
+        elixir=root/'rhythmer/LICENSES/GPL-3.0-Elixir-LXR.txt'
+        if elixir.is_file():z.write(elixir,'licenses/'+elixir.name)
+    archives=Path('/Volumes/SSD/Development/Archives/rhythmer')
+    if local and release.get('buildRevision'):
+        archives=archives/('install-'+release['buildRevision'])
+    archives.mkdir(parents=True,exist_ok=True)
+    shutil.copy2(archive,archives/archive.name)
     recoveryArchive=downloads/'FM-1-V15-recovery.zip'
     with zipfile.ZipFile(recoveryArchive,'w',zipfile.ZIP_DEFLATED) as z:
         for f in vendor.iterdir():

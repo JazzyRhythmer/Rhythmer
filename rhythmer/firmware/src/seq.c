@@ -41,7 +41,12 @@ static uint8_t kb_note[27], kb_trk[27];  /* per key: the note it started and on 
 static int8_t kb_oct[27];                /* (0.8.5) .. on a DRUM track, the kit's octave it plays (OCT then: seq.c dxo_on) */
 static volatile uint8_t kb_asleep;       /* MENU > SCREEN OFF (ui.c): the screen dark or waking, a key pressed now only
                                           * wakes it (silent, no layer, its release nothing) */
+static volatile uint8_t usb_midi_lost;
 static uint8_t last_note = 60;
+/* Track-local live drum input for the sound browser; sequencer playback and
+ * MIDI notes on other parts must not move its lane/cursor. */
+static volatile uint8_t dx_input_note[NTRK];
+static volatile uint32_t dx_input_serial[NTRK];
 static volatile uint8_t transport_req;   /* 1 start, 2 stop, 3 restart (from the UI) */
 static volatile uint8_t panic_req;       /* bit per track: release every sounding note (preset / engine change) */
 static volatile uint8_t midi_hint;       /* MIDI IN played track n - 1, which is not the selected one (the UI says so) */
@@ -57,7 +62,7 @@ static int drum_track(const track_t *t) { return ENGINES[eng_idx(t->eng_req)] ==
  * sequencer, the arp, FUGUE, the punch-in repeats, OCT and RANDOM on them, each track on its channel; the keys then
  * only where no arp plays them), OFF. The notes sent are remembered (mo_out): each gets its note-off, all of them at
  * STOP, a panic or a change of setting */
-enum { MO_KEYS, MO_CLOCK, MO_ALL, MO_OFF };
+enum { MO_KEYS, MO_CLOCK, MO_ALL, MO_OFF, MO_KICK_LINK };
 static volatile uint8_t mo_lvl;                    /* the setting (ui.c sets it every frame) */
 static uint8_t mo_last;                            /* .. as the ISR last saw it */
 static uint8_t mo_out[NTRK][128];                  /* a played note's note sent on, + 1 (0: none) */
@@ -110,7 +115,7 @@ static __attribute__((noinline)) void mo_flush_of(uint32_t mask)   /* the notes 
 #define mo_flush() mo_flush_of(0xFFu)
 static void mo_key(const track_t *t, uint32_t pkt)   /* a key's note: not with OFF; with ALL, an arp sends its own */
 {
-    if (mo_lvl != MO_OFF && !(mo_lvl == MO_ALL && t->p[P_AMODE]))
+    if (mo_lvl < MO_OFF && !(mo_lvl == MO_ALL && t->p[P_AMODE]))
         midi_out_event(pkt);
 }
 static int mo_clock_on(void) { return (mo_lvl == MO_CLOCK || mo_lvl == MO_ALL) && !song.g[G_CLOCK]; }
@@ -1054,6 +1059,7 @@ static void key_next(uint32_t k, track_t *t)
 static void key_on(uint32_t k, track_t *t)
 {
     if(!six_track_enabled(trk_index(t)))return;
+    if(drum_track(t)){unsigned ti=trk_index(t);if(ti<NTRK){dx_input_note[ti]=kb_note[k];dx_input_serial[ti]++;}}
     if(t->engine==ENGI_BREAK){
         kb_on[k]=kb_sn[k]=0;int cmd=six_break_command(k);if(cmd==-1)return;
         if(cmd==-2)cmd=(int)six_break_slice(k);
@@ -2327,8 +2333,10 @@ static int32_t click_beat_now(void)
 }
 
 /* everything that happens between two rendered blocks */
+static uint32_t kick_link_hold;
 static void events_block(uint32_t n)
 {
+    uint32_t remote_kick = 0;
     uint32_t i, pr, fo, seq_n = n;
     uint32_t clock_mode = (uint32_t)song.g[G_CLOCK];
     if (midi_clock.mode != clock_mode) {
@@ -2426,12 +2434,18 @@ static void events_block(uint32_t n)
         t->aholdp = t->p[P_AHOLD];
     }
     keyboard_block();
+    if(usb_midi_lost){usb_midi_lost=0;midi_host_lost();}
     while (mi_r != mi_w) {                            /* USB-MIDI (and TRS) in */
         uint32_t at = mi_r % MQ, pkt = midi_in_q[at], status = (pkt >> 8) & 0xFFu;
         uint32_t st = status & 0xF0u, ch = status & 0x0Fu;
         uint32_t d1 = (pkt >> 16) & 0x7Fu, d2 = (pkt >> 24) & 0x7Fu;
         uint32_t source = midi_in_source[at] ? midi_in_source[at] : 1u, ms = midi_in_ms[at];
         mi_r++;
+        if ((pkt & KICK_LINK_END_MASK) == KICK_LINK_END) {
+            if (d1 > remote_kick)
+                remote_kick = d1;
+            continue;
+        }
         if (status >= 0xF8u) {
             if (clock_mode == source) {
                 if (status == 0xF8u)
@@ -2475,6 +2489,22 @@ static void events_block(uint32_t n)
         if (!beat_n && song.playing)
             bar_n++;
     }
+    if (kick_link_local && mo_lvl == MO_KICK_LINK)
+        kick_link_send(kick_link_local);
+    if (song.g[G_DSRC] == DUCK_AUTO) {
+        uint32_t threshold = song.g[G_DTHR];
+        if (kick_link_local > threshold) {
+            duck_hit = 1;
+            kick_link_hold = 2u * beat_samples();
+        } else {
+            kick_link_hold = kick_link_hold > n ? kick_link_hold - n : 0;
+            if (!kick_link_hold && remote_kick > threshold)
+                duck_hit = 1;
+        }
+    } else {
+        kick_link_hold = 0;
+    }
+    kick_link_local = 0;
     if (song.playing)
         song.tick++;
 }

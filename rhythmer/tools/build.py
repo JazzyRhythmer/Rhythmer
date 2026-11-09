@@ -269,7 +269,7 @@ def build_app():
     flags = [*CFLAGS, "-mcpu=r3", "-mfprev1", "-ffp-contract=off", "-Ifirmware/hal", "-Ifirmware/src", "-I/output/gen" if use_docker() else f"-I{GEN}"]
     for flag in ("FELUCCA_FLASH", "FELUCCA_OTA", "FELUCCA_OTA_DRYRUN", "FELUCCA_OTA_RAMONLY", "FELUCCA_CDC",
                  "FELUCCA_UART", "FELUCCA_UAC", "FELUCCA_UAC_TONE", "FELUCCA_UAC_48K", "FELUCCA_ICONS", "FELUCCA_SLICE", "FELUCCA_FM4",
-                 "FELUCCA_CDC_DEFAULT"):
+                 "FELUCCA_CDC_DEFAULT", "RHYTHMER_USB_HOST", "RHYTHMER_NEW_SYNTHS", "RHYTHMER_SWAP_WLP", "RHYTHMER_RETIRE_M2", "RHYTHMER_FMINI", "RHYTHMER_PROPHET", "RHYTHMER_OBERVAVE"):
         v = os.environ.get(flag)    # unset: the default in firmware/src/felucca.c
         if v in ("0", "1"):
             flags.append(f"-D{flag}={v}")

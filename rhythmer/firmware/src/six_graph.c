@@ -65,6 +65,80 @@ static int six_visual_level(const track_t *t){
 static void six_dot_background(int h){
  for(int y=8;y<h-4;y+=12)for(int x=8;x<236;x+=12)cv_rect(x,y,1,1,T_DIM);
 }
+/* Each schematic has its own silhouette at both LCD sizes. Nibbles are
+ * normalized x/y coordinates; FF starts a disconnected stroke, FE ends it. */
+static const uint8_t MARK_ANALOG[]={0x17,0x43,0x75,0x98,0xbb,0xe7,0xff,0x17,0x4a,0x78,0x96,0xb4,0xe7,0xfe};
+static const uint8_t MARK_ACID[]={0x1b,0x4b,0x47,0x77,0x74,0xa4,0xa9,0xd9,0xd5,0xe5,0xff,0x14,0x34,0xfe};
+static const uint8_t MARK_SAW[]={0x1b,0x53,0x5b,0x93,0x9b,0xd3,0xdb,0xe9,0xfe};
+static const uint8_t MARK_SID[]={0x1a,0x3a,0x33,0x63,0x6a,0x9a,0x93,0xb3,0xba,0xea,0xfe};
+#if RHYTHMER_FMINI
+/* An angular carrier with a pair of outward-facing wavefronts. */
+static const uint8_t MARK_FMINI_WAVE[]={
+ 0x17,0x37,0x45,0x59,0x61,0x7d,0x82,0x9d,0xa5,0xb8,0xc7,0xe7,0xfe
+};
+static const uint8_t MARK_FMINI_FRONT[]={
+ 0x62,0x53,0x35,0x27,0x39,0x5b,0x6c,0xff,
+ 0x92,0xa3,0xc5,0xd7,0xc9,0xab,0x9c,0xfe
+};
+#endif
+#if !RHYTHMER_SWAP_WLP
+static const uint8_t MARK_PHASE[]={0x17,0x33,0x45,0x68,0x8c,0xa6,0xb3,0xd8,0xe7,0xfe};
+static const uint8_t MARK_LOFI[]={0x1a,0x3a,0x35,0x55,0x57,0x87,0x82,0xa2,0xaa,0xca,0xc7,0xe7,0xfe};
+#endif
+#if RHYTHMER_PROPHET
+static const uint8_t MARK_PROPHET[]={0x18,0x36,0x38,0x57,0x54,0x74,0x79,0x99,0x95,0xb5,0xb8,0xe8,0xfe};
+#endif
+#if FELUCCA_FM4
+static const uint8_t MARK_DIGITAL[]={0x43,0xb3,0xbb,0x4b,0x43,0xff,0x43,0xbb,0xff,0xb3,0x4b,0xfe};
+#endif
+static void six_trace(const uint8_t *path,int en,unsigned ph,int x,int y,int w,int h,uint16_t ink){
+ unsigned head=(ph>>27)&15u;
+ int height=h*(64+en/4)/100,px=-1,py=0;
+ for(unsigned j=0;path[j]!=0xfe;j++){
+  unsigned p=path[j];
+  if(p==0xff){px=-1;continue;}
+  int xx=x+((int)(p>>4)*(w-3))/15,yy=y+h/2+((int)(p&15u)-7)*height/14;
+  if(px>=0)cv_line_t(px,py,xx,yy,ink,1);
+  if(en&&(j==head||j+1u==head))cv_rect(xx-1,yy-1,3,3,ink);
+  else cv_rect(xx,yy,2,2,ink);
+  px=xx;py=yy;
+ }
+}
+#if RHYTHMER_FMINI
+static void six_fmini_wave(const track_t *t,int en,unsigned ph,int x,int y,int w,int h,uint16_t ink){
+ int cutoff=t?t->p[P_E0]:64;
+ int travel=(int)(ph>>25),spread=en*travel/128;
+ int inset=w*(208-cutoff/4-spread)/640;
+ uint16_t echo=ink==T_DIM?ink:T_MID;
+ if(w>=48)six_trace(MARK_FMINI_FRONT,en,ph,x+inset/2,y,w-inset,h,T_DIM);
+ six_trace(MARK_FMINI_FRONT,en,ph,x+inset,y,w-2*inset,h,en>70?ink:echo);
+ six_trace(MARK_FMINI_WAVE,en,ph,x,y,w,h,ink);
+}
+#endif
+#if RHYTHMER_OBERVAVE
+/* Three particulate ribbons drift upward, separate and dissipate on the right.
+ * The note envelope opens the plume; resonance curls its inner trails. */
+static void six_smoke(const track_t *t,int en,unsigned ph,int x,int y,int w,int h,uint16_t ink){
+ int count=w<48?8:24,cy=y+h/2;
+ int res=t?t->p[P_E1]:24;
+ int curl=h*(8+en/16+res/32)/100;
+ int spread=h*(8+en/12)/100,grain=w/96,margin=2+3*grain;
+ unsigned step=w<48?0x24000000u:0x0c000000u;
+ for(int lane=-1;lane<=1;lane++){
+  for(int j=0;j<count;j++){
+   unsigned phase=ph+(unsigned)j*step+(unsigned)lane*0x32000000u;
+   int yy=cy+(osc_sine(phase)*curl>>15)+j*(lane*spread-h/8)/count;
+   int seed=(j*13+lane*7+(int)(phase>>26))&7;
+   int xx=x+margin+j*(w-2*margin-3)/(count-1)+(seed-3)*grain;
+   uint16_t shade=lane==0&&j<count/2?ink:j+seed<count-2&&ink!=T_DIM?T_MID:T_DIM;
+   int size=w>=48&&j<count/2?2+(en>64&&seed<4):1+(lane==0&&j<count/2);
+   cv_rect(xx,yy+seed*h/192,size,size,shade);
+   int fleck=yy-(seed+2)*(spread+2)/8;
+   if(w>=48&&seed<4&&fleck>=y)cv_rect(xx+1,fleck,1,1,T_DIM);
+  }
+ }
+}
+#endif
 /* Shared geometry for the live instrument and startup. A NULL track uses a
  * bounded visual preview: startup precedes track/kit/sample initialization. */
 static void six_machine_glyph(const track_t *t,unsigned engine,int en,unsigned ph,int x,int y,int w,int h,uint16_t ink){
@@ -92,47 +166,65 @@ static void six_machine_glyph(const track_t *t,unsigned engine,int en,unsigned p
    cv_frame(xx-r,yy-r,r*2+1,r*2+1,ink);cv_rect(xx,yy,1+en/64,1+en/64,ink);
   }return;
  }
+#if !RHYTHMER_SWAP_WLP
  if(engine==ENGI_WHEEL){
   int cx=x+w/2;for(unsigned j=0;j<12;j++){uint32_t a=ph+j*(0xFFFFFFFFu/12u);int r=h/4+en*h/900;
    int dx=osc_sine(a)*r/32768,dy=osc_sine(a+0x40000000u)*r/32768;
    cv_line_t(cx+dx/3,cy+dy/3,cx+dx,cy+dy,ink,1);cv_rect(cx+dx-1,cy+dy-1,3,3,ink);
   }return;
  }
+#endif
  if(engine==ENGI_BREAK){
   static const uint8_t preview[16]={112,48,70,22,100,36,60,28,124,52,76,24,94,44,66,32};
-  for(unsigned j=0;j<16;j++){int a=2+(t?six_wave_peak[six_loop_now&1u][j]:preview[j])*(h-4)/127,xx=x+(int)j*w/16;
+  unsigned slot=six_loop_now&1u;
+  int sampled=t&&(six_loop_mask&(1u<<slot));
+  if(sampled)six_wave_cache(slot);
+  for(unsigned j=0;j<16;j++){
+   int a=2+(sampled?six_wave_peak[slot][j]*3:preview[j])*(h-4)/127,xx=x+(int)j*w/16;
    cv_rect(xx,cy-a/2,w/16>2?w/16-1:1,a,ink);
-   if(t?(jungle_playing()&&j==(unsigned)(jungle_current_step()/2)):(en&&j==(ph>>28)))cv_frame(xx-1,y,w/16+1,h,ink);
+   if(en&&(t?jungle_playing()&&j==(unsigned)(jungle_current_step()/2):j==(ph>>28)))cv_frame(xx,y,w/16+1,h,ink);
   }return;
  }
- /* Analog / phase / acid: the wave geometry follows their E parameters, voiced energy and LFO phase. */
- /* At 30 px a single 16-point trace resolves the same shape. Drawing all
-  * three 32-point traces here only overdraws pixels and churns the DSP cache. */
- unsigned compact=w<48,points=compact?16u:32u,shift=compact?4u:5u;
- uint32_t stride=(compact?0x11111111u:0x08421084u)*(1u+(t?(unsigned)t->p[P_E0]%3u:1u));
- unsigned wt=engine==ENGI_SERUM?(unsigned)clamp(t?t->p[P_E0]:64,0,127)*7u*256u/127u:0u,wi=wt>>8;
- const serum_frame_t *sa=&SERUM_FR[wi],*sb=&SERUM_FR[wi<7u?wi+1u:7u];
- for(unsigned lane=compact?1u:0u;lane<(compact?2u:3u);lane++){
-  int px=0,py=cy;for(unsigned j=0;j<points;j++){
-   uint32_t a=ph+j*stride+lane*0x18000000u;
-   int z=engine==ENGI_SERUM?serum_read(sa,sb,serum_warp(a>>16,t?(unsigned)t->p[P_E1]:32u),wt&255u):
-         engine==ENGI_PHASE?osc_sine(a+((uint32_t)osc_sine(a)*((t?(unsigned)t->p[P_E1]:32u)+1u)*1024u)):
-         engine==ENGI_M2SAW?(int)(a>>16)-32768:
-         engine==ENGI_M2SID?((t&&(unsigned)t->p[P_E3]*5u/128u==2u)?((a>>24)<((unsigned)t->p[P_E0]*2u+1u)?32767:-32767):osc_tri(a)):
-         engine==ENGI_ACID?((t&&t->p[P_E5])? (a<0x80000000u?32767:-32767):(int32_t)(a>>16)-32768):osc_tri(a);
-   if(engine==ENGI_LOFI){
-    unsigned wave=t?(unsigned)t->p[P_E1]:RW_PLS,duty=t?(unsigned)t->p[P_E2]:64u;
-    z=wave==RW_PLS?((a>>24)<(duty*2u+1u)?32767:-32767):wave==RW_SAW?(int)(a>>16)-32768:osc_tri(a);
-    if(wave==RW_WRAM){unsigned n=a>>27,b=WRAM[(duty/8u)&15u][n/2u];z=(int)((n&1u)?b&15u:b>>4)*4368-32760;}
-    else {int q=t&&t->p[P_E0]==CHIP_1BIT?32768:4096;z=(z/q)*q;}
-   }
-   int xx=x+(int)((j*(unsigned)w)>>shift),yy=cy+z*amp/32768+(int)lane-1;
-   cv_rect(xx,yy,2,2,ink);if(j&&lane==1)cv_line_t(px,py,xx,yy,T_DIM,1);px=xx;py=yy;
-  }
+ if(engine==ENGI_SERUM){
+  /* The wavetable's actual shape follows the two front-panel knobs. */
+  unsigned wt=(unsigned)clamp(t?t->p[P_E0]:64,0,127)*7u*256u/127u,wi=wt>>8;
+  const serum_frame_t *sa=&SERUM_FR[wi],*sb=&SERUM_FR[wi<7u?wi+1u:7u];
+  unsigned warp=t?(unsigned)t->p[P_E1]:32u;
+  int points=w<48?16:32;
+  for(int j=0;j<points;j++){
+   unsigned p=ph+(unsigned)j*(points==16?0x10000000u:0x08000000u);
+   int z=serum_read(sa,sb,serum_warp(p>>16,warp),wt&255u);
+   int xx=x+j*w/points,yy=cy+z*amp/32768;
+   cv_rect(xx,yy,2,2,ink);
+   if(points==32)cv_rect(xx,cy-z*amp/49152,1,1,T_DIM);
+  }return;
  }
+ const uint8_t *path=MARK_ANALOG;
+ switch(engine){
+ case ENGI_ACID:path=MARK_ACID;break;
+ case ENGI_M2SAW:path=MARK_SAW;break;
+ case ENGI_M2SID:path=MARK_SID;break;
+#if RHYTHMER_FMINI
+ case ENGI_FMINI:six_fmini_wave(t,en,ph,x,y,w,h,ink);return;
+#endif
+#if RHYTHMER_OBERVAVE
+ case ENGI_OBERVAVE:six_smoke(t,en,ph,x,y,w,h,ink);return;
+#endif
+#if !RHYTHMER_SWAP_WLP
+ case ENGI_PHASE:path=MARK_PHASE;break;
+ case ENGI_LOFI:path=MARK_LOFI;break;
+#endif
+#if RHYTHMER_PROPHET
+ case ENGI_PROPHET:path=MARK_PROPHET;break;
+#endif
+#if FELUCCA_FM4
+ case ENGI_DIGITAL:path=MARK_DIGITAL;break;
+#endif
+ }
+ six_trace(path,en,ph,x,y,w,h,ink);
 }
-static void six_machine_mark(const track_t *t,int x,int y,int w,int h){
- int en=(ui_prefs&PREF_ANIM_OFF)?0:six_visual_level(t);
+static void six_machine_mark(const track_t *t,int en,int x,int y,int w,int h){
+ if(ui_prefs&PREF_ANIM_OFF)en=0;
  unsigned ph=(en&&!(ui_prefs&PREF_ANIM_OFF))?t->lfo_ph:0u;
  unsigned at=six_vis_note_at[t-trk];
  if(en&&at&&!(ui_prefs&PREF_ANIM_OFF))ph+=(fm1_ms-(at-1u))*0x800000u*(1u+six_vis_note_vel[t-trk]/64u);
@@ -148,7 +240,7 @@ static void six_home_cards(void){
  fmt_int(line+9,t->p[P_SLEN]);str_cpy(line+str_len(line)," STEPS",sizeof line-str_len(line));
  char pg[5]={' ',(char)('1'+t->seq_idx/16),'/',(char)('0'+((unsigned)clamp(t->p[P_SLEN],1,64)+15u)/16u),0};str_cpy(line+str_len(line),pg,sizeof line-str_len(line));
  cv_text_in(8,43,140,&AF_X,line,T_DIM,T_BG);
- if(six_track_enabled(song.sel))six_machine_mark(t,158,4,70,38);
+ if(six_track_enabled(song.sel))six_machine_mark(t,six_visual_level(t),158,4,70,38);
  else cv_text_in(158,18,70,&AF_S,"OFF",T_DIM,T_BG);
  cv_line_t(6,58,234,58,T_TEXT,1);
  for(unsigned k=0;k<6;k++){
@@ -156,7 +248,7 @@ static void six_home_cards(void){
   if(selected)cv_rect(x,64,34,12,T_TEXT);
   cv_text_in(x,66,34,&AF_X,num,selected?T_BG:T_TEXT,selected?T_TEXT:T_BG);
   cv_text_in(x,81,34,&AF_X,!six_track_enabled(k)?"OFF":trk[k].p[P_MUTE]?"MUT":six_kind_label(trk[k].eng_req),T_TEXT,T_BG);
-  if(six_track_enabled(k)&&!trk[k].p[P_MUTE])six_machine_mark(&trk[k],x+2,93,30,24);
+  if(six_track_enabled(k)&&!trk[k].p[P_MUTE])six_machine_mark(&trk[k],en,x+2,93,30,24);
   else six_machine_glyph(0,trk[k].engine,0,0,x+2,93,30,24,T_DIM);
   /* Sound level remains a small rail below the shared machine symbol. */
   cv_rect(x+3,121,28,1,T_DIM);
@@ -184,9 +276,10 @@ static void six_home_routes(void){
 static void six_instrument(const track_t *t){
  char name[40];sound_name(t,name);six_dot_background((int)graph_h());
  cv_text_in(8,0,224,&AF_X,trk_engp(t)->name,T_TEXT,T_BG);
- six_machine_mark(t,16,22,208,82);
+ int lv=six_visual_level(t);
+ six_machine_mark(t,lv,16,22,208,82);
  cv_text_in(8,124,224,&AF_X,name,T_TEXT,T_BG);
- int lv=six_visual_level(t);for(unsigned k=0;k<16;k++)cv_rect(16+(int)k*13,113,9,2,k<(unsigned)lv*16/128?T_TEXT:T_DIM);
+ for(unsigned k=0;k<16;k++)cv_rect(16+(int)k*13,113,9,2,k<(unsigned)lv*16/128?T_TEXT:T_DIM);
 }
 static const char *six_break_event_name(unsigned n){
  static const char *const name[19]={"1/4 REPEAT","BUILD","STRETCH","ECHO","1/8 REPEAT","1/8 DOWN","1/8 UP","1/8 SHRINK","1/16 REPEAT","1/16 DOWN","1/16 UP","1/16 SHRINK","1/32 REPEAT","1/32 DOWN","1/32 UP","1/32 SHRINK","SOURCE A / AMEN","SOURCE B / THINK","STRAIGHT RETURN"};
@@ -213,6 +306,7 @@ static void six_voice_list_graph(void){
  fmt_int(count,pos<0?0:pos+1);str_cpy(count+str_len(count)," / ",sizeof count-str_len(count));fmt_int(count+str_len(count),(int)n);cv_text_in(8,118,224,&AF_X,count,T_DIM,T_BG);cv_text_in(8,130,224,&AF_X,"PLAY LANE KEY / SAVE PROJECT",T_DIM,T_BG);
 }
 static void six_graph_surface(const track_t *t,const page_t *pg){
+ if(!ui.home&&pg->graph==GR_BROWSE){graph_lz_presets();return;}
  if(!ui.home&&pg->fam==FAM_EDIT&&!ui.confirm&&trk_eng(TSEL)==ENGI_EMPTY){
   cv_text_in(8,24,224,&AF_S,"EMPTY TRACK",T_TEXT,T_BG);
   cv_text_in(8,50,224,&AF_X,"SELECT AN ENGINE",T_TEXT,T_BG);
@@ -222,7 +316,32 @@ static void six_graph_surface(const track_t *t,const page_t *pg){
  cv_oy=0;cv_bg=T_BG;
  if(ui.confirm==CF_DICE_ALL){gen_panel();return;}
  if(ui.home){if(home_set())six_home_routes();else if(home_level())six_instrument(t);else six_home_cards();return;}
+ if(pg->graph==GR_LIBCLEAR){
+  cv_text_in(8,20,224,&AF_M,"CLEAR LIBRARY",T_TEXT,T_BG);
+  cv_text_in(8,51,224,&AF_X,"K3: SELECTED STORED SECTION",T_TEXT,T_BG);
+  cv_text_in(8,69,224,&AF_X,"K4: PROJECT SECTIONS A-D",T_TEXT,T_BG);
+  cv_text_in(8,91,224,&AF_X,"RELATED SONG ROWS ALSO CLEAR",T_DIM,T_BG);
+  cv_text_in(8,118,224,&AF_X,"OCT+ REVIEW / OCT- CANCEL",T_TEXT,T_BG);return;
+ }
  if(pg->graph==GR_DXSND&&dx_pagen(pg)==9u){six_voice_list_graph();return;}
+ if(pg->graph==GR_DGEN){
+  unsigned len=(unsigned)clamp(t->p[P_SLEN],1,NSTEP),base=((song.playing?t->seq_idx:ui.cursor)/16)*16;
+  drum_gen_t *g=dg_current();char range[20];fmt_int(range,(int)base+1);str_cpy(range+str_len(range),"-",2);fmt_int(range+str_len(range),(int)(base+16<len?base+16:len));
+  cv_text_in(8,4,224,&AF_X,range,T_DIM,T_BG);
+  if(!drum_track(t)){if(trk_eng(t)==ENGI_BREAK)six_graph_break_step();else graph_roll(t,T_TEXT);}
+  else for(unsigned lane=0;lane<8;lane++){
+   int y=19+(int)lane*12;cv_text_in(8,y,25,&AF_X,drum_lane_abbr(t,lane),lane==g->lane?T_TEXT:T_DIM,T_BG);
+   for(unsigned j=0;j<16&&base+j<len;j++){
+    const step_t *st=&t->step[base+j];int x=39+(int)j*12;
+    int hit=st->time==ST_NOTE&&(step_lanes(st)>>lane&1);
+    if(hit)cv_rect(x,y+1,8,(st->acc>>lane&1)?7:4,T_TEXT);
+    else cv_rect(x+3,y+3,1,1,T_DIM);
+    if(song.playing&&base+j==t->seq_idx)cv_frame(x-1,y,10,9,T_TEXT);
+   }
+  }
+  cv_rect(0,graph_h()-17,240,17,T_BG);
+  cv_text_in(8,graph_h()-12,224,&AF_X,"OCT+ GEN / OCT- UNDO",T_TEXT,T_BG);return;
+ }
  if(pg->graph==GR_TRK){six_graph_lanes(6);return;}
  if(pg->graph==GR_SIXSTEP){six_graph_break_step();return;}
  if(pg->graph==GR_SIXBRK||pg->graph==GR_SIXBRKSEQ){six_graph_break();return;}

@@ -4,7 +4,7 @@
 #include "ui_test.c"
 int main(int argc,char **argv){
  if(argc!=3)return 2;ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);int bad=0;
- bad+=check("DRUM retains nine original kits plus ten MD kits",DX_NKIT==19&&ENG_DRUM.npresets==19);
+ bad+=check("DRUM retains original/MD kits and adds twelve LXR-X re-voicings",DX_NKIT==31&&ENG_DRUM.npresets==31);
  for(unsigned i=0;i<45;i++)bad+=check("classic and all MD choices round trip",dx_mode_ix(dx_mode_of(i))==i);
  for(unsigned kind=0;kind<MD_NMODEL;kind++){
   int peak=0;int64_t energy=0;
@@ -77,7 +77,7 @@ int main(int argc,char **argv){
   int32_t out[64];mix_block(out,32);if(mc_mask_last&&mc_mask_last!=63)split++;fwrite(out,sizeof out,1,f);
  }
  fclose(f);
- song.sel=0;ui.home=0;ui.menu=0;go_title("SOUND 3");dx_ui_lane=7;dx_ui_seen=last_note;md_patch_default(&dx_kit[7],12);ui.force=1;frame();
+ song.sel=0;ui.home=0;ui.menu=0;go_title("SOUND 3");dx_ui_lane=7;dx_ui_seen=dx_input_serial[song.sel];md_patch_default(&dx_kit[7],12);ui.force=1;frame();
  char path[1024];snprintf(path,sizeof path,"%s.ui.ppm",argv[2]);FILE *screen=fopen(path,"wb");if(!screen)return 5;
  fprintf(screen,"P6\n240 240\n255\n");for(unsigned i=0;i<240*240;i++){unsigned p=swap16(host_screen[i]);unsigned char rgb[3]={(p>>11)*255/31,((p>>5)&63)*255/63,(p&31)*255/31};fwrite(rgb,1,3,screen);}fclose(screen);
  bad+=check("MD tracks participate in both cores",!mc_host||split>0);

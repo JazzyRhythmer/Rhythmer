@@ -35,13 +35,12 @@ static void acid_render(track_t *t,voice_t *v,int32_t *out,uint32_t n,const vmod
  for(unsigned i=0;i<n;i++){int32_t x=mulq15(y[i],amp_at(m,i));if(t->p[P_E7])x=softclip(mulq15(x,32767+t->p[P_E7]*256));out[i]+=x;}
 }
 static const preset_t ACID_PRESETS[]={
- /* Hortator's four ACID colours adapted to the eight-control Rhythmer panel:
-  * cutoff/resonance/env/decay/accent exact; its tune and gate remain the
-  * track's pitch/SEQ gate; the final two controls retain SLIDE and DRIVE. */
- {"HT SQUELCH",{40,64,64,50,64,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT DEEPBASS",{20,30,30,30,40,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT SCREAMER",{60,115,100,80,100,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT SQUAREAC",{50,80,70,60,64,1,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0}
+ /* Hortator's four ACID colours with Rhythmer's factory cutoff settings.
+  * Tune and gate follow track pitch and SEQ; the last two controls are SLIDE and DRIVE. */
+ {"HT SQUELCH",{80,64,64,50,64,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
+ {"HT DEEPBASS",{80,30,30,30,40,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
+ {"HT SCREAMER",{50,115,100,80,100,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
+ {"HT SQUAREAC",{80,80,70,60,64,1,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0}
 };
 #define ACID_PD(n,hi,d) {n,F_INT,0,hi,d,0,0}
 static const char *const ACID_WAVES[]={"SAW","SQR"};

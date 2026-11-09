@@ -429,23 +429,44 @@ static __attribute__((noinline)) void lev_block(uint32_t n)
     lev_dg = (g1 - lev_g) / (int32_t)n;
     lev_g = g1;
 }
-/* DUCK (G_DUCK 0..100, G_DREL its release 40 .. 600 ms): a kick (eng_drum.c duck_hit) takes the parts that are not
- * DRUM down by up to 30 dB in ~2 ms, holds them there ~25 ms, and they come back with the release, shaped as a
- * sidechain pump (the gain follows 1 - (1 - env)^2: low for longer, then a quick rise). duck_g0 / duck_g1: the gain
- * (Q15) at the block's start and end, ramped by mix_part */
+/* The host audio input, filled before mixing. */
+static int32_t uin_l[CTL], uin_r[CTL];
+static volatile uint8_t uin_on;
+
+/* DUCK ramps the gain across each block. A selected track's peak is measured during the previous mix. */
 static int32_t duck_env, duck_g0 = 32767, duck_g1 = 32767;
-static uint8_t duck_att, duck_hold;
-static __attribute__((noinline)) void duck_block(void)
+static int32_t duck_peak;
+static uint8_t duck_att, duck_hold, duck_source;
+static __attribute__((noinline)) void duck_block(uint32_t n)
 {
-    int32_t dep = song.g[G_DUCK] * 31731 / 100, e;       /* (1 - 0.032: -30 dB at 100) */
-    if (duck_hit) {
-        duck_hit = 0;
+    int32_t depth = song.g[G_DUCK], threshold = song.g[G_DTHR] << 8;
+    uint32_t source = song.g[G_DSRC], hit = duck_hit;
+    if (depth && source == DUCK_USB && uin_on)
+        for (uint32_t i = 0; i < n; i++)
+            if (uin_l[i] > threshold || uin_l[i] < -threshold || uin_r[i] > threshold || uin_r[i] < -threshold) {
+                hit = 1;
+                break;
+            }
+    if (source == duck_source && duck_peak > threshold)
+        hit = 1;
+    duck_peak = 0;
+    duck_source = (uint8_t)source;
+    duck_hit = 0;
+    duck_g0 = duck_g1;
+    if (!depth) {
+        duck_att = duck_hold = 0;
+        duck_env = 0;
+        duck_g1 = 32767;
+        return;
+    }
+    if (hit) {
         duck_att = 1;
         duck_hold = (uint8_t)(1103u / CTL);              /* (25 ms in blocks) */
     }
-    duck_g0 = duck_g1;
     if (duck_att) {
-        duck_env += (32767 - duck_env) >> 1;
+        uint32_t attack = song.g[G_DATK];
+        int32_t remaining = 32767 - duck_env;
+        duck_env += attack ? mulq16(remaining, 65536u - dv_kb(attack * 1000u)) : remaining >> 1;
         if (duck_env > 31000)
             duck_att = 0;
     } else if (duck_hold) {
@@ -453,8 +474,8 @@ static __attribute__((noinline)) void duck_block(void)
     } else if (duck_env) {
         duck_env = (int32_t)(((uint32_t)duck_env * dv_kb(40000u + (uint32_t)song.g[G_DREL] * 5600u)) >> 16);
     }
-    e = (duck_env * (65536 - duck_env)) >> 15;           /* 1 - (1 - env)^2 */
-    duck_g1 = 32767 - mulq15(dep, e > 32767 ? 32767 : e);
+    int32_t curve = (duck_env * (65536 - duck_env)) >> 15;
+    duck_g1 = 32767 - mulq15(depth * 31731 / 100, curve > 32767 ? 32767 : curve);
 }
 /* MENU > USB LEVEL FIXED (for #42: record over USB with the speaker turned down): the mix goes to master_out at the
  * full MASTER level, USB audio takes that (audio.c uac_tap), and only then does MASTER scale what the DAC gets
@@ -1796,8 +1817,6 @@ static __attribute__((noinline)) void stem_post(uint32_t ti, const int32_t *pre,
  * stereo Q15; uin_on: this block holds it. The last live track takes it (mix_part, uin_mix): into the dry mix with
  * its LEVEL and PAN (a balance), its CHORUS / DELAY / REVERB sends from the sum, ducked by DUCK, silenced by its MUTE
  * and the mute layer; whatever the track's own engine plays as well (its DIST and filter are not on the input) */
-static int32_t uin_l[CTL], uin_r[CTL];
-static volatile uint8_t uin_on;
 #define UIN_SRC 1
 static __attribute__((noinline)) void uin_mix(int32_t *ol, int32_t *or_, int32_t *sc, int32_t *sd, int32_t *sr, uint32_t n,
                                               int32_t lq, int32_t dl, int32_t gl, int32_t dgl, int32_t gr, int32_t dgr,
@@ -1974,7 +1993,7 @@ static inline __attribute__((always_inline)) void mix_part(track_t *t, uint32_t 
         gr = 4096 + (p0 < 0 ? p0 >> 2 : 0);
         dgl = ((4096 - (mp_pan[ti] > 0 ? mp_pan[ti] >> 2 : 0)) - gl) >> CTL_LOG2;
         dgr = ((4096 + (mp_pan[ti] < 0 ? mp_pan[ti] >> 2 : 0)) - gr) >> CTL_LOG2;
-        int32_t c = t->p[P_CHOR] * 258, d = t->p[P_DLY] * 258, r = t->p[P_REV] * 258, pk = t->peak;
+        int32_t c = t->p[P_CHOR] * 258, d = t->p[P_DLY] * 258, r = t->p[P_REV] * 258, pk = 0;
         int32_t xmax = c > d ? c : d, *ol = c1 ? c1_mix.l : mix_l, *or_ = c1 ? c1_mix.r : mix_r;
         int32_t *sc = c1 ? c1_mix.c : send_c, *sd = c1 ? c1_mix.d : send_d, *sr = c1 ? c1_mix.rv : send_r;
         if (slicer_routes((uint32_t)(t - trk))) {       /* (JIANT 0.6.3) into the SLICER's bus, not the dry mix */
@@ -1985,7 +2004,7 @@ static inline __attribute__((always_inline)) void mix_part(track_t *t, uint32_t 
         int32_t pre[CTL];
         if (fx_stems)                                   /* (0.7.1) the part's stem: what it adds to the mix */
             stem_pre(pre, ol, or_, n);
-        if ((duck_g0 < 32767 || duck_g1 < 32767) && ENGINES[t->engine] != &ENG_DRUM)   /* DUCK: the kick's */
+        if ((duck_g0 < 32767 || duck_g1 < 32767) && t->engine != ENGI_DRUM && duck_source != ti + 1u)
             lq = duck_ramp(l0 >> 8, mp_lvl[ti] >> 8, &dl);
         track_dist(t, b, n);
         int32_t pm0 = 32768, pm1 = 32768;               /* (0.6.48: drum_mix's; pf.mg counts only while muting) */
@@ -2028,7 +2047,11 @@ static inline __attribute__((always_inline)) void mix_part(track_t *t, uint32_t 
             }
             uin_mix(ol, or_, sc, sd, sr, n, lq0, dl, gl0, dgl, gr0, dgr, c, d, r, pm1, &pk);
         }
-        t->peak = pk;
+        if (pk > t->peak)
+            t->peak = pk;
+        if (duck_source == ti + 1u && (t->engine != ENGI_DRUM || !song.g[G_DLANE]) &&
+            !t->p[P_MUTE] && !((trk_hush | pf.mute) & (1u << ti)))
+            duck_peak = pk;
         if (fx_stems)
             stem_post(st, pre, ol, or_, n);
     }
@@ -2222,6 +2245,15 @@ static uint32_t mc_cost(const track_t *t)               /* a part's share of the
     /* Seed a newly struck expensive model realistically before measured timing
      * catches up. The actual per-track timings still drive steady-state split. */
     uint32_t k, v = 0, w = e == &ENG_ACID ? 6u : e == &ENG_SERUM ? 6u :
+#if RHYTHMER_PROPHET
+        e == &ENG_PROPHET ? 7u :
+#endif
+#if RHYTHMER_FMINI
+        e == &ENG_FMINI ? 5u :
+#endif
+#if RHYTHMER_OBERVAVE
+        e == &ENG_OBERVAVE ? 4u :
+#endif
         e == &ENG_FM6 ? 4u : e == &ENG_LOFI || e == &ENG_NOISE ? 2u : 3u;
     for (k = 0; k < NVOICE; k++)
         v += t->v[k].active;
@@ -2481,7 +2513,7 @@ static __attribute__((noinline)) void mix_block(int32_t *out, uint32_t n)   /* (
     macro_master();                                     /* CLIP / PNCH with the matrix (mod.c) */
     dx_mot_block(n);                                    /* (0.5.1) DRUM-X X-MOD's LFO */
     master_begin();
-    duck_block();
+    duck_block(n);
     perf = perf_begin(n);                               /* the FX hold layer at work (perform.c) */
 #ifndef FX_HUSH_OFF                                     /* (tests/hush_test.c: the reference without it) */
     if (!perf && mix_hush()) {                          /* (0.9.16) all at rest: nothing rendered (above) */

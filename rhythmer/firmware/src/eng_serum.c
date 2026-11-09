@@ -154,7 +154,7 @@ static __attribute__((noinline)) void serum_render(track_t *t, voice_t *v, int32
 /* the presets: e[] = WT WARP DETUNE SUB CUT RES DRIVE FILT (P_E0..P_E7); env = ATK DEC SUS REL */
 static const preset_t SERUM_PRESETS[] = {
     {"MONO GIANT", {2, 0, 12, 60, 40, 25, 20, SF_LADDER}, {0, 50, 100, 30}, 30, 1 | TAG(BASS), FX(0, 0, 0, 10)},
-    {"SKEW LADDER", {3, 0, 0, 0, 50, 100, 25, SF_ACID}, {0, 55, 20, 30}, 48, 1 | TAG(BASS), FX(20, 0, 45, 15)},
+    {"SKEW LADDER", {3, 0, 0, 0, 50, 100, 25, SF_ACID}, {0, 55, 40, 30}, 48, 1 | TAG(BASS), FX(20, 0, 45, 15)},
     {"WT PAD", {4, 30, 20, 0, 70, 10, 0, SF_LADDER}, {80, 90, 110, 95}, 10, TAG(PAD), FX(0, 60, 20, 70)},
     {"WT LEAD", {6, 10, 14, 0, 85, 35, 15, SF_LADDER}, {4, 70, 100, 50}, 20, 1 | TAG(LEAD), FX(0, 10, 45, 30)},
     {"PLUCK", {1, 90, 0, 0, 30, 40, 0, SF_SVF}, {0, 88, 0, 60}, 55, TAG(PLUCK), FX(0, 20, 50, 30)},

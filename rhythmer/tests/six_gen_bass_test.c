@@ -9,10 +9,12 @@ static void setup(unsigned gi,unsigned seed){
 }
 int main(int argc,char **argv){
  ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);
+ set_engine_of(&trk[2],ENGI_ANALOG);set_engine_of(&trk[3],ENGI_ANALOG);
  FILE *out=argc>1?fopen(argv[1],"w"):0;if(out)fprintf(out,"genre,engine,preset,count\n");
- unsigned total=0;
+ unsigned total=0,fmini=0,ordinary=0,fmini_presets=0;
+ uint8_t fmini_seen[UINT8_MAX]={0};
  for(unsigned gi=0;gi<NGENRE;gi++){
-  unsigned count[NENGINES][32]={{0}},different=0,top=0,colours=0;
+  unsigned count[NENGINES][UINT8_MAX]={{0}},different=0,top=0,colours=0;
   for(unsigned seed=0;seed<512;seed++){
    setup(gi,seed*17+31);gen_sound(&trk[1],RL_BASS,gs.g->snd[GP_BASS]);
    unsigned e=trk[1].eng_req,p=trk[1].preset;
@@ -22,14 +24,31 @@ int main(int argc,char **argv){
    if(e==ENGI_ANALOG)C("original bass oscillator interval stays in tune",trk[1].p[P_E7]==ENGINES[e]->presets[p].e[7]);
    if(e==ENGI_M2SID)C("original SID tuning stays in tune",trk[1].p[P_E7]==ENGINES[e]->presets[p].e[7]);
    count[e][p]++;colours|=1u<<gen_bass_colour(e,p);total++;
+   if(e!=ENGI_ACID)ordinary++;
+   if(e==ENGI_FMINI){
+    fmini++;
+    fmini_presets+=!fmini_seen[p];fmini_seen[p]=1;
+    C("FMINI bass stays mono and retains its factory patch",trk[1].p[P_VOICE]==V_MONO&&trk[1].p[P_E7]==ENGINES[e]->presets[p].e[7]);
+   }
   }
-  for(unsigned e=0;e<NENGINES;e++)for(unsigned p=0;p<32;p++)if(count[e][p]){
+  for(unsigned e=0;e<NENGINES;e++)for(unsigned p=0;p<ENGINES[e]->npresets;p++)if(count[e][p]){
    different++;if(count[e][p]>top)top=count[e][p];
    if(out)fprintf(out,"%s,%s,%s,%u\n",GENRE[gi].name,ENGINES[e]->name,ENGINES[e]->presets[p].name,count[e][p]);
   }
   C("ordinary genres keep ten bass presets; explicit Acid reaches all four native sounds",different>=(GENRE[gi].snd[GP_BASS]==SR_ACID?4:10));
   C("no single preset dominates half the results",top<256);
+  if(RHYTHMER_FMINI&&RHYTHMER_SWAP_WLP&&GENRE[gi].drum>=DM_TECHNO&&GENRE[gi].drum<=DM_HARD){
+   unsigned techno_fmini=0;
+   for(unsigned p=0;p<ENGINES[ENGI_FMINI]->npresets;p++)techno_fmini+=count[ENGI_FMINI][p];
+   C("techno allows occasional FMINI bass without the automatic bonus",techno_fmini>0&&techno_fmini<77);
+   printf("%s FMINI bass: %u / 512\n",GENRE[gi].name,techno_fmini);
+  }
   C("ordinary genres keep at least five sound colours",GENRE[gi].snd[GP_BASS]==SR_ACID||__builtin_popcount(colours)>=5);
+ }
+ if(RHYTHMER_FMINI&&RHYTHMER_SWAP_WLP){
+  C("FMINI is frequently selected without dominating bass",fmini*4>ordinary&&fmini*2<ordinary);
+  C("FMINI chooses multiple bass patches",fmini_presets>=8);
+  printf("FMINI bass: %u / %u ordinary draws, %u distinct presets\n",fmini,ordinary,fmini_presets);
  }
  /* A missing-role engine is rerouted rather than taking its pad/lead list. */
  setup(0,31);gx.eng=ENGI_M2SAW;gen_sound(&trk[1],RL_BASS,SR_SUB);

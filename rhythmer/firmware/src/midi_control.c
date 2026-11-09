@@ -390,6 +390,11 @@ static volatile uint8_t midi_song_req;
  * channel aftertouch, so they stay free for other instruments. */
 static void __attribute__((noinline)) midi_event(uint32_t st, uint32_t ch, uint32_t d1, uint32_t d2)
 {
+    if (st == 0x90u && d2 && song.g[G_DSRC] == DUCK_MIDI && d1 == (uint32_t)song.g[G_DNOTE] &&
+        (!song.g[G_DCH] || ch + 1u == (uint32_t)song.g[G_DCH])) {
+        duck_hit = 1;                                   /* MIDI supplies timing; the local envelope sets the gain. */
+        return;
+    }
     if (st == 0xC0u && ch == 15u) {                    /* (0.6.80) channel 16's PROGRAM CHANGE: a section, a project */
         midi_song_req = (uint8_t)(d1 + 1u);
         return;
@@ -408,4 +413,23 @@ static void __attribute__((noinline)) midi_event(uint32_t st, uint32_t ch, uint3
         mod_midi(midi_track(ch), st, d1, d2);
     else if (st == 0xC0u)                          /* (0.6.72) PROGRAM CHANGE: the UI loads it (ui.c midi_pc_poll) */
         midi_pc_req[trk_index(midi_track(ch)) % NTRK] = (uint8_t)(d1 + 1u);
+}
+
+/* New USB host sessions share JIANT's USB/TRS channel ownership. A lost peer
+ * releases MIDI owners, never the local keyboard or a currently held sequencer
+ * note. This only runs on a disconnect/mode change, not every audio block. */
+static void midi_host_lost(void)
+{
+ for(unsigned ch=0;ch<16;ch++){
+  midi_ch[ch].pedal=0;
+  for(unsigned note=0;note<128;note++){
+   unsigned id=mn_get(ch,note)&7u;
+   if(!id)continue;
+   track_t *t=&trk[id-1];int sequenced=0;
+   for(unsigned j=0;j<t->seq_n&&j<sizeof t->seq_notes;j++)if(t->seq_notes[j]==note)sequenced=1;
+   if(sequenced){mn_set(ch,note,0);if(midi_owners[id-1])midi_owners[id-1]--;if(midi_ch[ch].owned[id-1]&&! --midi_ch[ch].owned[id-1])midi_ch[ch].targets&=(uint8_t)~(1u<<(id-1));}
+   else midi_release(ch,note);
+  }
+  midi_ch[ch].bend=0;midi_expression_channel(ch);
+ }
 }

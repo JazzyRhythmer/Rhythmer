@@ -5,16 +5,31 @@
  * factory patterns (SEQ > PATTERNS) and the parts' sounds at power-on. */
 #include "dsp.c"
 #include "eng_analog.c"
+#if RHYTHMER_OBERVAVE
+#include "eng_obervave.c"
+#endif
 #include "eng_phase.c"
 #include "eng_lofi.c"
 #include "eng_serum.c"
 #include "eng_mono2k.c"
 #include "eng_formant.c"
 #include "eng_wheel.c"
-#include "fm6_core.c"          /* typed FM6/MD runtime union; DSP implementation unchanged */
+#include "fm6_core.c" /* shared FM6/Prophet pitch helper and runtime type */
+#if RHYTHMER_PROPHET
+static inline float fm_clampf(float x,float lo,float hi){return x<lo?lo:x>hi?hi:x;}
+static inline float fm_fabsf(float x){return x<0?-x:x;}
+static inline float fm_minf(float a,float b){return a<b?a:b;}
+#include "../ports/mel_prophet.h"
+#endif
 #include "eng_drum.c"           /* DRUM: the 8-lane DRUM-X kit (drumx_voice.c) */
 #include "eng_noise.c"
 #include "eng_acid.c"          /* native Hortator mono synth; MIDI generation is separate */
+#if RHYTHMER_FMINI
+#include "eng_fmini.c"
+#endif
+#if RHYTHMER_PROPHET
+#include "eng_prophet.c"
+#endif
 #include "eng_fm6.c"            /* FM6: 6-operator FM, msfa ported (fm6_core.c, Apache-2.0) */
 #include "eng_animal.c"         /* (JIANT 0.8.3) ANIMAL: animal calls (CMOS PULSE WHSTL WING GLOTT) */
 #include "fm4_convert.c"        /* DIGITAL's tables, and its sounds -> FM6 */
@@ -64,6 +79,22 @@ static const engine_t ENG_EMPTY={
 #define ENG_NOISE ENG_GONE
 #define ENG_ANIMAL ENG_GONE
 #include "six_engines.c"
+#if RHYTHMER_NEW_SYNTHS && !RHYTHMER_FMINI
+#define ENG_FMINI ENG_GONE
+#endif
+#if RHYTHMER_NEW_SYNTHS && !RHYTHMER_PROPHET
+#define ENG_PROPHET ENG_GONE
+#endif
+#if RHYTHMER_RETIRE_M2
+#define ENG_M2STAT ENG_GONE
+#define ENG_M2SAW ENG_GONE
+#define ENG_M2SID ENG_GONE
+#endif
+#if RHYTHMER_SWAP_WLP
+#define ENG_WHEEL ENG_GONE
+#define ENG_LOFI ENG_GONE
+#define ENG_PHASE ENG_GONE
+#endif
 
 /* the editor protocol, user presets and projects store these indices: append, never reorder */
 static const engine_t *const ENGINES[NENGINES] = {
@@ -87,6 +118,12 @@ static const engine_t *const ENGINES[NENGINES] = {
     &ENG_GONE,                   /* 13: reserved (SLICE, retired in JIANT) */
     &ENG_ANIMAL,                 /* 14 retired in SIX */
     &ENG_BREAK, &ENG_ACID, &ENG_SERUM, &ENG_M2STAT, &ENG_M2SAW, &ENG_M2SID, &ENG_EMPTY,
+#if RHYTHMER_NEW_SYNTHS
+    &ENG_FMINI,&ENG_PROPHET,
+#endif
+#if RHYTHMER_OBERVAVE
+    &ENG_OBERVAVE,
+#endif
 };
 
 /* a track's engine number as an index (the audio paths: a compare, cheaper than % NENGINES; a bad number: 0) */
@@ -98,7 +135,14 @@ static inline uint32_t eng_idx(uint32_t e) { return e < NENGINES ? e : 0u; }
  * at power-on (TRK_DEF: T1..T6 are its first six), then PHASE WHEEL NOISE; was ANALOG FM6 PHASE LOFI VOICE WHEEL
  * NOISE DRUM ANIMAL. PROGRAM CHANGE numbers the sounds in this order too (ui.c midi_pc_poll) */
 static const uint8_t ENGINE_ORDER[NENG_SHOWN] = {
- ENGI_SERUM, ENGI_PHASE, ENGI_LOFI, ENGI_M2STAT, ENGI_M2SAW, ENGI_M2SID, ENGI_ANALOG, ENGI_FM6, ENGI_WHEEL, ENGI_DRUM, ENGI_ACID, ENGI_BREAK, ENGI_EMPTY
+ ENGI_SERUM,
+#if RHYTHMER_NEW_SYNTHS
+ ENGI_FMINI,ENGI_PROPHET,
+#endif
+#if RHYTHMER_OBERVAVE
+ ENGI_OBERVAVE,
+#endif
+ ENGI_PHASE, ENGI_LOFI, ENGI_M2STAT, ENGI_M2SAW, ENGI_M2SID, ENGI_ANALOG, ENGI_FM6, ENGI_WHEEL, ENGI_DRUM, ENGI_ACID, ENGI_BREAK, ENGI_EMPTY
 };
 
 /* the engines one can pick (engine 1 only with FELUCCA_FM4), in ENGINE_ORDER: eng_ok(e), the n-th of them
@@ -173,8 +217,15 @@ static const struct {
  * power_sound_of: no DIST CHOR DLY REV send, the effects are the player's to add) */
 #define TRK_PR_VOICE 9u          /* SINGER EN (eng_formant.c FORMANT_PRESETS) */
 #define TRK_PR_ANALOG 14u        /* FAT BASS (eng_analog.c) */
-static const uint8_t TRK_DEF[NPART][3] = {{ENGI_DRUM,0,0},{ENGI_SERUM,0,0},{ENGI_PHASE,0,0},
- {ENGI_LOFI,3,0},{ENGI_EMPTY,0,0},{ENGI_EMPTY,0,0}};
+static const uint8_t TRK_DEF[NPART][3] = {
+    {ENGI_DRUM,0,0}, {ENGI_SERUM,0,0},
+#if RHYTHMER_FMINI && RHYTHMER_OBERVAVE
+    {ENGI_FMINI,0,0}, {ENGI_OBERVAVE,1,0},
+#else
+    {ENGI_PHASE,0,0}, {ENGI_LOFI,3,0},
+#endif
+    {ENGI_EMPTY,0,0}, {ENGI_EMPTY,0,0}
+};
 /* DRUM-X (DRUM's first, the factory kit), SINGER EN, CMOS BIRD, BYTEBEAT, FAT BASS, TINE EP */
 /* the parts at power-on through 0.9.8 (the same columns): what an old project's tracks it had no room for load as
  * (project.c proj_new_tracks, PROJ_DEF_SOUND: format 1's tracks 2..4, a 4-track format's T5 / T6): never change it.

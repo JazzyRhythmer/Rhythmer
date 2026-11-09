@@ -1151,6 +1151,11 @@ static void edit_param(uint32_t slot, int32_t steps)
         }
         return;
     }
+    if(pg->graph==GR_LIBCLEAR&&slot<2){
+        if(slot==0){int n=clamp((int)song_cur+(steps>0?1:-1),0,NSONG-1);if((unsigned)n!=song_cur)(void)song_open((unsigned)n);}
+        else song.g[G_SLOT]=(int16_t)clamp(song.g[G_SLOT]+(steps>0?1:-1),1,4);return;
+    }
+    if (pg->graph == GR_DGEN) { drumgen_knob(pg,slot,steps);return; }
     if (pg->graph == GR_DXSND) {                          /* EDIT > SOUND: the DRUM-X kit (ui_dx.c) */
         dx_knob(pg, slot, steps);
         return;
@@ -1271,7 +1276,7 @@ static void edit_param(uint32_t slot, int32_t steps)
         return;
     }
     if (pg->graph == GR_SLOTS && slot == 0u) {            /* (0.6.12) KNOB 1 the project: its sections, the music kept */
-        int32_t n = clamp((int32_t)song_cur + (steps > 0 ? 1 : -1), 0, (int32_t)NSONG - 1);
+        int32_t n = clamp((int32_t)song_cur + steps, 0, (int32_t)NSONG - 1);
         if ((uint32_t)n != song_cur) (void)song_open((uint32_t)n);
         return;
     }
@@ -1339,6 +1344,10 @@ static void act_do(void)
     uint32_t c = act_col(), id, k = (uint32_t)song.g[G_SLOT] - 1u;
     if (!c--)
         return;
+    if(cur_page()->graph==GR_LIBCLEAR){
+        if(transport_busy()){ui_message("STOP TO CLEAR LIBRARY");return;}
+        confirm_open(c==2?CF_ERASE_SECTION:CF_ERASE_PROJECT,(song_cur<<2)|(k&3u));return;
+    }
     if (cur_page()->graph == GR_MOTION) {
         if (chain_busy()) { ui_message("STOP TO EDIT"); return; }
         confirm_open(CF_CLEAR_MOTION, song.sel);
@@ -1411,6 +1420,7 @@ static void act_do(void)
         ui.act = 0;
     switch (id) {
     case G_LOAD:
+        if (transport_busy()) { ui_message("STOP TO LOAD"); break; }
         undo_mark();                                      /* (0.6.21) UNDO: the music before the load */
         project_load(k);
         break;
@@ -1634,8 +1644,8 @@ static void seq_entry(uint32_t pressed)
         ent_commit();                                   /* (let go: LEN / the arpeggio written, the cursor on) */
 }
 
-/* (0.9.2, rule 3) PRESETS loads presets, on every page (the menu, a dialog, NAME and the layers: ui_input before this;
- * GEN: its GENRE, there): the selected track's sound, one list over every engine, then the used user presets
+/* (0.9.2, rule 3) PRESETS loads the selected track's sound (GEN: its genre): the full catalog outside the PRESETS
+ * browsers, which apply the selected list filter. EDIT's browser also stays within the selected engine.
  * (preset_step; a sound load keeps the steps); in SEQ the patterns: the PHRASES loader over the page (KNOB 1 the pattern
  * too, OCT+ LOAD, OCT- back to the page), each detent the next one. Never a page, a track, a module, a step or a row
  * (until 0.9.1 it was the bar, the step, the row, the module, the track, ROOT ..: KNOB 1's now, rule 4) */
@@ -2092,7 +2102,7 @@ static void ui_input_frame(void)
     perf_latch_on = fx_latch & 1u;                      /* (MENU > FX LATCH; a settings load sets it too) */
     fx_usb_fixed = (ui_prefs & PREF_USB_FIXED) != 0u;   /* (MENU > USB LEVEL: fx.c, audio.c) */
     fx_usb_gain = USB_GAIN[fx_usb_fixed ? usb_lvl % 5u : 0u];   /* (0.7.0) .. and its attenuation (usb.c uac_tap) */
-    mo_lvl = (uint8_t)(midi_out_mode & 3u);             /* (0.6.72) MENU > MIDI OUT (seq.c) */
+    mo_lvl = midi_out_mode;             /* (0.6.72) MENU > MIDI OUT (seq.c) */
     midi_pc_poll();                                     /* (0.6.72) PROGRAM CHANGE in: the sounds it asked for */
     ml_poll();                                          /* (0.9.12) MIDI LEARN: a CC came for the picked parameter */
     rp_apply();                                        /* (MENU > CLICK, CLICK LEVEL, COUNT-IN: click.c, seq.c) */
@@ -2139,7 +2149,7 @@ static void ui_input_frame(void)
     if (((pressed >> panel.btn[B_SAVE]) & 1u) && ui.ly == LAYER_SAVE)
         ui.save_t0 |= 2u;                               /* (SAVE too: layer_tap opens its pages) */
     layer_oct_open(pressed);                            /* (OCT± with a SET layer's button down: it opens now) */
-    oct = oct_taps(pressed, ui.menu || ui.confirm || act_cols() || name_on() || layer_set_open() || six_gen_page() || six_return_page());
+    oct = oct_taps(pressed, ui.menu || ui.confirm || act_cols() || name_on() || layer_set_open() || six_gen_page() || six_return_page() || drumgen_page());
     oct = layer_oct(pressed, oct);                      /* (a SET layer's OCT-: put back) */
     layer_masks();                                      /* seq.c: keys pressed with a layer's button are its own */
     live_frame();                                       /* (0.9.11) GLO > LIVE: MANO's keys, OCT- held, the modifiers */
@@ -2292,10 +2302,17 @@ static void ui_input_frame(void)
             uint32_t kind = ui.confirm;
             ui.confirm = 0;
             ui.force = 1;
-            if (kind != CF_TRACKS6 && kind != CF_OVR_PROJ && kind != CF_OVR_USER && kind != CF_ERASE_USER && kind != CF_DICE_ALL &&
+            if (kind != CF_USB_HOST && kind != CF_ERASE_SECTION && kind != CF_ERASE_PROJECT && kind != CF_TRACKS6 && kind != CF_OVR_PROJ && kind != CF_OVR_USER && kind != CF_ERASE_USER && kind != CF_DICE_ALL &&
                 !dice_kind(kind) && kind != CF_DEL_ROW && kind != CF_CLEAR_SONG && !chain_busy())
                 undo_mark();                            /* (0.6.21) the music before a clear, INIT, RECALL, pattern */
-            if (kind == CF_TRACKS6) {
+            if(kind==CF_ERASE_SECTION||kind==CF_ERASE_PROJECT){
+                (void)library_erase(ui.confirm_trk>>2,ui.confirm_trk&3u,kind==CF_ERASE_PROJECT);
+            } else if (kind == CF_USB_HOST) {
+#if RHYTHMER_USB_HOST
+                if(!transport_busy()){uh.want=1;ui_message("USB HOST REQUESTED");}
+                else ui_message("STOP TO CHANGE USB MODE");
+#endif
+            } else if (kind == CF_TRACKS6) {
                 trks_activate();settings_save();ui_message("6 TRACK MODE");
             } else if (kind == CF_OVR_PROJ) {                  /* overwrite: the NAME screen writes it */
                 name_open(NK_PROJ_SAVE, ui.confirm_trk & 3u);
@@ -2424,7 +2441,7 @@ static void ui_input_frame(void)
     if (seq == BT_TAP || seq == BT_HOLD)                /* (SONG: SAVE held, G5) */
         open_family(FAM_SEQ);
     if (home == BT_TAP)                                 /* HOME acts on release (a hold opens the menu): rule 2, HOME's */
-        nav_button(SEC_HOME);                           /* page last shown; on HOME the next group (ECO BEING GEN) */
+        nav_button(SEC_HOME);                           /* reopen HOME or advance one page */
     cursor_fix();                                       /* LEN may have changed (knob, editor, load) */
     for (id = 0; id < 14u; id++) {
         if (!((pressed >> id) & 1u))
@@ -2466,7 +2483,7 @@ static void ui_input_frame(void)
         case B_OCTDN:
         case B_OCTUP: {
             uint32_t both = (1u << panel.btn[B_OCTDN]) | (1u << panel.btn[B_OCTUP]);
-            if (act_cols() || layer_set_open() || gen_on() || six_gen_page() || six_return_page())   /* action pages: enter / back (below); SET layers: OCT-; GEN */
+            if (act_cols() || layer_set_open() || gen_on() || six_gen_page() || six_return_page() || drumgen_page())   /* action pages: enter / back (below); SET layers: OCT-; GEN */
                 break;
             if (live_page())                            /* (0.9.11) LIVE: OCT- RETURN / held BYPASS, OCT+ COMMIT */
                 break;                                  /* (ui_live.c live_frame) */
@@ -2503,7 +2520,8 @@ static void ui_input_frame(void)
     for (id = 0; b; id++, b >>= 1)
         if (b & 1u)
             page_tap(panel_btn_of(id));
-    if(six_return_page()&&oct){six_return_apply((oct&2u)!=0);}
+    if(drumgen_page()&&oct){drumgen_apply(!(oct&2u));}
+    else if(six_return_page()&&oct){six_return_apply((oct&2u)!=0);}
     else if(six_gen_page()&&oct){six_gen_apply((oct&2u)?0:1,0);}
     else if (gen_on() && (oct & 2u)) {                       /* (0.9.2) GEN, HOME's pages: OCT+ the piece (the screen stays, */
         if (!chain_busy()) gen_press();                 /* OCT+ again: another), OCT- back to ECO */

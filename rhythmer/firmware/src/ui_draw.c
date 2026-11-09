@@ -1244,8 +1244,35 @@ static void engine_columns(void)
     draw_column(2, "FAV", preset_favorite() ? "ON" : "OFF", "", VAL(2u), -1, ICON_X_STAR);
     draw_column(3, "", "", "", T_THEME, -1, ICON_NONE);
 }
+static void drumgen_cards(void)
+{
+ const page_t *pg=cur_page();drum_gen_t *g=dg_current();
+ const char *labels[4],*special[4]={0};int vals[4],max[4]={127,127,127,127};char b[12];
+ if(pg->id[0]==0){
+  labels[0]="TYPE";labels[1]=drum_track(TSEL)?"LANE":trk_eng(TSEL)==ENGI_BREAK?"CHOPS":"PITCH";labels[2]=g->type==DG_MUTATE?"AMOUNT":"DENSITY";
+  labels[3]=g->type==DG_EUCLID?"ROTATE":g->type==DG_TURING?"LOCK":g->type==DG_CELLULAR?"RULE":g->type==DG_GRIDS?"CHAOS":"-";
+  vals[0]=g->type;vals[1]=g->lane;vals[2]=g->density;vals[3]=g->variation;
+  max[0]=DG_COUNT-1;max[1]=drum_track(TSEL)?7:3;max[3]=g->type==DG_CELLULAR?255:g->type==DG_EUCLID?63:127;
+  static const char *const pitch[]={"PATTERN","ROOT","SCALE","CHORD"},*const brk[]={"STRAIGHT","KEEP","SOURCE A","SOURCE B"};
+  special[0]=DG_NAMES[g->type];special[1]=drum_track(TSEL)?drum_lane_abbr(TSEL,g->lane):trk_eng(TSEL)==ENGI_BREAK?brk[g->lane&3]:pitch[g->lane&3];
+ }else if(pg->id[0]==1){
+  labels[0]="MAP X";labels[1]="MAP Y";labels[2]="ACCENT";labels[3]="SEED";
+  vals[0]=g->x;vals[1]=g->y;vals[2]=g->accent;vals[3]=g->seed;max[2]=1;special[2]=g->accent?"ON":"OFF";
+ }else{
+  static const char *const join[]={"OR","XOR","AND","SUB"};
+  labels[0]="HITS 2";labels[1]="ROT 2";labels[2]="JOIN";labels[3]="REG LEN";
+  vals[0]=g->hits2;vals[1]=g->rotate2;vals[2]=g->join;vals[3]=g->reglen;
+  max[0]=max[1]=64;max[2]=3;max[3]=16;special[2]=join[g->join];
+ }
+ for(unsigned k=0;k<4;k++){fmt_int(b,vals[k]);draw_column(k,labels[k],special[k]?special[k]:b,"",VAL(k),vals[k]*1000/max[k],ICON_NONE);}
+}
 static void draw_columns(void)
 {
+ if(cur_page()->graph==GR_LIBCLEAR){char b[8];fmt_int(b,(int)song_cur+1);draw_column(0,"PROJECT",b,"",VAL(0),song_cur*1000/(NSONG-1),ICON_NONE);
+  b[0]=(char)('A'+(((unsigned)song.g[G_SLOT]-1)&3));b[1]=0;draw_column(1,"SECT",b,"",VAL(1),(((unsigned)song.g[G_SLOT]-1)&3)*1000/3,ICON_NONE);
+  draw_act_column(2,"CLR SECT",T_TEXT,ICON_NONE);draw_act_column(3,"CLR PROJ",T_TEXT,ICON_NONE);return;}
+
+ if(cur_page()->graph==GR_DGEN){drumgen_cards();return;}
  if(cur_page()->graph==GR_SIXSTEP){
   const step_t *s=&TSEL->step[ui.cursor];char c[8],cmd[8],l[8];fmt_int(c,(int)ui.cursor+1);note_name(cmd,s->note[0]);fmt_int(l,(int)note_len(TSEL,ui.cursor,(unsigned)TSEL->p[P_SLEN]));
   draw_column(0,"STEP",c,"",T_TEXT,-1,ICON_AUTO);draw_column(1,"COMMAND",cmd,"",T_TEXT,-1,ICON_AUTO);
@@ -1567,7 +1594,7 @@ static void draw_columns(void)
         fmt_int(u + 1, (int32_t)total);
         if (!total || (cur + 1u >= 100u && total >= 100u)) u[0] = 0;   /* (0.7.0) "147/155" is too wide for the card: the
                                                          * number alone past 99 (every engine's presets counted) */
-        draw_column(0, "No.", val, u, VAL(0u), -1, ICON_NONE);
+        draw_column(0, "PRESET", val, u, VAL(0u), -1, ICON_NONE);
         draw_column(1, "ENG", ENGINES[TSEL->eng_req]->name, "", VAL(1u), -1, engine_icon(ENGINES[TSEL->eng_req]->name));
         draw_column(2, "FAV", preset_favorite() ? "ON" : "OFF", "", VAL(2u), -1, ICON_X_STAR);
         draw_column(3, "LIST", N_LIST[list_get()], "", VAL(3u), -1, ICON_X_FOLDER);
@@ -1806,14 +1833,22 @@ static uint8_t spl_anim;
 /* Startup is a fixed six-machine identity, independent of track assignments.
  * Keep EMPTY defaults and all live track rendering unchanged. */
 static unsigned splash_engine(unsigned k){
+#if RHYTHMER_FMINI && RHYTHMER_OBERVAVE
+ static const uint8_t machine[6]={ENGI_DRUM,ENGI_ANALOG,ENGI_FMINI,ENGI_OBERVAVE,ENGI_ACID,ENGI_BREAK};
+#else
  static const uint8_t machine[6]={ENGI_DRUM,ENGI_ANALOG,ENGI_PHASE,ENGI_LOFI,ENGI_ACID,ENGI_BREAK};
+#endif
  return machine[k%6u];
 }
 static void splash_sig(int32_t px,uint32_t ms){
  (void)px;unsigned off=!!(ui_prefs&PREF_ANIM_OFF);if(off)ms=SPL_WRITE;
  unsigned progress=clamp((int)(ms*48u/SPL_WRITE),0,48);
  static const uint8_t g[8][7]={{30,17,17,30,20,18,17},{17,17,17,31,17,17,17},{17,17,10,4,4,4,4},{31,4,4,4,4,4,4},{17,17,17,31,17,17,17},{17,27,21,21,17,17,17},{31,16,16,30,16,16,31},{30,17,17,30,20,18,17}};
+#if RHYTHMER_FMINI && RHYTHMER_OBERVAVE
+ static const char *const part[6]={"DRUM","ANALOG","FMINI-1","OBERVAVE","ACID","BREAK"};
+#else
  static const char *const part[6]={"DRUM","ANALOG","PHASE","LOFI","ACID","BREAK"};
+#endif
  cv_begin(240,120,T_BG);
  cv_text_in(8,0,114,&AF_X,"RHYTHMER OS",T_TEXT,T_BG);
  cv_text_r(232,0,&AF_X,progress==48u?"READY":"STARTUP",T_DIM,T_BG);
@@ -1969,6 +2004,11 @@ static void confirm_text(char *a, char *b)
     uint32_t k = ui.confirm_trk;
     b[0] = 0;
     switch (ui.confirm) {
+    case CF_ERASE_SECTION:
+        str_cpy(a,"ERASE P1 SECTION A?",24);a[7]=(char)('1'+(k>>2));a[17]=(char)('A'+(k&3));str_cpy(b,"STORED DATA / NO UNDO",24);break;
+    case CF_ERASE_PROJECT:
+        str_cpy(a,"ERASE PROJECT 1?",24);a[14]=(char)('1'+(k>>2));str_cpy(b,"SECTIONS A-D / NO UNDO",24);break;
+    case CF_USB_HOST: str_cpy(a,"USB MIDI HOST?",24);str_cpy(b,"POWER DEVICE / HUB",24);break;
     case CF_CLEAR_TRK:
         str_cpy(a, "CLEAR TRACK 1?", 24);
         a[12] = (char)('1' + k % NTRK);
@@ -2176,6 +2216,12 @@ static void draw_confirm(void)
         cv_text_in(0,51,212,&AF_S,"MAY CAUSE NOISE / GLITCHES",T_MID,cb);
         cv_text_in(0,70,212,&AF_X,"IF THIS HAPPENS: MUTE TRACKS",T_TEXT,cb);
         cv_text_in(0,81,212,&AF_X,"OR REDUCE VOICES / FX",T_TEXT,cb);
+    }else if(ui.confirm==CF_USB_HOST){
+        cv_text_in(0,12,212,&AF_M,"USB MIDI HOST?",T_TEXT,cb);
+        cv_text_in(0,38,212,&AF_X,"COMPUTER LINK WILL CLOSE",T_TEXT,cb);
+        cv_text_in(0,54,212,&AF_X,"EDITOR / INSTALLER OFF",T_TEXT,cb);
+        cv_text_in(0,70,212,&AF_X,"POWERED DEVICE / HUB NEEDED",T_TEXT,cb);
+        cv_text_in(0,84,212,&AF_X,"REBOOT: USB DEVICE MODE",T_DIM,cb);
     }else{
     cv_text_on(12, 12 - AF_M_CAP_Y, &AF_M, "?", T_ACCENT, cb);
     if (text_w(tf, a) > 196)

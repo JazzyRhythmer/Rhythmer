@@ -320,6 +320,13 @@ static void fm1_main(void)
     for (;;) {
         uint32_t m = fm1_ms;
         fm1_wdt_feed();
+#if RHYTHMER_USB_HOST
+        uh_task(m);
+        if(uh.msg){
+            static const char *const message[]={"","USB HOST ON","USB DEVICE MODE","USB MIDI CONNECTED","NO MIDI INTERFACE","LOW SPEED UNSUPPORTED","USB MIDI DISCONNECTED","POWER A MIDI DEVICE","USB DEVICE NO ANSWER","HUB: NO DEVICE","HUB: NO MIDI"};
+            ui_message(uh.msg<NELEM(message)?message[uh.msg]:"USB HOST");uh.msg=0;
+        }
+#endif
         usb_retry(fm1_ms);
         if (fm1_ms > 30000u && bootguard.pending) {     /* a crash or hang in the first 30 s counts */
             bootguard.pending = 0;

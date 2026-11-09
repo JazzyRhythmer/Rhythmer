@@ -93,6 +93,7 @@ static int song_stage(uint32_t s, uint32_t row)
     }
     sec_stage.motion = p->motion;
     memcpy(sec_stage.dx, p->dx, sizeof sec_stage.dx);
+    sec_stage.dx_md_hi = project_drum_bits(p);
     sec_stage.dx_mute = (uint16_t)(p->dx_mute & DXM_ALL);
     memcpy(sec_stage.pfx_lane, p->pfx_lane, sizeof sec_stage.pfx_lane);
     memcpy(sec_stage.slg, &p->g[G_SLMODE], sizeof sec_stage.slg);   /* (0.6.3) the section's SLICER */
@@ -435,4 +436,40 @@ static void song_poll(void)
     live.dirty = 0;
     song_idx_dirty = 0;
 #endif
+}
+
+/* Stored-library deletion uses the existing commit-last A/B store. An empty
+ * valid payload supersedes the old project; no raw flash erase or layout change.
+ * The current audition is cleared only if it came from the erased section. */
+static int library_erase(uint32_t project,uint32_t section,int whole)
+{
+ if(project!=song_cur||project>=NSONG||section>=4){ui_message("PROJECT CHANGED / RETRY");return 1;}
+ if(transport_busy()||voices_busy()){ui_message("STOP / RELEASE NOTES FIRST");return 1;}
+#if FELUCCA_FLASH
+ if(!flash_ok){ui_message("FLASH UNAVAILABLE");return 1;}
+#endif
+ int failed=0;
+ for(unsigned k=0;k<4;k++)if(whole||k==section){
+  memset(&proj_wire,0,sizeof proj_wire);proj_wire_gen++;
+#if FELUCCA_FLASH
+  if(st_save(proj_obj(k),&proj_wire,sizeof proj_wire)){failed=1;break;}
+#endif
+  memcpy(&proj_slot[k],&proj_wire,sizeof proj_slot[k]);live.dirty&=(uint8_t)~(1u<<k);dice_secs&=(uint8_t)~(1u<<k);
+  unsigned to=0;
+  for(unsigned row=0;row<chain_config.count;row++)if(chain_config.row[row].slot!=k){
+   chain_config.row[to]=chain_config.row[row];song_idx.scene[song_cur][to]=song_idx.scene[song_cur][row];to++;
+  }
+  for(unsigned row=to;row<CHAIN_ROWS;row++)memset(&song_idx.scene[song_cur][row],0,sizeof song_idx.scene[0][0]);
+  chain_config.count=(uint8_t)to;
+  if(live.cur==(int8_t)k){
+   for(unsigned tr=0;tr<NTRK;tr++){load_begin(&trk[tr],LOAD_PAT);track_defaults_steps(&trk[tr]);motion_clear(&trk[tr]);load_end(&trk[tr]);latch_drop_req|=(uint8_t)(1u<<tr);}
+   memset(pfx_lane,0,sizeof pfx_lane);live.cur=-1;proj_cur=PROJ_NO_SLOT;proj_name[0]=0;
+  }
+ }
+ if(whole&&!failed){chain_defaults(&chain_config);memset(song_idx.scene[song_cur],0,sizeof song_idx.scene[0]);}
+ sec_stage.ready=0;live.req=-1;ui.song_row=0;song_idx_touch();
+ if(song_index_save())failed=1;
+ ui.act=0;ui.force=1;
+ ui_message(failed?"ERASE INCOMPLETE / RETRY":whole?"PROJECT CLEARED":"SECTION CLEARED");
+ return failed;
 }

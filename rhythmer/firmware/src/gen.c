@@ -874,6 +874,7 @@ static void gen_pads(track_t *t, uint32_t len)
     const ggenre_t *g = gs.g;
     uint32_t i, a = gs.amt[GP_CHORDS], last = 0xFFFFu, cnt = 0, style = g->pads, mode = gvo_mode(), fam = HXF(gs.hx);
     int32_t n[4];
+    int three_voice=trk_eng(t)==ENGI_FMINI;
     int rootless = (fam == HF_JAZZ || (fam == HF_JAZZY && gs.vm == VM_RICH)) && gs.act[RL_BASS];
     uint8_t dub[16] = {0}, comp[16] = {0}, brk[16] = {0};
     uint32_t off, sh;
@@ -925,7 +926,17 @@ static void gen_pads(track_t *t, uint32_t len)
         }
         if (hold > 0 && pp + (uint32_t)hold >= cl && style != CS_DRONE) hold = (int)(cl - pp) - 1;   /* (held to its chord's end) */
         if (gs.human) vel += grr(-(int32_t)gs.human / 12, (int32_t)gs.human / 12);
-        gnote(s, n, cnt, vel, 0);
+        uint32_t notes=cnt;
+        if(three_voice&&notes==4u){
+            /* Fit the voicing to FMini's three voices. Prefer dropping the
+             * fifth so the chord's third and extensions are audible. */
+            int32_t fifth=gtone(c,4,0)%12;
+            unsigned drop=0;
+            while(drop<3u&&n[drop]%12!=fifth)drop++;
+            for(unsigned j=drop;j<3u;j++)n[j]=n[j+1u];
+            notes=3;
+        }
+        gnote(s, n, notes, vel, 0);
         if (hold > 0) dhold(t, i, (uint32_t)hold, len);
     }
 }
@@ -1429,13 +1440,21 @@ static const uint8_t GENVF[RL_N][2] = {{0, 0}, {6, 20}, {4, 14}, {6, 18}, {8, 24
  * recipe's (no range); their weights */
 static const uint8_t GENV[3][8] = {{0, 6, 55, 76, 12, 58, 55, 72}, {38, 62, 70, 88, 55, 90, 66, 90}, {2, 14, 62, 84, 60, 88, 64, 86}};
 static const uint8_t GENV_LW[4] = {45, 15, 25, 15}, GENV_AW[4] = {60, 8, 17, 15};
-/* Automatic song creation uses the light musical pool. Manual model/preset
- * selection stays unrestricted. One automatic Serum is allowed, including
- * any Serum already kept on the untouched tracks. */
-static int gen_auto_synth_ok(unsigned e){return e==ENGI_ANALOG||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_WHEEL||e==ENGI_M2SID||e==ENGI_SERUM;}
-static int gen_serum_free(const track_t *t){for(unsigned k=0;k<NTRK;k++)if(&trk[k]!=t&&trk[k].eng_req==ENGI_SERUM)return 0;return 1;}
-/* Soft role guidance, not a fixed machine assignment. Every row keeps at
- * least five light synths eligible; at most one Serum remains a hard budget. */
+/* Automatic generation keeps a light pool and one active instance per imported engine. */
+static int gen_auto_synth_ok(unsigned e)
+{
+    return e==ENGI_ANALOG||e==ENGI_M2SID||e==ENGI_SERUM||
+        (RHYTHMER_FMINI&&e==ENGI_FMINI)||(RHYTHMER_OBERVAVE&&e==ENGI_OBERVAVE)||
+        (!RHYTHMER_SWAP_WLP&&(e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_WHEEL));
+}
+static int gen_engine_free(const track_t *t,unsigned e)
+{
+    if(e!=ENGI_SERUM&&e!=ENGI_FMINI&&e!=ENGI_OBERVAVE)return 1;
+    for(unsigned k=0;k<trk_live;k++)
+        if(&trk[k]!=t&&trk[k].eng_req==e&&
+           (&trk[k]<t||!(six_gen_work_mask&(1u<<k))))return 0;
+    return 1;
+}
 static void gen_guide(unsigned feel,unsigned role,uint8_t *weight){
  static const uint8_t guide[GF_N][3][6]={
  {{18,22,22,10,10,18},{18,22,22,10,10,18},{18,22,22,10,10,18}},
@@ -1460,13 +1479,45 @@ static void gen_guide(unsigned feel,unsigned role,uint8_t *weight){
  };
  memcpy(weight,guide[feel<GF_N?feel:0][role==RL_BASS?0:role==RL_PAD?1:2],6);
 }
-static unsigned gen_tag_weight(unsigned role,unsigned tag){
- if(role==RL_BASS)return tag==PT_BASS?8u:tag==PT_PLUCK||tag==PT_KEYS?2u:1u;
- if(role==RL_PAD)return tag==PT_PAD||tag==PT_KEYS?6u:tag==PT_VOX?3u:1u;
- if(role==RL_ARP)return tag==PT_PLUCK?6u:tag==PT_KEYS||tag==PT_BELL?4u:2u;
- return tag==PT_LEAD?6u:tag==PT_PLUCK||tag==PT_BELL?3u:2u;
-}
 #include "gen_bass_sound.c"
+static unsigned gen_pick_preset(unsigned e,unsigned role,const grecipe_t *r)
+{
+    const engine_t *en=ENGINES[e];
+    uint8_t weight[UINT8_MAX]={0};
+    unsigned total=0;
+    /* A patch can contribute to multiple roles, but mono patches cannot voice
+     * a chord, and slow pads cannot take the rhythmic arp of an imported synth. */
+    static const uint8_t role_weight[RL_N-2][PT_N]={
+        {0,0,0,7,6,0,0,0,0,0}, /* chord */
+        {1,0,6,0,3,3,3,2,0,0}, /* lead */
+        {1,0,3,0,4,6,4,0,0,0}, /* arp */
+        {1,0,2,6,2,1,3,7,0,2}, /* texture */
+    };
+    for(unsigned i=0;i<en->npresets;i++){
+        const preset_t *p=&en->presets[i];
+        unsigned tag=PR_TAG(p),w=0;
+        if(role==RL_BASS){
+            if(!gen_bass_ok(e,i))continue;
+            w=gen_bass_weight(e,i);
+        }else{
+            if(gnever(p->name)||tag==PT_BASS||(tag==PT_FX&&role!=RL_TEX)||
+               (e==ENGI_LOFI&&p->e[1]>=RW_BYTE))continue;
+            if(tag>=PT_N)continue;
+            w=role_weight[role-RL_PAD][tag];
+            if(role==RL_PAD&&PR_MONO(p))continue;
+        }
+        if(!w)continue;
+        for(unsigned k=0;k<3u&&r->w[k];k++)if(dname_has(p->name,r->w[k])){
+            w+=role==RL_BASS?1u:3u-k;
+            break;
+        }
+        unsigned id=e<<8|i;
+        for(unsigned j=0;j<gs.nsnd;j++)if(gs.snd[j]==id){w=(w+1u)/2u;break;}
+        weight[i]=(uint8_t)w;
+        total+=w;
+    }
+    return total?gpickw(weight,en->npresets):en->npresets;
+}
 static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
 {
     /* Only the existing, explicitly named Acid recipe selects this machine.
@@ -1476,71 +1527,43 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
         apply_preset_to(t,gr()%ENG_ACID.npresets);t->p[P_VOICE]=V_LEGATO;return;
     }
     const grecipe_t *r = &RECIPE[ri];
-    static const uint8_t EW[3] = {55, 30, 15};
-    uint32_t e = r->eng[gpickw(EW, 3)], i, k, n, nm = 0, na = 0;
-    uint8_t m[32], w[32], any[32];
-    const engine_t *en;
-    if (gx.eng >= 0) e = (uint32_t)gx.eng;              /* (0.8.6) EXPLORE: any engine (gx_engine) */
-    if(t>=trk&&t<trk+SIX_GEN_TRACKS&&(gx.eng<0||!gen_auto_synth_ok(e)||(e==ENGI_SERUM&&!gen_serum_free(t))||
-       (role==RL_BASS&&!gen_bass_engine_weight(e,16))||(e==ENGI_M2SID&&role!=RL_LEAD))){
-        static const uint8_t engines[6]={ENGI_ANALOG,ENGI_PHASE,ENGI_LOFI,ENGI_WHEEL,ENGI_M2SID,ENGI_SERUM};
-        uint8_t weight[6]={18,22,22,10,10,18};
+    static const uint8_t engines[]={
+        ENGI_ANALOG,RHYTHMER_SWAP_WLP?ENGI_FMINI:ENGI_PHASE,ENGI_LOFI,
+        RHYTHMER_SWAP_WLP?ENGI_OBERVAVE:ENGI_WHEEL,ENGI_M2SID,ENGI_SERUM
+    };
+    unsigned e=(unsigned)gx.eng,i,k;
+    if(!gen_auto_synth_ok(e)||!gen_engine_free(t,e)||
+       (e==ENGI_M2SID&&role!=RL_LEAD)||(role==RL_BASS&&!gen_bass_engine_weight(e,16))){
+        uint8_t weight[NELEM(engines)];
         gen_guide(gs.g->feel,role,weight);
-        weight[4]=role==RL_LEAD?2u:0u; /* SID: rare mono lead, never chords/bass/texture. */
-        if(role==RL_BASS)for(unsigned j=0;j<6;j++)weight[j]=(uint8_t)gen_bass_engine_weight(engines[j],weight[j]);
-        if(!gen_serum_free(t))weight[5]=0;
-        e=engines[gpickw(weight,6)];
-    }
-    if (e == ENGI_FM6 && gs.fm6 >= 2u) e = r->eng[0] == ENGI_FM6 ? EG_A : r->eng[0];
-    gs.fm6 += e == ENGI_FM6;
-    set_engine_of(t, e);
-    e = trk_eng(t); /* Recipes follow the actual selected engine, never a track number. */
-    en = trk_engp(t);
-    n = en->npresets;
-    if (!n) return;
-    for (i = 0; i < n; i++) {
-        const char *pn = en->presets[i].name;
-        if(e==ENGI_LOFI&&en->presets[i].e[1]>=RW_BYTE)continue; /* GEN favors pitched chip sounds. */
-        unsigned tag=PR_TAG(&en->presets[i]);
-        if (gnever(pn) || (tag==PT_FX&&role!=RL_TEX)) continue;
-        if (role==RL_BASS && !gen_bass_ok(e,i)) continue;
-        if (role==RL_PAD && tag!=PT_PAD && tag!=PT_KEYS) continue;
-        if (role != RL_BASS && PR_TAG(&en->presets[i]) == PT_BASS) continue;   /* (0.9.12: by its type, was its name:
-                                                         * BASS GROWL ACID; a REESE now too) */
-        if (na < sizeof any) any[na++] = (uint8_t)i;
-    }
-    for (i = 0; role!=RL_BASS && i < na; i++) {          /* (0.9.17) every preset a word of the recipe names, the first
-                                                         * word's likeliest (3 2 1), one another track of the piece has
-                                                         * already seldom: until 0.9.16 only the first word that fitted,
-                                                         * often one preset (MICRO HOUSE's lead: the press before's
-                                                         * sound in 45 % of the presses) */
-        const char *pn = en->presets[any[i]].name;
-        for (k = 0; k < 3u && r->w[k] && !dname_has(pn, r->w[k]); k++) {}
-        if (k < 3u && r->w[k]) {
-            uint32_t id = e << 8 | any[i], j;
-            for (j = 0; j < gs.nsnd && gs.snd[j] != id; j++) {}
-            m[nm] = any[i]; w[nm++] = (uint8_t)(j < gs.nsnd ? 1u : (6u-2u*k)*gen_tag_weight(role,PR_TAG(&en->presets[any[i]])));
+        if(RHYTHMER_SWAP_WLP){
+            unsigned drum=gs.gi<NGENRE?GENRE[gs.gi].drum:gs.g->drum;
+            /* Use the selected genre so drum variations cannot re-enable
+             * the FMINI bass bonus in a techno arrangement. */
+            weight[1]=(uint8_t)(role==RL_BASS?
+                (drum>=DM_TECHNO&&drum<=DM_HARD?5u:weight[1]+15u):weight[1]+4u);
+            weight[2]=0;
+            weight[3]=(uint8_t)(role==RL_PAD||role==RL_TEX?weight[3]+10u:weight[3]);
         }
-    }
-    if(role==RL_BASS){
-        /* Keep the entire suitable pool alive; recipe words are a small bonus,
-         * not an exclusive shortlist that can force a single repeating bass. */
-        for(i=0;i<na;i++){
-            unsigned id=e<<8|any[i],j,v=gen_bass_weight(e,any[i]);
-            for(j=0;j<3&&r->w[j];j++)if(dname_has(en->presets[any[i]].name,r->w[j])){v++;break;}
-            for(j=0;j<gs.nsnd&&gs.snd[j]!=id;j++){}
-            w[i]=(uint8_t)(j<gs.nsnd?(v+1u)/2u:v);
+        weight[4]=role==RL_LEAD?2u:0u; /* SID stays a rare mono lead. */
+        for(unsigned j=0;j<NELEM(engines);j++){
+            unsigned model=engines[j];
+            if(!gen_auto_synth_ok(model)||!gen_engine_free(t,model))weight[j]=0;
+            else if(role==RL_BASS&&weight[j])weight[j]=(uint8_t)gen_bass_engine_weight(model,weight[j]);
         }
-        /* Defensive fallback stays in the bass pool, never all presets. The
-         * engine fence above normally makes this branch unnecessary. */
-        if(!na){set_engine_of(t,ENGI_ANALOG);e=trk_eng(t);en=trk_engp(t);n=en->npresets;
-            for(i=0;i<n&&na<sizeof any;i++)if(gen_bass_ok(e,i)){any[na]=(uint8_t)i;w[na++]=(uint8_t)gen_bass_weight(e,i);}}
-    }else if(!nm)for(i=0;i<na;i++)w[i]=(uint8_t)gen_tag_weight(role,PR_TAG(&en->presets[any[i]]));
-    if(role==RL_BASS){if(!na)return;k=any[gpickw(w,na)];}
-    else k = nm ? m[gpickw(w, nm)] : na ? any[gpickw(w,na)] : gr() % n;
+        e=engines[gpickw(weight,NELEM(engines))];
+    }
+    k=gen_pick_preset(e,role,r);
+    if(k==ENGINES[e]->npresets){
+        e=ENGI_ANALOG;
+        k=gen_pick_preset(e,role,r);
+        if(k==ENG_ANALOG.npresets)return;
+    }
+    set_engine_of(t,e);
     if (gs.nsnd < SIX_GEN_TRACKS) gs.snd[gs.nsnd++] = (uint16_t)(e << 8 | k);
     apply_preset_to(t, k);
-    for (i = 0; role!=RL_BASS && !gs.g->feel && i < 8u; i++) { /* Bass presets keep their oscillator tuning too. */
+    int imported=e==ENGI_FMINI||e==ENGI_OBERVAVE;
+    for (i = 0; role!=RL_BASS && !gs.g->feel && !imported && i < 8u; i++) { /* Bass presets keep their oscillator tuning too. */
                                                         /* Curated genres keep oscillator tuning, ratios and the
                                                          * imported preset's character. Filter/envelope/mix still vary. */
         const param_desc_t *d = track_desc(t, P_E0 + i);
@@ -1548,11 +1571,13 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
         if (!d->label || d->label[0] == '-' || d->max <= d->min || d->fmt == F_ENUM || !span) continue;
         t->p[P_E0 + i] = (int16_t)clamp(t->p[P_E0 + i] + grr(-span, span), d->min, d->max);
     }
-    t->p[P_ATK] = (int16_t)grr(r->atk[0], r->atk[1]);
-    t->p[P_DEC] = (int16_t)grr(r->dec[0], r->dec[1]);
-    t->p[P_SUS] = (int16_t)grr(r->sus[0], r->sus[1]);
-    t->p[P_REL] = (int16_t)grr(r->rel[0], r->rel[1]);
-    if (!gs.g->feel && (role == RL_LEAD || role == RL_ARP) && r->sus[1] < 120u) {   /* (0.9.17, "too many leads with full sustain and
+    if(!imported){
+        t->p[P_ATK] = (int16_t)grr(r->atk[0], r->atk[1]);
+        t->p[P_DEC] = (int16_t)grr(r->dec[0], r->dec[1]);
+        t->p[P_SUS] = (int16_t)grr(r->sus[0], r->sus[1]);
+        t->p[P_REL] = (int16_t)grr(r->rel[0], r->rel[1]);
+    }
+    if (!imported && !gs.g->feel && (role == RL_LEAD || role == RL_ARP) && r->sus[1] < 120u) {   /* (0.9.17, "too many leads with full sustain and
                                                          * no release") a lead's or an arp's envelope a shape of its own:
                                                          * plucked (a real decay to a sustain well under the top, a short
                                                          * release), swelling (a slow attack), held with a tail; the
@@ -1636,7 +1661,9 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
     else t->p[P_DIST] = 0;
     t->p[P_CHOR] = (int16_t)(r->chor[1] ? grr(r->chor[0], r->chor[1]) : 0);
     t->p[P_GLIDE] = (int16_t)(r->glide ? grr(r->glide - 10, r->glide + 10) : 0);
-    t->p[P_VOICE] = (int16_t)(e==ENGI_M2SID?V_MONO:r->voice);
+    if(e==ENGI_M2SID||role==RL_BASS)t->p[P_VOICE]=V_MONO;
+    else if(role==RL_PAD)t->p[P_VOICE]=V_POLY;
+    else if(!imported)t->p[P_VOICE]=r->voice;
     t->p[P_DETUNE] = (int16_t)(ri == SR_REESE || ri == SR_WALL || ri == SR_HOOVER ? grr(30, 60) : t->p[P_DETUNE]);
     if (ri == SR_GTR || ri == SR_DRONE) {               /* (a tremolo: AUTO PAN on the beat) */
         t->p[P_APDEP] = (int16_t)grr(30, 60); t->p[P_APSYNC] = 1; t->p[P_APRATE] = (int16_t)grr(4, 6); t->p[P_APWAVE] = (int16_t)(ri == SR_GTR ? 3 : 0);
@@ -2148,9 +2175,23 @@ static void gx_mutate(void)
  * SPRING, the texture left out, then the arp, then the lead (gx_fit_sounds, before the parts); the delay's grain off,
  * a PLAYHEAD less, a note less in every chord (two at least), the long releases shorter, the texture cleared
  * (gx_fit_piece, after them). The genres and RANDOM are left as they were */
-static const uint8_t GC_ENG[NENGINES] = {27, 79, 45, 27, 27, 64, 27, 44, 27, 27, 70, 60, 79, 27, 22, 45, 50, 68, 80, 75, 40};   /* (ANALOG ..
+static const uint8_t GC_ENG[NENGINES] = {27, 79, 45, 27, 27, 64, 27, 44, 27, 27, 70, 60, 79, 27, 22, 45, 50, 68, 80, 75, 40,
+#if RHYTHMER_FMINI
+    [ENGI_FMINI]=44,
+#endif
+#if RHYTHMER_OBERVAVE
+    [ENGI_OBERVAVE]=44,
+#endif
+};   /* (ANALOG ..
                                                          * ANIMAL by number; the retired ones as ANALOG, DIGITAL as FM6) */
-static const uint8_t GC_VOX[NENGINES] = {19, 26, 15, 17, 19, 23, 19, 22, 19, 19, 11, 16, 26, 19, 11, 0, 40, 24, 28, 26, 20};
+static const uint8_t GC_VOX[NENGINES] = {19, 26, 15, 17, 19, 23, 19, 22, 19, 19, 11, 16, 26, 19, 11, 0, 40, 24, 28, 26, 20,
+#if RHYTHMER_FMINI
+    [ENGI_FMINI]=26,
+#endif
+#if RHYTHMER_OBERVAVE
+    [ENGI_OBERVAVE]=24,
+#endif
+};
 static const uint8_t GC_REV[5] = {0, 25, 32, 10, 47};   /* ROOM SPRING SHIMMER RESO CLOUD */
 static const uint8_t GC_DIVQ[6] = {1, 2, 4, 8, 3, 6};   /* a DIV's steps a beat, x 4 / 4 (1/4 .. 1/32, 8T, 16T) */
 #define GC_GRAIN 25u
@@ -2222,7 +2263,7 @@ static void gx_fit_sounds(void)
         if (best == NTRK) break;
         r = gs.role[best]; e = trk[best].eng_req;
         gs.fm6 -= e == ENGI_FM6; gx.nan -= e == ENGI_ANIMAL; gx.nvo -= e == EG_VO;
-        gx.eng = (int8_t)(gch(50) ? EG_LO : EG_A);
+        gx.eng = (int8_t)(!RHYTHMER_SWAP_WLP && gch(50) ? EG_LO : EG_A);
         gen_sound(&trk[best], r, gsnd(r));
         gx.eng = -1;
         gx_sound(&trk[best], r);

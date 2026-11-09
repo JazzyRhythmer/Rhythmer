@@ -215,6 +215,16 @@ static drum_lane_t *drum_kit_of(const track_t *t)
 
 #include "drum_md.c"
 
+static int drum_kick_lane(uint32_t lane)
+{
+    const dx_lane_t *patch = &dx_kit[lane];
+    uint32_t extra = (dx_md_hi >> lane) & 1u;
+    if (!dx_is_md(patch->mode))
+        return (lane == DV_KICK) ^ extra;
+    uint32_t model = md_base(dx_md_id(patch->mode) | (extra << 5));
+    return model == 3u || model == 15u || model == 16u;  /* BDTRX, B2TRX, BDEFM and their variants */
+}
+
 /* the lane voice v plays, 0 when it plays none (any more) */
 static drum_lane_t *drum_lane_of(track_t *t, const voice_t *v)
 {
@@ -278,8 +288,14 @@ static void drum_note_on(track_t *t, voice_t *v)
     } else {
         L->rm = L->rt = 0;
     }
-    if (lane == DV_KICK)
-        duck_hit = 1;
+    uint32_t source = (uint32_t)song.g[G_DSRC];
+    if (t->p[P_LN0 + lane] && t->p[P_LEVEL]) {
+        if (v->vel > kick_link_local && drum_kick_lane(lane))
+            kick_link_local = v->vel;
+        if (v->vel > song.g[G_DTHR] && source == (uint32_t)(t - trk) + 1u &&
+            song.g[G_DLANE] == (int32_t)lane + 1)
+            duck_hit = 1;
+    }
     dx_trigger(&L->x);
     if (lane == DV_HATC)                                 /* a closed hat chokes the open one */
         dx_choke(&K[DV_HATO].x);
@@ -614,6 +630,7 @@ static const preset_t DRUM_PRESETS[] = {                /* (0.7.2) one a factory
     {"MD DIRT",DRUM_KIT_E,{0,100,127,100},0,TAG(DRUM),FX(0,0,0,12),PAT(12)},
     {"MD LAB 1",DRUM_KIT_E,{0,100,127,100},0,TAG(DRUM),FX(0,0,0,12),PAT(12)},
     {"MD LAB 2",DRUM_KIT_E,{0,100,127,100},0,TAG(DRUM),FX(0,0,0,12),PAT(12)},
+#include "lxrx_presets.h"
 };
 _Static_assert(sizeof DRUM_PRESETS / sizeof DRUM_PRESETS[0] == sizeof DX_KITS / sizeof DX_KITS[0], "a DRUM preset a kit");
 /* (0.7.2) a factory kit into the section's: the sounds, their LAYERs, their SENDs (the project saves them) */

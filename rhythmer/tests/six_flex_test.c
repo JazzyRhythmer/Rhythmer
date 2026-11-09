@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
-static int break_in_browser(void){unsigned n,found=0;preset_all_pos(&n);for(unsigned i=0;i<n;i++){unsigned k,e=preset_all_at(i,&k);found+=e==ENGI_BREAK||(e==NENGINES&&up_engine(k)==ENGI_BREAK);}return found;}
+static int break_in_browser(void){unsigned n,found=0;preset_all_pos(NENGINES,&n);for(unsigned i=0;i<n;i++){unsigned k,e=preset_all_at(NENGINES,i,&k);found+=e==ENGI_BREAK||(e==NENGINES&&up_engine(k)==ENGI_BREAK);}return found;}
 static int break_in_models(void){unsigned e=ENGI_SERUM,found=0;for(unsigned i=0;i<NENG_SHOWN;i++){e=eng_step(e,1);found+=e==ENGI_BREAK;}return found;}
 static void settle(void){int32_t out[64];for(unsigned i=0;i<24;i++)mix_block(out,32);}
 static void save_fixture(const char *path){project_capture(&proj_scratch);if(!proj_pack(&proj_wire,&proj_scratch))exit(3);FILE *f=fopen(path,"wb");if(!f)exit(4);fwrite(&proj_wire,1,sizeof proj_wire,f);fclose(f);}

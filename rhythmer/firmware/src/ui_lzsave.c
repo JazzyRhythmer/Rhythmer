@@ -185,18 +185,17 @@ static void graph_sound(void)
 static void graph_lz_presets(void)
 {
     uint32_t total, cur = preset_pos(&total), e, k, i, first;
-    lz_track_being();
     if (!total) {
-        cv_text_in(88, 63, 148, &AF_X, "NO FAVORITES", T_MID, T_SURF);
+        cv_text_in(8, 63, 224, &AF_X, "NO MATCHES", T_MID, T_BG);
         return;
     }
-    first = cur < 4u ? 0u : cur - 4u;
+    first = cur >= total || cur < 4u ? 0u : cur - 4u;
     if (total > 9u && first + 9u > total)
         first = total - 9u;
     for (i = first; i < total && i < first + 9u; i++) {
         int32_t y = 2 + (int32_t)(i - first) * 15;
         int sel = i == cur;
-        uint16_t bg = sel ? T_TINT : T_SURF;
+        uint16_t bg = sel ? T_TEXT : T_BG;
         char nm[13];
         const char *en;
         e = preset_at(i, &k);
@@ -208,15 +207,15 @@ static void graph_lz_presets(void)
             en = ENGINES[e]->name;
         }
         if (sel)
-            cv_rect(88, y, 148, 14, bg);
+            cv_rect(6, y, 228, 14, bg);
         GFX_HOOK_ALIGN(0, y, 0, y + 14, AL_V, "sound preset row centred up/down");
-        cv_free_text(94, y + CAP_IN(X, 14), &AF_X, nm, sel ? T_TEXT : T_MID, bg, 84);
+        cv_free_text(12, y + CAP_IN(X, 14), &AF_X, nm, sel ? T_BG : T_TEXT, bg, 148);
         if (favorite_has(e, k)) {
             GFX_HOOK_ALIGN(0, y, 0, y + 14, AL_V, "sound preset star centred up/down");
-            cv_text_on(182, y + CAP_IN(S, 14), &AF_S, "*", T_ACCENT, bg);   /* (a favourite; 0.8.5 no icons) */
+            cv_text_on(166, y + CAP_IN(S, 14), &AF_S, "*", sel ? T_BG : T_ACCENT, bg);   /* (a favourite; 0.8.5 no icons) */
         }
         GFX_HOOK_ALIGN(0, y, 0, y + 14, AL_V, "sound preset row centred up/down");
-        cv_text_r(232, y + CAP_IN(X, 14), &AF_X, eng_abbr(en), T_DIM, bg);
+        cv_text_r(232, y + CAP_IN(X, 14), &AF_X, eng_abbr(en), sel ? T_BG : T_MID, bg);
     }
 }
 /* the lens's panel for the SAVE page shown */
@@ -225,7 +224,10 @@ static void graph_save_lz(const page_t *pg)
     uint32_t lv = save_level();
     if (pg->graph == GR_TOOLS) graph_lz_tools();
     else if (pg->graph == GR_SONG) graph_proj(1);
-    else if (pg->graph == GR_SLOTS) { if (lv == SV_PROJ) graph_proj(0); else graph_lib(); }
+    else if (pg->graph == GR_SLOTS || pg->graph == GR_LIBCLEAR) {
+        if (lv == SV_PROJ) graph_proj(0);
+        else graph_lib();
+    }
     else if (pg->graph == GR_USER) graph_sound();
     else graph_lz_presets();
 }

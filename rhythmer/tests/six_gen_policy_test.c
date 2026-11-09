@@ -5,14 +5,41 @@ static void fresh(unsigned six){ui_power_on();fm6_init();power_on_parts();six_na
 int main(void){int bad=0;unsigned sid=0,mel=0,unsafe=0,all6=1,pack_ok=1;
  fresh(0);track_t fifth=trk[4],sixth=trk[5];gp.seed=31;gen_go();
  bad+=check("GEN four-track mode preserves both inactive EMPTY slots",!memcmp(&fifth,&trk[4],sizeof fifth)&&!memcmp(&sixth,&trk[5],sizeof sixth));
- for(unsigned n=0;n<160;n++){
+ unsigned max_engine_copies=0,wrong_role=0,bad_osc=0,over_poly=0,role_models[NENGINES][RL_TEX+1u]={{0}};
+ for(unsigned n=0;n<240;n++){
   fresh(1);gp.genre=n%NGENRE+1;gp.seed=47*n+1;gen_go();project_capture(&proj_scratch);pack_ok&=proj_pack(&proj_wire,&proj_scratch)!=0;
+  unsigned uses[NENGINES]={0};
   for(unsigned k=0;k<NTRK;k++){
    unsigned e=trk[k].eng_req;all6&=e!=ENGI_EMPTY;
    unsafe+=(e==ENGI_ACID&&(gs.role[k]!=RL_BASS||gsnd(RL_BASS)!=SR_ACID))||e==ENGI_BREAK||e==ENGI_FM6||e==ENGI_M2STAT||e==ENGI_M2SAW;
    if(e!=ENGI_DRUM)mel++;
+   unsigned role=gs.role[k];
+   role_models[e][role]++;
+   if(e==ENGI_SERUM||e==ENGI_FMINI||e==ENGI_OBERVAVE){
+    if(++uses[e]>max_engine_copies)max_engine_copies=uses[e];
+   }
+   if(e==ENGI_FMINI||e==ENGI_OBERVAVE){
+    const preset_t *p=&ENGINES[e]->presets[trk[k].preset];
+    unsigned tag=PR_TAG(p);
+    if(role==RL_BASS)wrong_role+=!gen_bass_ok(e,trk[k].preset)||trk[k].p[P_VOICE]!=V_MONO;
+    else if(role==RL_PAD)wrong_role+=(tag!=PT_PAD&&tag!=PT_KEYS)||PR_MONO(p)||trk[k].p[P_VOICE]!=V_POLY;
+    else if(role==RL_ARP||role==RL_LEAD)wrong_role+=tag==PT_PAD||tag==PT_BASS||tag==PT_FX;
+    for(unsigned i=0;i<8;i++)bad_osc+=trk[k].p[P_E0+i]!=p->e[i];
+    if(role==RL_PAD)for(unsigned j=0;j<NSTEP;j++)
+     if(trk[k].step[j].time==ST_NOTE)over_poly+=trk[k].step[j].n>ENGINES[e]->poly;
+   }
    if(e==ENGI_M2SID){sid++;bad+=check("SID automatic assignments are mono leads only",gs.role[k]==RL_LEAD&&(trk[k].p[P_VOICE]==V_MONO||trk[k].p[P_VOICE]==V_LEGATO));for(unsigned j=0;j<NSTEP;j++)if(trk[k].step[j].time==ST_NOTE)bad+=check("SID lead sequences contain single notes",trk[k].step[j].n<=1);}
   }
+ }
+ bad+=check("full GEN keeps at most one of each of Serum, FMINI and OberVave",max_engine_copies==1);
+ bad+=check("imported patches keep their exact engine parameters and fit their role",!wrong_role&&!bad_osc&&!over_poly);
+ if(RHYTHMER_FMINI&&RHYTHMER_OBERVAVE&&RHYTHMER_SWAP_WLP){
+  bad+=check("FMINI and OberVave occur in real arrangements across bass, chords and melodic roles",
+      role_models[ENGI_FMINI][RL_BASS]&&role_models[ENGI_FMINI][RL_LEAD]&&
+      role_models[ENGI_OBERVAVE][RL_PAD]&&role_models[ENGI_OBERVAVE][RL_ARP]);
+  for(unsigned e=ENGI_FMINI;e<=ENGI_OBERVAVE;e+=2)
+    printf("%s GEN roles (bass/chord/lead/arp/texture): %u/%u/%u/%u/%u\n",ENGINES[e]->name,
+      role_models[e][RL_BASS],role_models[e][RL_PAD],role_models[e][RL_LEAD],role_models[e][RL_ARP],role_models[e][RL_TEX]);
  }
  bad+=check("GEN six-track mode assigns all six previously empty/normal slots",all6);
  bad+=check("automatic Acid is exclusive to its named bass recipe; Break and heavy synths remain excluded",unsafe==0);

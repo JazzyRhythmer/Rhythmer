@@ -135,8 +135,8 @@ static uint8_t dx_tone;
  * at a moment of its own (~3 .. 45 ms after it, the dice thrown again each hit: no tempo in it) and at a level of its
  * own, then dying as the hit does: a few people clapping, then a crowd. 0: the clap as it was */
 static uint8_t dx_hands;
-static dx_lane_t dx_kit[8];
-static uint8_t dx_md_hi; /* lane-wise sixth model bit, section/project header byte 65 */                              /* (defined below with the factory kit: the BP knows its lanes) */
+static dx_lane_t dx_kit[8];                            /* defined below with the factory kit */
+static uint8_t dx_md_hi;                              /* per lane: MD model bit 5, or native kick-role override */
 /* (JIANT 0.6.49) EDIT > LAYER, each sound's (the kit's: project.c keeps it, FUNC's 'D' 'L' block; 0 before it): low
  * nibble LAYER, a second oscillator (a triangle) at sqrt 2 of the pitch (the most out of tune with it there is) frequency-modulated
  * by the first, more as it goes up (1..15: a metal edge .. a clang with no note: the sound melts into the rhythm and
@@ -567,7 +567,10 @@ static const dx_kit_t DX_KITS[] = {
       {DX_MD(12),{64,127,35,93,107},{64,127,35,93,107}},
       },.lay={0},.snd={0} },
 #include "md_factory_kits.h"
+#include "lxrx_kits.h"
 };
+#define LXRX_BASE_KIT 19u
+#define LXRX_NKIT 12u
 #define DX_NKIT ((uint32_t)(sizeof DX_KITS / sizeof DX_KITS[0]))
 /* a stored kit as the voice takes it: values 0..127, the mode's fields in range (wave 0..3, filter 0..2, snap) */
 static int dx_kit_ok(const dx_lane_t *k)

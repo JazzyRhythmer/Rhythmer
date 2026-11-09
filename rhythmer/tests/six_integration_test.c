@@ -31,7 +31,7 @@ int main(int argc,char **argv) {
  power_on_parts();test_optional_machines();six_native_init();trks_put(3);
  for(unsigned k=0;k<6;k++)bad+=check("explicit fixture engine layout",trk[k].eng_req==(k==4?ENGI_ACID:k==5?ENGI_BREAK:TRK_DEF[k][0]));
  bad+=check("160 BPM and four projects",song.g[G_BPM]==160 && NSONG==4);
- for(unsigned t=0;t<6;t++){song.sel=t;uint32_t total;preset_all_pos(&total);int ok=total>0;for(unsigned i=0;i<total;i++){uint32_t k,e=preset_all_at(i,&k);ok&=six_preset_engine(e);}bad+=check("preset browser respects singleton Break ownership",ok);}
+ for(unsigned t=0;t<6;t++){song.sel=t;uint32_t total;preset_all_pos(NENGINES,&total);int ok=total>0;for(unsigned i=0;i<total;i++){uint32_t k,e=preset_all_at(NENGINES,i,&k);ok&=six_preset_engine(e,NENGINES);}bad+=check("preset browser respects singleton Break ownership",ok);}
  song.sel=1;bad+=check("model list includes EMPTY and keeps stable synth order",eng_step(ENGI_SERUM,-1)==ENGI_EMPTY&&eng_step(ENGI_SERUM,1)==ENGI_PHASE&&eng_step(ENGI_PHASE,1)==ENGI_LOFI);
  bad+=check("stored Acid Break IDs remain stable",ENGI_BREAK==15u&&ENGI_ACID==16u&&ENGI_SERUM==17u);
  project_capture(&proj_scratch);bad+=check("Garden engines pack and round trip",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire)&&proj_scratch.t[1].engine==ENGI_SERUM&&proj_scratch.t[2].engine==ENGI_PHASE&&proj_scratch.t[3].engine==ENGI_LOFI);

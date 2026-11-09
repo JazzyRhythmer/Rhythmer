@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {DeviceUpdater,inspect,backup,authorize,validateRhythmer,validateStockPackage,validateLoop,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,sha256hex,strictInfo} from './core.mjs';
 import {uploadBreakBank,packBreak} from '../editor/break-audio.mjs';
-import {FakeFM1,infoOf} from './fake.mjs';
+import {FakeFM1,infoOf,infoForProduct} from './fake.mjs';
 const $=s=>document.querySelector(s),FAST={hs:2200,hsTries:2,findTries:1,backoff:5,settle1:10,idle1:5000,upgradeTries:1,loaderSettle:10,loader:15000,settle2:10,idle2:5000,back:15000,poll:50};
 let checks=[];const ok=(value,label)=>{if(!value)throw Error(label);checks.push(label);$('#tests').textContent=checks.map((x,i)=>`${i+1}. PASS ${x}`).join('\n');};
 const rejects=async(fn,label)=>{let error;try{await fn();}catch(e){error=e;}ok(!!error,label);};
@@ -42,11 +42,16 @@ async function runTests(){
   ok(authorize({...base,source:{kind:'loader'},checkpoint:{product:target.product,sha256:target.sha256}}),'Matching saved checkpoint permits explicit Rhythmer resume');
   await rejects(()=>authorize({...base,source:{kind:'loader'},checkpoint:{product:target.product,sha256:'wrong'}}),'Wrong checkpoint hash blocks resume');
   ok(authorize({...base,mode:'stock',source:{kind:'loader'},target:recovery}),'Explicit official V15 recovery permits unknown responding loader');
+  const returnedInfo=infoForProduct(m.firmware.product);
+  const devBuild=strictInfo(returnedInfo)?.engines===25;
+  ok(strictInfo(returnedInfo,m.firmware.product),'Target INFO accepts the expected engine and global layout');
+  ok(strictInfo(infoForProduct('FM-1_748020'),'FM-1_748020')?.globals===77 &&
+     !strictInfo(infoForProduct('FM-1_748019'),'FM-1_748020'),'MIDI DUCK build rejects a prior global layout');
   let {dev,up}=make(target);let source=await inspect(up);ok(dev.upgrades===0&&source.kind==='v15','Connect/inspect sends no UPGRADE writes');
   const wrongPort={...dev.input,id:'another',name:'FM-1 2'};dev.access.inputs.set('another',wrongPort);await rejects(()=>inspect(up),'Multiple MIDI endpoints block device selection');ok(dev.upgrades===0,'Multiple devices cause no firmware write');dev.access.inputs.delete('another');
   dev.boot('FM-1_015','FM-1');await rejects(()=>transfer(up,source,target,()=>{}),'Device/port changed after review blocks first write');ok(dev.upgrades===0,'Changed device remains untouched');
   ({dev,up}=make(target));source=await inspect(up);let finds=0;const originalFind=up.find.bind(up);up.find=async(...args)=>{if(++finds===2)dev.boot('FM-1_015','FM-1');return originalFind(...args);};await rejects(()=>transfer(up,source,target,()=>{}),'Port swap at actual UPGRADE entry is blocked');ok(dev.upgrades===0,'Upgrade-entry race sends no UPGRADE');
-  ({dev,up}=make(target,{info:infoOf()}));source=await inspect(up);const stages=[];await transfer(up,source,target,(s)=>stages.push(s));ok(dev.upgrades===2&&dev.bad===0&&stages.includes('write')&&stages.includes('reboot'),'Real two-stage updater serves exact logical-image bytes and reconnects');ok((await verifyRhythmer(up)).kind==='rhythmer','Post-install exact Rhythmer INFO verification');
+  ({dev,up}=make(target,{afterInfo:returnedInfo}));source=await inspect(up);const stages=[];await transfer(up,source,target,(s)=>stages.push(s));ok(dev.upgrades===2&&dev.bad===0&&stages.includes('write')&&stages.includes('reboot'),'Real two-stage updater serves exact logical-image bytes and reconnects');ok((await verifyRhythmer(up)).kind==='rhythmer','Post-install exact Rhythmer INFO verification');
   ok(await verifyEmbeddedBanks(await inspect(up))===3&&!(dev.sampleWrites||0),'Integrated firmware install verifies banks without separate sample writes');
   for(const mask of [0,1,2]){
    dev.mask=mask;let error;try{await verifyEmbeddedBanks(await inspect(up));}catch(e){error=e;}
@@ -67,10 +72,14 @@ async function runTests(){
   ({dev,up}=make(target,{unplugAfter:2}));source=await inspect(up);await rejects(()=>transfer(up,source,target,()=>{}),'Disconnect during staging stops updater');
   ({dev,up}=make(target,{after:'FM-1_016'}));source=await inspect(up);await rejects(()=>transfer(up,source,target,()=>{}),'Unexpected returned firmware identity fails completion');
   ({dev,up}=make(target));source=await inspect(up);await rejects(()=>transfer(up,source,target,()=>{}),'Right product but absent Rhythmer INFO fails completion');
-  ({dev,up}=make(target,{info:infoOf()}));dev.boot('ota-'+target.product,'JIANT Update');source=await inspect(up);await transfer(up,source,target,()=>{},{resume:true});ok(dev.upgrades===1&&dev.bad===0,'Explicit loader resume uses stage two and verifies returned firmware');
+  if(devBuild){
+   ({dev,up}=make(target,{afterInfo:infoOf()}));source=await inspect(up);
+   await rejects(()=>transfer(up,source,target,()=>{}),'Wrong 22-entry INFO cannot pass the 25-entry development build check');
+  }
+  ({dev,up}=make(target,{afterInfo:returnedInfo}));dev.boot('ota-'+target.product,'JIANT Update');source=await inspect(up);await transfer(up,source,target,()=>{},{resume:true});ok(dev.upgrades===1&&dev.bad===0,'Explicit loader resume uses stage two and verifies returned firmware');
   // Real official V15 bytes, simulated device only; this is not a physical restore.
   const synthetic=complete.recovery;
-  ({dev,up}=make(synthetic,{identity:m.firmware.product,info:infoOf(),after:'FM-1_015'}));source=await inspect(up);await transfer(up,source,synthetic,()=>{});ok(dev.identity==='FM-1_015'&&dev.bad===0,'Official V15 logical-image transfer/reconnect on simulated MIDI (not physical restore)');
+  ({dev,up}=make(synthetic,{identity:m.firmware.product,info:returnedInfo,after:'FM-1_015'}));source=await inspect(up);await transfer(up,source,synthetic,()=>{});ok(dev.identity==='FM-1_015'&&dev.bad===0,'Official V15 logical-image transfer/reconnect on simulated MIDI (not physical restore)');
   $('#status').textContent=`PASS: ${checks.length} simulated checks. No physical FM-1 was accessed.`;
   const report={passed:checks.length,checks,physicalHardwareTested:false,officialV15PositiveFileTested:true,firmwareSHA256:await sha256hex(raw)};
   const a=$('#download');a.href=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));a.hidden=false;

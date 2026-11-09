@@ -13,7 +13,11 @@ typedef struct {int16_t p[8];int8_t nt;} md_track_t;
  * engine's fade before calling the new engine. The engine tag clears stale
  * pointers/phases once at that handoff, on the audio thread. This recovers
  * the original 512-frame DMA margin without reducing eight MD lanes or stacks. */
-typedef union { md_voice_t md; fm6_note_t fm6; } md_fm6_runtime_t;
+typedef union { md_voice_t md; fm6_note_t fm6;
+#if RHYTHMER_PROPHET
+ p5_voice_t prophet;
+#endif
+ } md_fm6_runtime_t;
 static md_fm6_runtime_t md_shared[NPART][4];
 static md_voice_t md_pool[NPART][3] __attribute__((section(".pool")));
 static md_voice_t md_aux[NPART] __attribute__((section(".lowbuf")));
@@ -108,8 +112,8 @@ static inline void dm_put(md_voice_t *v,int32_t *out,uint32_t i,int32_t x){x=mul
 #undef HZ
 #include "md_models.h"
 
-/* The extra model bit lives in one existing reserved project byte. The kit
- * and per-hit state sizes stay fixed; DRIVE and A/B macros are preserved. */
+/* The section's kit byte stores the extra model bit on MD lanes.
+ * On native lanes the same bit flips the default kick role. */
 static unsigned md_kind(const dx_lane_t *p){uintptr_t a=(uintptr_t)p,b=(uintptr_t)dx_kit;unsigned h=a>=b&&a<b+sizeof dx_kit?((dx_md_hi>>((a-b)/sizeof *p))&1u):0u;return dx_md_id(p->mode)|(h<<5);}
 static void md_set_hi(dx_lane_t *p,unsigned kind){uintptr_t a=(uintptr_t)p,b=(uintptr_t)dx_kit;if(a>=b&&a<b+sizeof dx_kit){unsigned bit=1u<<((a-b)/sizeof *p);dx_md_hi=(uint8_t)((dx_md_hi&~bit)|((kind>>5)?bit:0));}}
 static int md_ext_ok(const dx_lane_t *p,unsigned hi){for(unsigned i=0;i<8;i++)if(dx_is_md(p[i].mode)&&(dx_md_id(p[i].mode)|(((hi>>i)&1u)<<5))>=MD_NMODEL)return 0;return 1;}

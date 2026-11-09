@@ -25,6 +25,13 @@
  * the rate until a host asks for another, sends the samples as before, bit for bit. (0.8.9) With CORES 2 the
  * second core resamples each half after the render (uac_render_end), off the first core's render; one core: each
  * block in the ISR as before (uac_rs_run, in RAM either way). An underrun never drops or shortens a packet. */
+/* USB Host is application-only. Every power-on remains a USB device;
+ * update loaders never include the host path. */
+#ifndef RHYTHMER_USB_HOST
+#define RHYTHMER_USB_HOST 0 /* enabled by the application, never by the loader */
+#endif
+static volatile uint8_t usb_midi_lost;
+static int usb_midi_out_ready(void);
 #include "../hal/fm1_usb.h"   /* registers; relative, so the loader and the host tests find it too */
 #ifndef FELUCCA_CDC
 #define FELUCCA_CDC 0
@@ -269,12 +276,55 @@ static int midi_enqueue(uint32_t pkt, uint32_t source)
 
 static void midi_out_event(uint32_t pkt)            /* from the audio ISR */
 {
-    if (usb.config && mo_w - mo_r < MQ) {
+    if (
+#if RHYTHMER_USB_HOST
+        usb_midi_out_ready()
+#else
+        usb.config
+#endif
+        && mo_w - mo_r < MQ) {
         midi_out_q[mo_w % MQ] = pkt;
         RING_PUBLISH();
         mo_w++;
     }
 }
+
+#ifdef KICK_LINK_START
+static uint8_t kick_link_cable;                       /* cable + 1 of the pending SysEx prefix */
+static int kick_link_packet(uint32_t pkt)
+{
+    uint32_t cable = ((pkt >> 4) & 15u) + 1u;
+    if ((pkt & ~0xF0u) == KICK_LINK_START) {
+        kick_link_cable = (uint8_t)cable;
+        return 1;
+    }
+    if (kick_link_cable == cable && (pkt & KICK_LINK_END_MASK) == KICK_LINK_END) {
+        kick_link_cable = 0;
+        midi_enqueue(pkt & ~0xF0u, 1u);
+        return 1;
+    }
+    if ((pkt & 15u) != 15u || ((pkt >> 8) & 255u) < 0xF8u)
+        kick_link_cable = 0;
+    return 0;
+}
+
+static void kick_link_send(uint32_t velocity)
+{
+    uint32_t w = mo_w;
+    if (
+#if RHYTHMER_USB_HOST
+        !usb_midi_out_ready() ||
+#else
+        !usb.config ||
+#endif
+        w - mo_r > MQ - 4u)
+        return;
+    midi_out_q[w % MQ] = KICK_LINK_START;
+    midi_out_q[(w + 1u) % MQ] = KICK_LINK_END | (velocity << 16);
+    RING_PUBLISH();
+    mo_w = w + 2u;
+}
+#endif
 
 /* ------------------------------------------------------- descriptors --- */
 /* Two functions: audio + MIDI (0 audio control, 1 MIDI streaming, 2 audio streaming with FELUCCA_UAC)
@@ -998,6 +1048,15 @@ static void sysex_byte(uint8_t b)
 static void midi_in_event(uint32_t pkt)                 /* one USB-MIDI event packet */
 {
     uint32_t cin = pkt & 15u, st = (pkt >> 8) & 0xFFu;
+#ifdef KICK_LINK_START
+    if (kick_link_packet(pkt)) {
+        usb.sx_on = 0;
+#if FELUCCA_OTA
+        sx_collect = 0;
+#endif
+        return;
+    }
+#endif
     if (cin >= 4u && cin <= 7u) {
         uint32_t k, nb = cin == 4u || cin == 7u ? 3u : cin == 6u ? 2u : 1u;
         for (k = 0; k < nb; k++)
@@ -1138,6 +1197,11 @@ static void ep1_tx(void)
         uint32_t pkt;
         RING_PUBLISH();                                 /* the audio ISR (producer) can preempt us: */
         pkt = midi_out_q[mo_r % MQ];                    /* slot read strictly between the index checks */
+#ifdef KICK_LINK_START
+        /* Keep the frame together even if editor SysEx has priority on the next transfer. */
+        if (n == 60u && pkt == KICK_LINK_START)
+            break;
+#endif
         ep1tx[n] = (uint8_t)pkt;
         ep1tx[n + 1] = (uint8_t)(pkt >> 8);
         ep1tx[n + 2] = (uint8_t)(pkt >> 16);
@@ -1748,9 +1812,19 @@ static __attribute__((noinline)) void uac_in_fill(uint32_t n)
 #endif
 #endif
 
+#include "usb_host.c"
+static int usb_midi_out_ready(void) {
+#if RHYTHMER_USB_HOST
+ if(uh.on)return uh.run&&uh.out_mps;
+#endif
+ return usb.config!=0;
+}
 static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
 {
     uint32_t iu, it, ir;
+#if RHYTHMER_USB_HOST
+    if(uh.run){uh_poll();return;}
+#endif
     if (!usb.up)
         return;
     if (fm1_usb_sof_take()) {                           /* SOF pending: NOT a reliable "host is there" */
@@ -1772,6 +1846,9 @@ static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
                 usb.suspended = 0;
             } else if (++usb.frame_same >= 10u && !usb.suspended) {   /* 100 ms frozen: unplugged / host asleep */
                 usb.suspended = 1;
+#if RHYTHMER_USB_HOST
+                if(usb.config)usb_midi_lost=1;
+#endif
                 usb.frame_stalls++;
             }
         }
@@ -1786,16 +1863,25 @@ static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
 #endif
     if (iu & 0x01u) {                                   /* suspend: the bus went idle */
         usb.suspends++;
+#if RHYTHMER_USB_HOST
+        if(usb.config)usb_midi_lost=1;
+#endif
         usb.suspended = 1;
     }
     if (iu & 0x02u)                                     /* resume */
         usb.suspended = 0;
     if (iu & 0x04u) {                                   /* bus reset */
         usb.resets++;
+#if RHYTHMER_USB_HOST
+        if(usb.config)usb_midi_lost=1;
+#endif
         sie_wr(S_FADDR, 0);
         usb.config = 0;
         usb.suspended = 0;
         mo_r = mo_w;                                    /* nothing stale for the next host */
+#ifdef KICK_LINK_START
+        kick_link_cable = 0;
+#endif
         usb.sx_on = 0;
 #if FELUCCA_OTA
         so_r = so_w;
@@ -1877,7 +1963,11 @@ static int usb_retry_due(uint32_t now_ms)              /* (apart: the host tests
         t = now_ms - 1000u + USB_REPLUG_MS;             /* (the next retry USB_REPLUG_MS from now) */
         return 0;
     }
-    if (usb.up || usb.detached || now_ms - t < 1000u)
+    if (usb.up || usb.detached || now_ms - t < 1000u
+#if RHYTHMER_USB_HOST
+        || uh.on
+#endif
+       )
         return 0;
     t = now_ms;
     return 1;
@@ -1894,6 +1984,9 @@ static void usb_detach(void)
 {
     usb.detached = 1;
     usb.up = 0;
+#if RHYTHMER_USB_HOST
+    uh.run=uh.on=uh.want=0;
+#endif
     fm1_usb_off();
 }
 
@@ -1901,6 +1994,9 @@ static void usb_detach(void)
  * apply (the console off, the stems on) drop it once: the second finds it off */
 static __attribute__((unused)) void usb_replug(void)
 {
+#if RHYTHMER_USB_HOST
+    if(uh.on)return;
+#endif
     if (usb.up) {
         usb.up = 0;                                     /* usb_poll (TIMER5) stops before the SIE goes */
         RING_PUBLISH();

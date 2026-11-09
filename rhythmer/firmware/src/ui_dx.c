@@ -9,17 +9,16 @@
  *   SOUND 3  (JIANT 0.4) LANE again, PMOD's mode (DECAY LONG NOISE SINE), DRIVE (OFF / ON), the wave alone
  * The values are the side's; the MORPH plays between the two (EDIT 2 MRPH). The panel shows the kit's specimen
  * with the sound's organ singled out (ui_plates.c graph_p_drum: the iris, its node lit). */
-static uint8_t dx_ui_seen = 0xFFu;                   /* the last key note followed */
+static uint32_t dx_ui_seen;
+static uint8_t dx_ui_track=0xFFu;
 static const char *const DX_LANE_ABBR[8] = {"BD", "SD", "CP", "CH", "OH", "TM", "RS", "CB"};
-
-/* a key struck on the track (seq.c key_on: last_note) picks the sound it plays */
+/* Only an explicit note on this drum part follows the lane. Repeated strikes
+ * of the same key count; global last_note / another part's MIDI never do. */
 static void dx_follow(void)
 {
-    if (last_note != dx_ui_seen) {
-        if (dx_ui_seen != 0xFFu)                     /* (the first look only takes note of it) */
-            dx_ui_lane = (uint8_t)drum_lane(last_note);
-        dx_ui_seen = last_note;
-    }
+    unsigned k=song.sel%NTRK;uint32_t serial=dx_input_serial[k];
+    if(dx_ui_track!=k){dx_ui_track=(uint8_t)k;dx_ui_seen=serial;return;}
+    if(serial!=dx_ui_seen){dx_ui_seen=serial;dx_ui_lane=(uint8_t)drum_lane(dx_input_note[k]);}
 }
 
 /* the mode as one value 0..23: wave x 6 + filter x 2 + SNAP, and back */
@@ -54,14 +53,47 @@ static uint8_t dx_send_of(int32_t ix)
 /* DRUM VOICE: named source sounds; selection changes only this section lane.
  * No catalog search, allocation or new oscillators in the audio callback. */
 static uint8_t dx_voice_bank;
-#define DX_VOICES (72u+MD_NSOUND)
-static int dx_voice_accept(unsigned id){if(!dx_voice_bank)return 1;if(id<72)return dx_voice_bank==1;if(dx_voice_bank==1)return 0;unsigned k=md_base(MD_SOUNDS[id-72].kind);return dx_voice_bank==(k<3||k>=16?3u:2u);}
+static uint16_t dx_voice_hint[8]; /* keeps identical translated patches browsable */
+#define DX_LXRX_BASE (72u+MD_NSOUND)
+#define DX_VOICES (DX_LXRX_BASE+LXRX_NKIT*8u)
+static int dx_voice_accept(unsigned id){if(!dx_voice_bank)return 1;if(id>=DX_LXRX_BASE)return dx_voice_bank==4;if(dx_voice_bank==4)return 0;if(id<72)return dx_voice_bank==1;if(dx_voice_bank==1)return 0;unsigned k=md_base(MD_SOUNDS[id-72].kind);return dx_voice_bank==(k<3||k>=16?3u:2u);}
 static unsigned dx_voice_count(void){unsigned n=0;for(unsigned i=0;i<DX_VOICES;i++)n+=dx_voice_accept(i);return n;}
 static unsigned dx_voice_at(unsigned ix){for(unsigned i=0;i<DX_VOICES;i++)if(dx_voice_accept(i)&&!ix--)return i;return 0;}
-static int dx_voice_current(void){const dx_lane_t *p=&dx_kit[dx_ui_lane&7u];if(dx_is_md(p->mode)){unsigned k=md_kind(p);for(unsigned i=0;i<MD_NSOUND;i++)if(MD_SOUNDS[i].kind==k)return 72+(int)i;}else for(unsigned i=0;i<72;i++)if(!memcmp(p,&DX_KITS[i/8].lane[i%8],sizeof *p))return (int)i;return -1;}
+static const dx_lane_t *dx_voice_patch(unsigned id){return id<72?&DX_KITS[id/8].lane[id%8]:id>=DX_LXRX_BASE&&id<DX_VOICES?&DX_KITS[LXRX_BASE_KIT+(id-DX_LXRX_BASE)/8].lane[(id-DX_LXRX_BASE)%8]:0;}
+static int dx_voice_current(void){
+ const dx_lane_t *p=&dx_kit[dx_ui_lane&7u];unsigned hint=dx_voice_hint[dx_ui_lane&7u];
+ if(hint&&hint<=DX_VOICES){unsigned id=hint-1;const dx_lane_t *ref=dx_voice_patch(id);
+  if(ref&&!memcmp(p,ref,sizeof *p))return (int)id;
+  if(id>=72&&id<DX_LXRX_BASE&&dx_is_md(p->mode)&&md_kind(p)==MD_SOUNDS[id-72].kind)return (int)id;
+ }
+ if(dx_is_md(p->mode)){unsigned k=md_kind(p);for(unsigned i=0;i<MD_NSOUND;i++)if(MD_SOUNDS[i].kind==k)return 72+(int)i;}
+ else for(unsigned i=0;i<DX_VOICES;i++){const dx_lane_t *ref=dx_voice_patch(i);if(ref&&!memcmp(p,ref,sizeof *p))return (int)i;}
+ return -1;
+}
 static int dx_voice_pos(void){int id=dx_voice_current(),n=0;for(unsigned i=0;i<DX_VOICES;i++)if(dx_voice_accept(i)){if((int)i==id)return n;n++;}return -1;}
-static void dx_voice_name(char *b,unsigned id){if(id>=72){str_cpy(b,MD_SOUNDS[(id-72)%MD_NSOUND].name,13);return;}str_cpy(b,DRUM_PRESETS[id/8].name,9);unsigned n=str_len(b);b[n++]=' ';str_cpy(b+n,DX_LANE_ABBR[id%8],13-n);}
-static void dx_voice_pick(unsigned id){unsigned lane=dx_ui_lane&7u;if(id>=72)md_patch_default(&dx_kit[lane],MD_SOUNDS[(id-72)%MD_NSOUND].kind);else{dx_kit[lane]=DX_KITS[id/8].lane[id%8];md_set_hi(&dx_kit[lane],0);}dx_lay[lane]=0;}
+static void dx_voice_name(char *b,unsigned id){if(id>=DX_LXRX_BASE){unsigned v=id-DX_LXRX_BASE;str_cpy(b,DRUM_PRESETS[LXRX_BASE_KIT+v/8].name,10);unsigned n=str_len(b);b[n++]=' ';str_cpy(b+n,DX_LANE_ABBR[v%8],13-n);return;}if(id>=72){str_cpy(b,MD_SOUNDS[(id-72)%MD_NSOUND].name,13);return;}str_cpy(b,DRUM_PRESETS[id/8].name,9);unsigned n=str_len(b);b[n++]=' ';str_cpy(b+n,DX_LANE_ABBR[id%8],13-n);}
+static void dx_voice_pick(unsigned id)
+{
+    if (id >= DX_VOICES)
+        return;
+    unsigned lane = dx_ui_lane & 7u;
+    const dx_lane_t *patch = dx_voice_patch(id);
+    dx_voice_hint[lane] = (uint16_t)(id + 1u);
+    fm1_irq_off();
+    if (!patch) {
+        md_patch_default(&dx_kit[lane], MD_SOUNDS[id - 72u].kind);
+    } else {
+        unsigned source = id >= DX_LXRX_BASE ? id - DX_LXRX_BASE : id;
+        unsigned kit = source / 8u + (id >= DX_LXRX_BASE ? LXRX_BASE_KIT : 0u);
+        unsigned source_lane = source % 8u;
+        unsigned bit = dx_is_md(patch->mode) ? (DX_KITS[kit].md_hi >> source_lane) & 1u
+                                            : (source_lane == DV_KICK) != (lane == DV_KICK);
+        dx_kit[lane] = *patch;
+        md_set_hi(&dx_kit[lane], bit << 5);
+    }
+    dx_lay[lane] = 0;
+    fm1_irq_on();
+}
 /* KNOB k (0..3) turned s on a SOUND page or X-MOD */
 static void dx_knob(const page_t *pg, uint32_t k, int32_t s)
 {
@@ -77,7 +109,7 @@ static void dx_knob(const page_t *pg, uint32_t k, int32_t s)
     }
     if(pn==9u){
       if(k==0)dx_lane_turn(s);
-      else if(k==1)dx_voice_bank=(uint8_t)clamp((int)dx_voice_bank+(s>0?1:-1),0,3);
+      else if(k==1)dx_voice_bank=(uint8_t)clamp((int)dx_voice_bank+(s>0?1:-1),0,4);
       else if(k==2){int pos=dx_voice_pos();unsigned n=dx_voice_count();pos=clamp(pos+accel(EN_K3,s,(int)n-1),0,(int)n-1);dx_voice_pick(dx_voice_at((unsigned)pos));}
       else {int16_t *level=&TSEL->p[P_LN0+(dx_ui_lane&7u)];*level=(int16_t)clamp(*level+accel(EN_K4,s,127),0,127);}
       return;
@@ -99,7 +131,10 @@ static void dx_knob(const page_t *pg, uint32_t k, int32_t s)
         if(k==1u){
           uint8_t before=L->mode;uint32_t ix=(uint32_t)clamp((int32_t)(dx_is_md(before)?24u+md_base(md_kind(L)):dx_mode_ix(before))+(s>0?1:-1),0,44);uint8_t mode=dx_mode_of(ix);
           if(dx_is_md(mode)){if(!dx_is_md(before)||md_kind(L)!=dx_md_id(mode))md_patch_default(L,dx_md_id(mode));L->mode=(uint8_t)(mode|(before&DX_DRIVE));}
-          else {md_set_hi(L,0);L->mode=(uint8_t)(mode|(before&DX_DRIVE)|(dx_is_md(before)?0:(before&0x60u)));}
+          else {
+            if (dx_is_md(before)) md_set_hi(L, 0);
+            L->mode=(uint8_t)(mode|(before&DX_DRIVE)|(dx_is_md(before)?0:(before&0x60u)));
+          }
         }else if(k==2u&&!dx_is_md(L->mode))L->mode=(uint8_t)((L->mode&~0x60u)|(uint32_t)clamp((int32_t)((L->mode>>5)&3u)+(s>0?1:-1),0,3)<<5);
         else if(k==3u)L->mode=(uint8_t)(s>0?L->mode|DX_DRIVE:L->mode&~DX_DRIVE);
         return;
@@ -151,9 +186,9 @@ static void dx_cards(const page_t *pg)
     const uint8_t *v = dx_ui_side ? L->b : L->a;
     uint32_t pn = dx_pagen(pg);
     char val[12], ln[8];
-    if(pn==9u){static const char *const bank[]={"ALL","KITS","MD TRX","MD EFM"};char name[13];int id=dx_voice_current();if(id<0)str_cpy(name,"CUSTOM",sizeof name);else dx_voice_name(name,(unsigned)id);
+    if(pn==9u){static const char *const bank[]={"ALL","KITS","MD TRX","MD EFM","LXR-X"};char name[13];int id=dx_voice_current();if(id<0)str_cpy(name,"CUSTOM",sizeof name);else dx_voice_name(name,(unsigned)id);
       draw_column(0,"LANE",DX_LANE_ABBR[dx_ui_lane&7u],"",VAL(0),dx_ui_lane*1000/7,ICON_X_PATTERN);
-      draw_column(1,"BANK",bank[dx_voice_bank],"",VAL(1),dx_voice_bank*1000/3,ICON_WAVE);
+      draw_column(1,"BANK",bank[dx_voice_bank],"",VAL(1),dx_voice_bank*1000/4,ICON_WAVE);
       draw_column(2,"SOUND",name,"",VAL(2),dx_voice_pos()<0?0:dx_voice_pos()*1000/(int)(dx_voice_count()-1),ICON_TONE);
       fmt_int(val,TSEL->p[P_LN0+(dx_ui_lane&7u)]*100/127);draw_column(3,"LEVEL",val,"%",VAL(3),TSEL->p[P_LN0+(dx_ui_lane&7u)]*1000/127,ICON_LEVEL);return;
     }

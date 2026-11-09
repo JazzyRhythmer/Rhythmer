@@ -175,7 +175,15 @@ static const param_desc_t TP[P_COUNT] = {
     [P_FRES] = PD("RES", F_PCT, 0, 127, 0),       /* no resonance: out of the chain (its drive: DIST, the part's) */
 };
 
+static const char *const DUCK_SRC_NAMES[] = {"AUTO", "T1", "T2", "T3", "T4", "T5", "T6", "USB", "MIDI"};
+static const char *const DUCK_LANE_NAMES[] = {"ALL", "BD", "SD", "CP", "CH", "OH", "TM", "RS", "CB"};
 static const param_desc_t GP[G_COUNT] = {
+    [G_DSRC] = PE("SRC", DUCK_SRC_NAMES, DUCK_AUTO),
+    [G_DLANE] = PE("LANE", DUCK_LANE_NAMES, 0),
+    [G_DNOTE] = PD("NOTE", F_INT, 0, 127, 36),
+    [G_DCH] = PD("CH", F_INT, 0, 16, 0),
+    [G_DTHR] = PD("THR", F_PCT, 0, 127, 0),
+    [G_DATK] = {"ATK", F_INT, 0, 60, 0, 0, "ms"},
     [G_BPM] = PD("BPM", F_BPM, 40, 240, 160),
     [G_SWING] = PD("SWING", F_PCT, 0, 100, 0),
     [G_CLOCK] = PE("CLOCK", N_CLOCK, 0),
@@ -206,7 +214,7 @@ static const param_desc_t GP[G_COUNT] = {
     /* (JIANT) the drum bus and the kick's ducking (fx.c, eng_drum.c); the ids of the GM drum part's level and
      * reverb send, inert since 1.0 */
     [G_PUNCH] = PD("PUNCH", F_PCT, 0, 100, 0),    /* DRUM fattened: up to +5 dB the first 4 ms, the body +3 dB (0.5) */
-    [G_DUCK] = PD("DUCK", F_PCT, 0, 100, 0),     /* the kick ducks the other parts: up to -18 dB */
+    [G_DUCK] = PD("DUCK", F_PCT, 0, 100, 0),     /* gain reduction depth for the duck envelope */
     /* (JIANT, FUNB) the buses: not in a project's header (project.c: after the punch-in lane) */
     [G_CSTER] = PD("FEEDBACK", F_BIPCT, -64, 63, 0), /* (0.6.9) the CHORUS's stereo: 0 as before, -64 mono, 63 ~2x (was G_DHPF) */
     [G_WIDTH] = PD("WIDE", F_PCT, 0, 127, 0),    /* the delay's right echo up to 1/32 later, the chorus's taps apart */
@@ -429,6 +437,16 @@ static void param_format(const param_desc_t *d, int32_t v, char *val, const char
 {
     *unit = "";
     fmt_named = d->fmt == F_ENUM;
+    if (d == &GP[G_DREL]) {
+        fmt_int(val, 40 + v * 56 / 10);
+        *unit = "ms";
+        return;
+    }
+    if (d == &GP[G_DCH] && !v) {
+        str_cpy(val, "ANY", 6);
+        fmt_named = 1;
+        return;
+    }
     if (d == &FMT_WDESC[0] && v <= 0) {                 /* (0.8.5) VOICE's words: POS 0, each note the next */
         str_cpy(val, "AUTO", 6);
         fmt_named = 1;
@@ -557,7 +575,7 @@ enum { GR_NONE, GR_ADSR, GR_LFO, GR_STEPS, GR_ARP, GR_SCALE, GR_FX, GR_ROLL, GR_
        GR_SLCR, GR_MOD, GR_PATS, GR_SONG, GR_TOOLS, GR_CHANCE, GR_MOTION, GR_EVENTS, GR_DXSND, GR_MSEQ, GR_SLPIT,
        GR_FMOP, GR_FMOP2, GR_FMENV,
        GR_COMP, GR_MUTATE, GR_MORPH, GR_DXIMG, GR_FUGUE, GR_SHAPE, GR_PUNCH, GR_BUSES, GR_FOCUS, GR_STAGE,
-       GR_LYRIC, GR_LIVE, GR_SIXGEN, GR_SIXBRK, GR_SIXBRKSEQ, GR_SIXRETURN, GR_SIXSTEP };   /* (0.9.11) GLO > LIVE: MANO, RIELES (ui_live.c) */   /* (0.8.5) EDIT > WORDS: VOICE's lyric (sing.c) */   /* (0.8.5:
+       GR_LYRIC, GR_LIVE, GR_SIXGEN, GR_SIXBRK, GR_SIXBRKSEQ, GR_SIXRETURN, GR_SIXSTEP, GR_DGEN, GR_LIBCLEAR };   /* (0.9.11) GLO > LIVE: MANO, RIELES (ui_live.c) */   /* (0.8.5) EDIT > WORDS: VOICE's lyric (sing.c) */   /* (0.8.5:
                                                          * LENTE's EDIT > FOCUS, ENV > STAGE) */   /* (0.6.99) FX > PUNCH: the punch-in lane */   /* (JIANT 0.6.39) SEQ > COMP: the step components (ui_input.c comp_*, ui_graph.c graph_comp) */   /* (JIANT 0.6.10, from Felucca 1.5: FM6's operator pages, ui_fm6op.c) */
 
 typedef struct {
@@ -615,6 +633,7 @@ static const page_t PAGES[] = {
     {"FX", FAM_FX, SC_TRACK, GR_FX, {P_DIST, P_CHOR, P_DLY, P_REV}},
     {"MASTER", FAM_FX, SC_GLOBAL, GR_NONE, {G_CLIP, G_PUNCH, G_DUCK, G_DREL}},   /* JIANT: clipper, drum bus, ducking;
                                                          * (0.7.6) FX's second page, at hand (was after SL PITCH) */
+    {"DUCK", FAM_FX, SC_GLOBAL, GR_NONE, {G_DSRC, G_DLANE, G_DTHR, G_DATK}},
     {"DIST", FAM_FX, SC_TRACK, GR_NONE, {P_DIST, P_DTYPE, P_DTONE, 0xFF}},   /* JIANT: the drive's type and tone */
     {"AUTO PAN", FAM_FX, SC_TRACK, GR_NONE, {P_APDEP, P_APRATE, P_APSYNC, P_APWAVE}},   /* (JIANT 0.6.9) the track's pan swung */
     {"BUSES", FAM_FX, SC_GLOBAL, GR_BUSES, {G_DMIX, G_RSIZE, G_CDEPTH, G_SLDEP}},   /* (0.8.5) FX's lens: the buses' main values */
@@ -727,7 +746,13 @@ static const page_t PAGES[] = {
     {"LFO 2", FAM_LFO, SC_TRACK, GR_LFO, {P_L2RATE, P_L2WAVE, ID_L2MODE, P_L2FADE}},
     {"LFO 2 PHASE", FAM_LFO, SC_TRACK, GR_LFO, {ID_L2PHS, 0xFF, 0xFF, 0xFF}},
     {"LFO 2 DEST", FAM_LFO, SC_TRACK, GR_NONE, {ID_L2DEST,ID_L2DEST,ID_L2DEST,ID_L2DEST}},
+    {"LIB CLEAR",FAM_SAVE,SC_GLOBAL,GR_LIBCLEAR,{0xFF,0xFF,0xFF,0xFF}},
+    {"SEQ GEN",FAM_SEQ,SC_TRACK,GR_DGEN,{0,0xFF,0xFF,0xFF}},
+    {"GEN MAP",FAM_SEQ,SC_TRACK,GR_DGEN,{1,0xFF,0xFF,0xFF}},
+    {"GEN OPTIONS",FAM_SEQ,SC_TRACK,GR_DGEN,{2,0xFF,0xFF,0xFF}},
     {"DRUM VOICE",FAM_EDIT,SC_TRACK,GR_DXSND,{0xFF,0xFF,0xFF,0xFF}},
+    {"PRESETS", FAM_EDIT, SC_GLOBAL, GR_BROWSE, {0xFF, 0xFF, 0xFF, 0xFF}},
+    {"DUCK ENV", FAM_FX, SC_GLOBAL, GR_NONE, {G_DATK, G_DREL, G_DUCK, 0xFF}},
 };
 #define NPAGES (sizeof(PAGES) / sizeof(PAGES[0]))
 static uint8_t mod_ui_slot;      /* the MOD page: the matrix slot (0..3) KNOB 2..4 edit */
@@ -739,6 +764,7 @@ static const param_desc_t REV_PRE = PD("PRE", F_INT, 0, 100, 0);       /* ROOM /
 static const param_desc_t REV_AIR = PD("AIR", F_SEMI, -24, 24, 0);    /* (0.6.12) SHIMMER / CLOUD: pitch and tone, down dark,
                                                                        * up airy (G_RPRE; fx.c rev_air) */
 static const param_desc_t AP_BEAT = PE("RATE", N_APDIV, 2);          /* (0.6.9) AUTO PAN's RATE on the tempo (SYNC BEAT) */
+static const param_desc_t DUCK_AMOUNT = PD("AMT", F_PCT, 0, 100, 0);
 static uint8_t sl_ui_step;       /* (JIANT 0.6.3) the SL PITCH page: the step KNOB 2 edits */
 
 static const param_desc_t *page_desc(const page_t *pg, uint32_t slot, int16_t **valp)
@@ -774,9 +800,24 @@ static const param_desc_t *page_desc(const page_t *pg, uint32_t slot, int16_t **
         return 0;
     }
     if (pg->scope == SC_GLOBAL) {
+        if (pg->id[0] == G_DSRC && song.g[G_DSRC] == DUCK_MIDI) {
+            if (id == G_DLANE)
+                id = G_DCH;
+            else if (id == G_DTHR)
+                id = G_DNOTE;
+        }
+        if (id == G_DLANE) {
+            uint32_t src = song.g[G_DSRC];
+            if (!src || src > NTRK || trk[src - 1u].eng_req != ENGI_DRUM) {
+                *valp = 0;
+                return 0;
+            }
+        }
         if (pg->graph == GR_SLPIT && id == G_SLP0)    /* the pitch of the step shown */
             id += sl_ui_step & 15u;
         *valp = &song.g[id];
+        if (id == G_DUCK && pg->id[0] == G_DATK)
+            return &DUCK_AMOUNT;
         if (song.g[G_RTYPE] == 3 && (id == G_RPRE || id == G_RDAMP))   /* (0.6.5) RESO: PITCH, FOLW in their slots */
             return id == G_RPRE ? &RESO_PITCH : &RESO_FOLW;
         if (id == G_RPRE)                             /* (0.6.12) SHIMMER / CLOUD: AIR; ROOM / SPRING: PRE */
