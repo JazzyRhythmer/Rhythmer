@@ -13,13 +13,28 @@ def apply_site_navigation(root,dist):
         s=p.read_text()
         s=re.sub(r'<header class="rhy-site-header" data-rhythmer-navigation>.*?</header>','',s,count=1,flags=re.S)
         s=re.sub(r'<link rel="stylesheet" href="../assets/site-navigation.css[^"]*">','',s)
+        s=re.sub(r'<link rel="stylesheet" href="../(?:firmware-links|jazzy-bridge)\.css">','',s)
         s=s.replace('<script>if(window.self!==window.top)document.documentElement.setAttribute("data-rhythmer-framed","");</script>','')
         if name=='installer/index.html' and 'class="rhy-install-options"' not in s:
             s,n=re.subn(r'<header>.*?</header>', '<nav class="rhy-install-options" aria-label="Installation options"><a href="./">RHYTHMER INSTALL</a><a href="?mode=stock">RETURN TO V15</a></nav>',s,count=1,flags=re.S)
             if n!=1:raise ValueError('Installer header anchor changed')
         links=''.join('<a href="../#'+route+'" target="_top"'+(' aria-current="page"' if route==active else '')+'>'+label+'</a>' for label,route in routes)
-        header='<header class="rhy-site-header" data-rhythmer-navigation><div class="rhy-site-inner"><a class="rhy-site-brand" href="../#home" target="_top" aria-label="Rhythmer home"><span aria-hidden="true">▥</span> RHYTHMER</a><nav aria-label="Main navigation">'+links+'</nav><a class="rhy-site-support" href="../#support" target="_top">SUPPORT ↗</a></div></header>'
-        head='<link rel="stylesheet" href="../assets/site-navigation.css?v='+digest+'"><script>if(window.self!==window.top)document.documentElement.setAttribute("data-rhythmer-framed","");</script>'
+        firmwares = (
+            '<div class="firmware-links" role="group" aria-label="Firmwares and support">'
+            '<a href="../#home" target="_top" aria-current="true"><img class="firmware-mark" src="../rhythmer-mark.svg" alt="" width="14" height="14">RHYTHMER</a>'
+            '<a class="firmware-support" href="../#support" target="_top">SUPPORT ↗</a></div>'
+        )
+        header = (
+            '<header class="rhy-site-header" data-rhythmer-navigation><div class="rhy-site-inner">'
+            '<a class="rhy-site-brand" href="../#home" target="_top" aria-label="Rhythmer home">'
+            '<img class="rhy-brand-mark" src="../rhythmer-mark.svg" alt="" width="27" height="27"> RHYTHMER</a>'
+            '<nav aria-label="Main navigation">' + links + '</nav>' + firmwares + '</div></header>'
+        )
+        head = (
+            '<link rel="stylesheet" href="../assets/site-navigation.css?v=' + digest + '">'
+            '<link rel="stylesheet" href="../firmware-links.css"><link rel="stylesheet" href="../jazzy-bridge.css">'
+            '<script>if(window.self!==window.top)document.documentElement.setAttribute("data-rhythmer-framed","");</script>'
+        )
         s=s.replace('</head>',head+'</head>',1)
         s,n=re.subn(r'(<body\b[^>]*>)',lambda m:m[1]+header,s,count=1)
         if n!=1:raise ValueError('Body anchor missing: '+name)

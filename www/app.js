@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {fm1Device} from './device.mjs';
-import {renderLanding,wireLanding} from './landing.mjs?v=bc66746355a5';
-import {renderManual,wireManual} from './manual.mjs?v=1caefab994dd';
+import {renderLanding,wireLanding} from './landing.mjs?v=efe2003192fc';
+import {renderManual,wireManual} from './manual.mjs?v=bfcefac6bfb6';
 import {mountStudioNotes,cleanupStudioNotes} from './newsletter.mjs?v=63d9555e7ac9';
 import {MODELS,SCALES,ROOTS,kind,makeProject,availableModels,setModel,validateProject,randomDraft} from './model.mjs';
 const $ = s => document.querySelector(s);
