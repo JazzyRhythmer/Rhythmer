@@ -2,7 +2,7 @@
 
 ## 0.1.2-dev1 — 2026-11-09 · build 20261109.18
 
-- FMINI-1 (43 presets) and OberVave (32 presets) replace PHASE, LOFI and WHEEL. Analog, Serum, FM6 and all three MONO2K machines remain. Projects using a retired engine load the affected track with Analog.
+- FMINI-1 (43 presets) and OberVave (32 presets) replace PHASE, LOFI and WHEEL. Analog, Wavetable, FM6 and all three MONO2K machines remain. Projects using a retired engine load the affected track with Analog.
 - Twelve LXR-X kits use Rhythmer's Drum-X synthesis, alongside the full Hortator MD bank. Browse and swap individual lane sounds; factory kick detection follows the selected sound.
 - Five generators in SEQ for drums, synths and Break chops. Full GEN has more role-specific sound choices, including FMINI basses where they suit the genre.
 - EDIT / SOUND / PRESETS scopes browsing to the selected engine; the physical PRESETS knob keeps global browsing outside that page. SAVE shows SONG, PROJECT, SOUND, with confirmed project and section clearing.

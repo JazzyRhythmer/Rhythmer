@@ -41,7 +41,7 @@
     }
   },
   "releaseHold": null,
-  "buildRevision": "20261109.18",
+  "buildRevision": "20261110.3",
   "releaseCaution": "Public beta: FMINI-1, OberVave, LXR-X, per-track SEQ generation and USB MIDI Host. Back up first. Projects that used PHASE, LOFI or WHEEL open with Analog in this build.",
   "previousOwnerTests": [
     {

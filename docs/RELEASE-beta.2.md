@@ -8,7 +8,7 @@ Built on JIANT’s sequencing and system foundation, with X0X-derived Acid gener
 
 ## Changes
 
-- GEN keeps SERUM, PHASE, LOFI, ANALOG, WHEEL and SID-6581. It automatically assigns at most one SERUM, including any existing SERUM on untouched tracks. SWAV-SAW, FM+STAT and FM6 are excluded from automatic GEN assignment. Manual model selection remains available; existing songs are not rewritten.
+- GEN keeps WAVETABLE, PHASE, LOFI, ANALOG, WHEEL and SID-6581. It automatically assigns at most one WAVETABLE, including any existing WAVETABLE on untouched tracks. SWAV-SAW, FM+STAT and FM6 are excluded from automatic GEN assignment. Manual model selection remains available; existing songs are not rewritten.
 - Sustained high CPU or recurring missed audio deadlines produces a short `CPU HIGH: REDUCE INSTRUMENTS` notice. It does not interrupt transport, open a modal, or overwrite higher-priority messages. Debounce and a 30-second cooldown limit interruptions.
 - Break playback avoids unnecessary remainder calculations and bypasses its performance filter when fully open. The track filter, ENV and both LFO routes remain active. Re-enabling the performance filter fades into fresh filter state.
 - SWAV-SAW high-pass arithmetic uses an equivalent cheaper integer calculation. Focused comparisons preserve the original result.

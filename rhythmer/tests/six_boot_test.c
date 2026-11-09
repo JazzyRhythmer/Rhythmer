@@ -17,7 +17,7 @@ int main(int argc,char**argv){int bad=0;draw_splash();ui_power_on();fm6_init();p
  bad+=check("wordmark assembles in stages then settles sharply",early!=build&&build!=complete&&complete==logo_hash());
  splash_sig(0,900);memcpy(still,host_screen,sizeof still);
  for(unsigned layout=0;layout<4;layout++){
-  for(unsigned k=0;k<NTRK;k++)trk[k].engine=trk[k].eng_req=(uint8_t)(layout==0?ENGI_EMPTY:layout==1?ENGI_SERUM:layout==2?ENGI_DRUM:k==0?ENGI_BREAK:ENGI_ACID);
+  for(unsigned k=0;k<NTRK;k++)trk[k].engine=trk[k].eng_req=(uint8_t)(layout==0?ENGI_EMPTY:layout==1?ENGI_WAVETABLE:layout==2?ENGI_DRUM:k==0?ENGI_BREAK:ENGI_ACID);
   trks_put(layout&1u);unsigned tracks=fnv(2166136261u,trk,sizeof trk),globals=fnv(2166136261u,&song,sizeof song);
   splash_sig(0,900);bad+=check("startup composition ignores actual engines and four/six-track mode",!memcmp(still,host_screen,sizeof still));
   splash_sig(0,1300);unsigned moving=1;for(unsigned k=0;k<6;k++){unsigned change=0,x0=13+k%3*76,y0=149+k/3*42;for(unsigned y=y0;y<y0+20;y++)for(unsigned x=x0;x<x0+60;x++)change+=still[y*240+x]!=host_screen[y*240+x];moving&=change>0;}

@@ -42,7 +42,7 @@
 #define NENGINES (22+2*RHYTHMER_NEW_SYNTHS+RHYTHMER_OBERVAVE)              /* stored engine IDs are append-only */
 #define ENGI_BREAK 15u
 #define ENGI_ACID 16u
-#define ENGI_SERUM 17u           /* Garden wavetable; 15 remains Rhythmer BREAK */
+#define ENGI_WAVETABLE 17u           /* Garden wavetable; 15 remains Rhythmer BREAK */
 #define ENGI_M2STAT 18u
 #define ENGI_M2SAW 19u
 #define ENGI_M2SID 20u
@@ -773,7 +773,7 @@ static uint32_t six_role_engine(uint32_t track, uint32_t e) {
 #if RHYTHMER_OBERVAVE
  if(e==ENGI_OBERVAVE)return e;
 #endif
- return e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID||e==ENGI_SERUM||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_ANALOG||e==ENGI_FM6||e==ENGI_WHEEL?e:ENGI_SERUM;
+ return e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID||e==ENGI_WAVETABLE||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_ANALOG||e==ENGI_FM6||e==ENGI_WHEEL?e:ENGI_WAVETABLE;
 }
 /* BREAK is a project-wide singleton, including inactive tracks. Selection
  * availability is separate from stored-engine validity (project loading). */

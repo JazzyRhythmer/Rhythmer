@@ -14,9 +14,9 @@ int main(void){
  enable();bad+=check("confirmed six-track mode fills empty T5 Acid and T6 Break",trk_live==6&&trk[4].eng_req==ENGI_ACID&&trk[5].eng_req==ENGI_BREAK&&six_break_track()==5);
  bad+=check("activation preserves existing MIDI without generating a pattern",steps_sig(&trk[4])==sig5&&steps_sig(&trk[5])==sig6);
  bad+=check("activation uses the native Hortator default and Amen bank A",trk[4].preset==0&&trk[4].p[P_E5]==0&&trk[5].p[P_E4]==0);
- set_engine_of(&trk[4],ENGI_SERUM);set_engine_of(&trk[5],ENGI_PHASE);
+ set_engine_of(&trk[4],ENGI_WAVETABLE);set_engine_of(&trk[5],ENGI_PHASE);
  int16_t p5[P_COUNT],p6[P_COUNT];memcpy(p5,trk[4].p,sizeof p5);memcpy(p6,trk[5].p,sizeof p6);
- trks_request(0);enable();bad+=check("re-enabling never replaces assigned sounds or parameters",trk[4].eng_req==ENGI_SERUM&&trk[5].eng_req==ENGI_PHASE&&!memcmp(p5,trk[4].p,sizeof p5)&&!memcmp(p6,trk[5].p,sizeof p6));
+ trks_request(0);enable();bad+=check("re-enabling never replaces assigned sounds or parameters",trk[4].eng_req==ENGI_WAVETABLE&&trk[5].eng_req==ENGI_PHASE&&!memcmp(p5,trk[4].p,sizeof p5)&&!memcmp(p6,trk[5].p,sizeof p6));
  set_engine_of(&trk[1],ENGI_BREAK);set_engine_of(&trk[4],ENGI_EMPTY);set_engine_of(&trk[5],ENGI_EMPTY);
  trks_request(0);enable();bad+=check("Break on another track prevents duplicate automatic Break",trk[4].eng_req==ENGI_ACID&&trk[5].eng_req==ENGI_EMPTY&&six_break_track()==1);
  set_engine_of(&trk[4],ENGI_EMPTY);rp_apply();bad+=check("applying saved mode at boot never invents assignments",trk_live==6&&trk[4].eng_req==ENGI_EMPTY&&trk[5].eng_req==ENGI_EMPTY);

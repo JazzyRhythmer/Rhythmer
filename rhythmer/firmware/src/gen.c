@@ -1443,13 +1443,13 @@ static const uint8_t GENV_LW[4] = {45, 15, 25, 15}, GENV_AW[4] = {60, 8, 17, 15}
 /* Automatic generation keeps a light pool and one active instance per imported engine. */
 static int gen_auto_synth_ok(unsigned e)
 {
-    return e==ENGI_ANALOG||e==ENGI_M2SID||e==ENGI_SERUM||
+    return e==ENGI_ANALOG||e==ENGI_M2SID||e==ENGI_WAVETABLE||
         (RHYTHMER_FMINI&&e==ENGI_FMINI)||(RHYTHMER_OBERVAVE&&e==ENGI_OBERVAVE)||
         (!RHYTHMER_SWAP_WLP&&(e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_WHEEL));
 }
 static int gen_engine_free(const track_t *t,unsigned e)
 {
-    if(e!=ENGI_SERUM&&e!=ENGI_FMINI&&e!=ENGI_OBERVAVE)return 1;
+    if(e!=ENGI_WAVETABLE&&e!=ENGI_FMINI&&e!=ENGI_OBERVAVE)return 1;
     for(unsigned k=0;k<trk_live;k++)
         if(&trk[k]!=t&&trk[k].eng_req==e&&
            (&trk[k]<t||!(six_gen_work_mask&(1u<<k))))return 0;
@@ -1529,7 +1529,7 @@ static void gen_sound(track_t *t, uint32_t role, uint32_t ri)
     const grecipe_t *r = &RECIPE[ri];
     static const uint8_t engines[]={
         ENGI_ANALOG,RHYTHMER_SWAP_WLP?ENGI_FMINI:ENGI_PHASE,ENGI_LOFI,
-        RHYTHMER_SWAP_WLP?ENGI_OBERVAVE:ENGI_WHEEL,ENGI_M2SID,ENGI_SERUM
+        RHYTHMER_SWAP_WLP?ENGI_OBERVAVE:ENGI_WHEEL,ENGI_M2SID,ENGI_WAVETABLE
     };
     unsigned e=(unsigned)gx.eng,i,k;
     if(!gen_auto_synth_ok(e)||!gen_engine_free(t,e)||

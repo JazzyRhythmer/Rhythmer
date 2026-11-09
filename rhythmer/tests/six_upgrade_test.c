@@ -44,10 +44,10 @@ int main(int argc,char **argv){int bad=0;reset();
    reset();gp.form=0;gp.seed=seed*197+31;gp.genre=gi+1;gp.energy=55;gp.complex=65;gp.human=70;gp.swing=GA_AUTO;
    for(unsigned j=0;j<GP_N;j++)gp.amt[j]=GA_AUTO;
    gp.sig=0;ui.home=1;ui.confirm=CF_DICE_ALL;gen_go();
-   unsigned sig=steps_sig(&trk[0]),prior=0;for(unsigned u=0;u<seed;u++)prior|=patterns[u]==sig;diverse+=!prior;patterns[seed]=sig;unsigned serum=0,localchords=0;
+   unsigned sig=steps_sig(&trk[0]),prior=0;for(unsigned u=0;u<seed;u++)prior|=patterns[u]==sig;diverse+=!prior;patterns[seed]=sig;unsigned wavetable=0,localchords=0;
    for(unsigned k=0;k<4;k++){
     if(k)bad+=check("genre keeps safe automatic engine",gen_auto_synth_ok(trk[k].eng_req));
-    serum+=trk[k].eng_req==ENGI_SERUM;if(k)engines[k-1]|=1u<<trk[k].eng_req;hooks+=k&&gs.role[k]==RL_LEAD;arp+=k&&gs.role[k]==RL_ARP;
+    wavetable+=trk[k].eng_req==ENGI_WAVETABLE;if(k)engines[k-1]|=1u<<trk[k].eng_req;hooks+=k&&gs.role[k]==RL_LEAD;arp+=k&&gs.role[k]==RL_ARP;
     for(unsigned i=0;i<dlen(&trk[k]);i++)if(trk[k].step[i].time==ST_NOTE){
      step_t *st=&trk[k].step[i];localchords+=k&&st->n>=3;micro+=ST_MICRO(st)!=0;
      if(st->n>4)return 7;
@@ -60,7 +60,7 @@ int main(int argc,char **argv){int bad=0;reset();
    if(gi==51&&gs.role[3]==RL_LEAD)bad+=check("G-funk hook uses legato glide",trk[3].p[P_VOICE]==V_LEGATO&&trk[3].p[P_GLIDE]==18);
    if(gi==55&&gs.role[3]==RL_ARP)bad+=check("abstract arp has a fifteen-step cycle",trk[3].p[P_SLEN]==15);
 
-   bad+=check("genre keeps the Serum ceiling and Acid/Break outside GEN",serum<=1&&trk[4].eng_req==ENGI_ACID&&trk[5].eng_req==ENGI_BREAK);
+   bad+=check("genre keeps the Wavetable ceiling and Acid/Break outside GEN",wavetable<=1&&trk[4].eng_req==ENGI_ACID&&trk[5].eng_req==ENGI_BREAK);
    if(argc>1&&seed==0){song.sel=0;ui.home=1;ui.confirm=CF_DICE_ALL;gp.page=0;fm1_ms+=500;ui.force=1;frame();char label[40];snprintf(label,sizeof label,"GEN-%s",names[g]);screen(argv[1],label);go_home();ui.force=1;frame();screen(argv[1],names[g]);save_project(argv[1],names[g]);}
   }
   printf("GEN %s diversity=%u/32 chord-arrangements=%u/32 timed-hits=%u engines=%x,%x,%x hooks=%u arps=%u\n",names[g],diverse,chords,micro,engines[0],engines[1],engines[2],hooks,arp);
@@ -69,7 +69,7 @@ int main(int argc,char **argv){int bad=0;reset();
   bad+=check("genre produces varied, voiced, timed phrases",diverse>=28&&chords>=28&&micro>0);
  }
  /* Repeating the same settings regenerates the same pattern; untouched
-  * machine tracks retain music and own the automatic Serum allowance. */
+  * machine tracks retain music and own the automatic Wavetable allowance. */
  for(unsigned gi=49;gi<NGENRE;gi++){
   unsigned hashes[2][4];
   for(unsigned pass=0;pass<2;pass++){

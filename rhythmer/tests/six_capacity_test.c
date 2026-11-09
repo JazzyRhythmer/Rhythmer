@@ -3,7 +3,7 @@
 #include "ui_test.c"
 int main(int argc,char **argv){
  if(argc<2)return 2;ui_power_on();load_depth++;fm6_init();power_on_parts();test_optional_machines();load_depth--;six_native_init();trks_put(1);song.master_q12=4096;
- const unsigned model[]={ENGI_SERUM,ENGI_FM6,ENGI_PHASE,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID,ENGI_DRUM};
+ const unsigned model[]={ENGI_WAVETABLE,ENGI_FM6,ENGI_PHASE,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID,ENGI_DRUM};
  for(unsigned m=0;m<sizeof model/sizeof *model;m++){
   for(unsigned k=0;k<6;k++)set_engine_of(&trk[k],ENGI_ANALOG);
   for(unsigned k=0;k<6;k++){

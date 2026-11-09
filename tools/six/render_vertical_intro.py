@@ -32,8 +32,8 @@ def fit(d,x,y,s,maxw,size=120,**kw):
  text(d,x,y,s,size,**kw)
 def layer():
  im=Image.new('L',(W,H),0);return im,ImageDraw.Draw(im)
-NAMES=['DRUM','SERUM','PHASE','LOFI','ANALOG','FM6','WHEEL','FM+STAT','SWAV-SAW','SID-6581','ACID','BREAK']
-IDS=['drum','serum','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']
+NAMES=['DRUM','WAVETABLE','PHASE','LOFI','ANALOG','FM6','WHEEL','FM+STAT','SWAV-SAW','SID-6581','ACID','BREAK']
+IDS=['drum','wavetable','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']
 DESC=[('SYNTHESIZED PERCUSSION','KITS / HATS / METAL'),('WAVETABLE SYNTHESIS','MORPH / WARP / DETUNE'),('PHASE DISTORTION','ROUND KEYS / DIGITAL EDGE'),('LOW-RESOLUTION SYNTHESIS','STEPPED WAVES / GRAIN'),('CLASSIC WAVEFORMS','DETUNE / RESONANT FILTER'),('SIX-OPERATOR FM','RATIOS / FEEDBACK / NETWORKS'),('HARMONIC LAYERS','TONEWHEEL / ROTATION'),('COMPACT FM','SHIFTING RATIOS / FEEDBACK'),('LAYERED SAW WAVES','BRIGHT LEADS / WIDE TEXTURES'),('CHIP-STYLE SYNTHESIS','PULSE / SAW / TRIANGLE'),('303-STYLE BASS','ACCENTS / SLIDES / GENERATE'),('SEQUENCED BREAKBEATS','CHOP / REPEAT / SWITCH A-B')]
 CLIPS={}
 for name in IDS+['acid-generate','break-perform']:
@@ -71,7 +71,7 @@ def machines(t):
  im,d=layer();u=t-3.05
  text(d,84,300,'THE MACHINES',76,245,bold=True)
  text(d,88,410,'SOUND / PATTERN / PERFORMANCE',25,140,mono=True)
- for j,(name,title) in enumerate(zip(['drum','serum','phase','lofi','acid','break'],['DRUM','SERUM','PHASE','LOFI','ACID','BREAK'])):
+ for j,(name,title) in enumerate(zip(['drum','wavetable','phase','lofi','acid','break'],['DRUM','WAVETABLE','PHASE','LOFI','ACID','BREAK'])):
   k=ease((u-j*.38)/.7)
   if k<=0:continue
   x=84+(j%2)*470;y=515+(j//2)*340+round((1-k)*60)
@@ -122,7 +122,7 @@ def logo(t):
   text(d,540,1035,'SOUND INTO',44,220*k,True,True)
   text(d,540,1095,'MOTION.',44,220*k,True,True)
   d.rectangle((899,730,987,780),outline=round(180*k),width=2);text(d,943,744,'OS',28,245*k,True,mono=True)
-  for j,name in enumerate(['drum','serum','phase','lofi','acid','break']):graphic(im,name,144+(j%3)*288,1280+(j//3)*120,216,82,t)
+  for j,name in enumerate(['drum','wavetable','phase','lofi','acid','break']):graphic(im,name,144+(j%3)*288,1280+(j//3)*120,216,82,t)
  for hit in [12.65,13.45,16.75]:
   if 0<=ct-hit<.065:
    for y,shift in [(860,15),(914,-11)]:

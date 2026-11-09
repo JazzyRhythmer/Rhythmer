@@ -32,11 +32,11 @@ int main(int argc,char **argv) {
  for(unsigned k=0;k<6;k++)bad+=check("explicit fixture engine layout",trk[k].eng_req==(k==4?ENGI_ACID:k==5?ENGI_BREAK:TRK_DEF[k][0]));
  bad+=check("160 BPM and four projects",song.g[G_BPM]==160 && NSONG==4);
  for(unsigned t=0;t<6;t++){song.sel=t;uint32_t total;preset_all_pos(NENGINES,&total);int ok=total>0;for(unsigned i=0;i<total;i++){uint32_t k,e=preset_all_at(NENGINES,i,&k);ok&=six_preset_engine(e,NENGINES);}bad+=check("preset browser respects singleton Break ownership",ok);}
- song.sel=1;bad+=check("model list includes EMPTY and keeps stable synth order",eng_step(ENGI_SERUM,-1)==ENGI_EMPTY&&eng_step(ENGI_SERUM,1)==ENGI_PHASE&&eng_step(ENGI_PHASE,1)==ENGI_LOFI);
- bad+=check("stored Acid Break IDs remain stable",ENGI_BREAK==15u&&ENGI_ACID==16u&&ENGI_SERUM==17u);
- project_capture(&proj_scratch);bad+=check("Garden engines pack and round trip",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire)&&proj_scratch.t[1].engine==ENGI_SERUM&&proj_scratch.t[2].engine==ENGI_PHASE&&proj_scratch.t[3].engine==ENGI_LOFI);
- favorite_set(ENGI_ACID,0,1);favorite_set(ENGI_BREAK,0,1);favorite_set(ENGI_SERUM,0,1);favorite_set(ENGI_LOFI,0,1);favorite_set(ENGI_LOFI,0,0);
- bad+=check("new synth favorites preserve Acid Break and machine bits",favorite_has(ENGI_ACID,0)&&favorite_has(ENGI_BREAK,0)&&favorite_has(ENGI_SERUM,0)&&!favorite_has(ENGI_LOFI,0)&&favorites.factory[15][15]==0x61u);
+ song.sel=1;bad+=check("model list includes EMPTY and keeps stable synth order",eng_step(ENGI_WAVETABLE,-1)==ENGI_EMPTY&&eng_step(ENGI_WAVETABLE,1)==ENGI_PHASE&&eng_step(ENGI_PHASE,1)==ENGI_LOFI);
+ bad+=check("stored Acid Break IDs remain stable",ENGI_BREAK==15u&&ENGI_ACID==16u&&ENGI_WAVETABLE==17u);
+ project_capture(&proj_scratch);bad+=check("Garden engines pack and round trip",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire)&&proj_scratch.t[1].engine==ENGI_WAVETABLE&&proj_scratch.t[2].engine==ENGI_PHASE&&proj_scratch.t[3].engine==ENGI_LOFI);
+ favorite_set(ENGI_ACID,0,1);favorite_set(ENGI_BREAK,0,1);favorite_set(ENGI_WAVETABLE,0,1);favorite_set(ENGI_LOFI,0,1);favorite_set(ENGI_LOFI,0,0);
+ bad+=check("new synth favorites preserve Acid Break and machine bits",favorite_has(ENGI_ACID,0)&&favorite_has(ENGI_BREAK,0)&&favorite_has(ENGI_WAVETABLE,0)&&!favorite_has(ENGI_LOFI,0)&&favorites.factory[15][15]==0x61u);
 
  for(unsigned k=0;k<5;k++){song.sel=k; dice_seq(&trk[k]); bad+=check("JIANT DICE creates sequence",!seq_is_empty(&trk[k]));}
  song.sel=TEST_BREAK_TRACK;dice_seq(TSEL);int chops_ok=1;for(unsigned i=0;i<NSTEP;i++)if(TSEL->step[i].time==ST_NOTE&&TSEL->step[i].n)chops_ok&=TSEL->step[i].n==1&&TSEL->step[i].note[0]<16;bad+=check("JIANT DICE uses valid break chops",chops_ok&&!seq_is_empty(TSEL));for(unsigned i=0;i<NSTEP;i++)step_clear(&TSEL->step[i]);
@@ -146,12 +146,12 @@ int main(int argc,char **argv) {
  }
  if(argc>4){
   for(unsigned k=1;k<4;k++){
-   set_engine_of(&trk[k],ENGI_SERUM);apply_preset_to(&trk[k],3);
+   set_engine_of(&trk[k],ENGI_WAVETABLE);apply_preset_to(&trk[k],3);
    static const int16_t e[8]={64,96,20,40,96,80,80,SF_LADDER};
    for(unsigned i=0;i<8;i++)trk[k].p[P_E0+i]=e[i];
   }
   for(unsigned k=0;k<6;k++){trk[k].p[P_DIST]=35;trk[k].p[P_CHOR]=50;trk[k].p[P_DLY]=25;trk[k].p[P_REV]=25;}
-  project_capture(&proj_scratch);bad+=check("pack triple-Serum stress fixture",proj_pack(&proj_wire,&proj_scratch));
+  project_capture(&proj_scratch);bad+=check("pack triple-Wavetable stress fixture",proj_pack(&proj_wire,&proj_scratch));
   FILE *f=fopen(argv[4],"wb");if(!f)return 2;fwrite(&proj_wire,1,sizeof proj_wire,f);fclose(f);
  }
  if(argc>7){

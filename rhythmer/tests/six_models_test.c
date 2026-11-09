@@ -6,7 +6,7 @@ int main(void){
  char layout_path[1024];snprintf(layout_path,sizeof layout_path,"%s/six-model-layout.json",getenv("RHYTHMER_BUILD_DIR")?getenv("RHYTHMER_BUILD_DIR"):"rhythmer/build");
  FILE *layout=fopen(layout_path,"w");if(!layout)return 2;
  fprintf(layout,"{\"song_sel\":%u,\"track_stride\":%u,\"engine\":%u,\"p\":%u,\"step\":%u,\"step_stride\":%u,\"step_note\":%u,\"voices\":%u,\"voice_stride\":%u,\"voice_note\":%u,\"voice_active\":%u,\"voice_stage\":%u,\"voice_age\":%u}\n",(unsigned)offsetof(song_t,sel),(unsigned)sizeof(track_t),(unsigned)offsetof(track_t,engine),(unsigned)offsetof(track_t,p),(unsigned)offsetof(track_t,step),(unsigned)sizeof(step_t),(unsigned)offsetof(step_t,note),(unsigned)offsetof(track_t,v),(unsigned)sizeof(voice_t),(unsigned)offsetof(voice_t,note),(unsigned)offsetof(voice_t,active),(unsigned)offsetof(voice_t,stage),(unsigned)offsetof(voice_t,age));fclose(layout);
- const unsigned model[6]={ENGI_SERUM,ENGI_PHASE,ENGI_LOFI,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID},count[6]={8,16,17,5,6,6};
+ const unsigned model[6]={ENGI_WAVETABLE,ENGI_PHASE,ENGI_LOFI,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID},count[6]={8,16,17,5,6,6};
  track_t *t=&trk[1];song.sel=1;
  for(unsigned e=0;e<6;e++){
   const engine_t *eng=ENGINES[model[e]];

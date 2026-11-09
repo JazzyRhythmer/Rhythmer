@@ -21,7 +21,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 | | | |
 | --- | --- | --- |
-| **DRUM**<br><img src="docs/motion/drum.gif" alt="DRUM firmware UI animation" width="240"><br>Synthesized percussion | **SERUM**<br><img src="docs/motion/serum.gif" alt="SERUM firmware UI animation" width="240"><br>Wavetable morphing | **FMINI-1**<br><img src="docs/motion/fmini.gif" alt="FMINI-1 firmware UI animation" width="240"><br>Ladder-filter basses and leads |
+| **DRUM**<br><img src="docs/motion/drum.gif" alt="DRUM firmware UI animation" width="240"><br>Synthesized percussion | **WAVETABLE**<br><img src="docs/motion/wavetable.gif" alt="WAVETABLE firmware UI animation" width="240"><br>Wavetable morphing | **FMINI-1**<br><img src="docs/motion/fmini.gif" alt="FMINI-1 firmware UI animation" width="240"><br>Ladder-filter basses and leads |
 | **OBERVAVE**<br><img src="docs/motion/obervave.gif" alt="OBERVAVE firmware UI animation" width="240"><br>Vintage polysynth textures | **ANALOG**<br><img src="docs/motion/analog.gif" alt="ANALOG firmware UI animation" width="240"><br>Classic waveforms | **FM6**<br><img src="docs/motion/fm6.gif" alt="FM6 firmware UI animation" width="240"><br>Six-operator patch networks |
 | **FM+STAT**<br><img src="docs/motion/fmstat.gif" alt="FM+STAT firmware UI animation" width="240"><br>Compact FM | **SWAV-SAW**<br><img src="docs/motion/swavsaw.gif" alt="SWAV-SAW firmware UI animation" width="240"><br>Layered saws | **SID-6581**<br><img src="docs/motion/sid.gif" alt="SID-6581 firmware UI animation" width="240"><br>Chip-style synthesis |
 
@@ -34,8 +34,8 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 ## Machines and sequencing
 
-- Up to six assignable tracks; fresh settings start with four active tracks: DRUM / SERUM / FMINI-1 / OBERVAVE. T5/T6 start EMPTY. Confirm six-track mode with OCT+ to fill empty T5/T6 with ACID / BREAK; existing sounds and notes are kept and a Break on another track is never duplicated.
-- Synths: Serum, FMINI-1 (43 presets), OberVave (32 presets), Analog, FM6, FM+STAT, SWAV-SAW and SID-6581. FMINI-1 and OberVave keep their original filter designs.
+- Up to six assignable tracks; fresh settings start with four active tracks: DRUM / WAVETABLE / FMINI-1 / OBERVAVE. T5/T6 start EMPTY. Confirm six-track mode with OCT+ to fill empty T5/T6 with ACID / BREAK; existing sounds and notes are kept and a Break on another track is never duplicated.
+- Synths: Wavetable, FMINI-1 (43 presets), OberVave (32 presets), Analog, FM6, FM+STAT, SWAV-SAW and SID-6581. FMINI-1 and OberVave keep their original filter designs.
 - Drums include the complete 55-preset Hortator MD bank (57 articulations / 21 kernels), 31 kits including 12 Drum-X LXR-X interpretations and two experimental MD LAB kits, and individual lane sound replacement. Drum attacks are protected for about 40 ms; tails then use the ordinary shared voice/CPU policy, without a separate MD-only cap.
 - Multiple Acid tracks; one Break machine per project, assignable anywhere. Machine-specific EDIT/SEQ pages follow the selected machine.
 - Acid NEW/MUTATE follows SCL (default CHR). Factory cutoff is 80 for three presets and 50 for HT SCREAMER. Saved projects keep their values.

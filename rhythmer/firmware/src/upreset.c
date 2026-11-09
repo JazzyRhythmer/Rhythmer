@@ -348,7 +348,7 @@ static void up_auto_name(char *b, uint32_t e, uint32_t k)
 {
     char l[4];
     e %= NENGINES;
-    str_cpy(b, ENGINES[eng_live(e)]->name, 9);   /* (a DIGITAL record plays as FM6, PHYS as ANALOG) */
+    str_cpy(b, ENGINES[eng_live(e)]->name, 10);   /* (a DIGITAL record plays as FM6, PHYS as ANALOG) */
     up_slot_label(l, k);
     str_cpy(b + str_len(b), " ", 2);
     str_cpy(b + str_len(b), l + 1, 3);

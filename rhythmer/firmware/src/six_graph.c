@@ -185,15 +185,15 @@ static void six_machine_glyph(const track_t *t,unsigned engine,int en,unsigned p
    if(en&&(t?jungle_playing()&&j==(unsigned)(jungle_current_step()/2):j==(ph>>28)))cv_frame(xx,y,w/16+1,h,ink);
   }return;
  }
- if(engine==ENGI_SERUM){
+ if(engine==ENGI_WAVETABLE){
   /* The wavetable's actual shape follows the two front-panel knobs. */
   unsigned wt=(unsigned)clamp(t?t->p[P_E0]:64,0,127)*7u*256u/127u,wi=wt>>8;
-  const serum_frame_t *sa=&SERUM_FR[wi],*sb=&SERUM_FR[wi<7u?wi+1u:7u];
+  const wavetable_frame_t *sa=&WAVETABLE_FR[wi],*sb=&WAVETABLE_FR[wi<7u?wi+1u:7u];
   unsigned warp=t?(unsigned)t->p[P_E1]:32u;
   int points=w<48?16:32;
   for(int j=0;j<points;j++){
    unsigned p=ph+(unsigned)j*(points==16?0x10000000u:0x08000000u);
-   int z=serum_read(sa,sb,serum_warp(p>>16,warp),wt&255u);
+   int z=wavetable_read(sa,sb,wavetable_warp(p>>16,warp),wt&255u);
    int xx=x+j*w/points,yy=cy+z*amp/32768;
    cv_rect(xx,yy,2,2,ink);
    if(points==32)cv_rect(xx,cy-z*amp/49152,1,1,T_DIM);

@@ -28,7 +28,7 @@ def load():
  for name in ['drum-sound','gen-target','gen-break','gen-styles']:
   p=Q/'native'/f'{name}.webp';a=Image.open(p);CLIPS[name]=[]
   for i in range(a.n_frames):a.seek(i);CLIPS[name].append(a.convert('RGB'))
- for name in ['drum','serum','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break','acid-generate','break-perform']:
+ for name in ['drum','wavetable','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break','acid-generate','break-perform']:
   a=Image.open(R/'site/media/motion'/f'{name}.webp');CLIPS[name]=[]
   for i in range(a.n_frames):a.seek(i);CLIPS[name].append(a.convert('RGB'))
 def frm(name,t=0):
@@ -37,7 +37,7 @@ def screen(im,name,xy,size,t=0):
  im.paste(frm(name,t).resize((size,size),Image.Resampling.NEAREST),xy)
  ImageDraw.Draw(im).rectangle((xy[0]-2,xy[1]-2,xy[0]+size+1,xy[1]+size+1),outline=LINE,width=2)
 def glyphs(im,x,y,w,h,t=0):
- for j,n in enumerate(['drum','serum','phase','lofi','acid','break']):
+ for j,n in enumerate(['drum','wavetable','phase','lofi','acid','break']):
   raw=frm(n,t+j*.13).crop((15,101,225,191));ww=int(w/6*.82);hh=round(ww*90/210)
   raw=raw.resize((ww,hh),Image.Resampling.NEAREST);im.paste(raw,(int(x+j*w/6),y))
   text(im,(int(x+j*w/6),y+hh+12),n.upper(),max(13,int(w/75)),True,GRAY)
@@ -105,7 +105,7 @@ def posters():
   save(im,f'Instagram-{j+2:02d}-{name}-2160x2700',(1080,1350))
  # Individual upscaled actual LCD screens, no invention of extra detail.
  screens=O/'Screens';screens.mkdir(exist_ok=True)
- names=['drum-sound','gen-styles','gen-target','gen-break','acid-generate','break-perform','drum','serum','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']
+ names=['drum-sound','gen-styles','gen-target','gen-break','acid-generate','break-perform','drum','wavetable','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']
  sheet=bg(3200,math.ceil(len(names)/4)*910+220);text(sheet,(90,55),'RHYTHMER / ACTUAL FIRMWARE UI',58)
  for j,name in enumerate(names):
   f=frm(name,.3);f.resize((1920,1920),Image.Resampling.NEAREST).save(screens/(name+'-1920.png'))

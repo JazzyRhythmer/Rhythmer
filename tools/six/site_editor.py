@@ -64,6 +64,15 @@ def build_editor(root,dist):
     s=s.replace('href="rhythmer.css"','href="rhythmer.css?v='+editor_version+'"')
     version=html.escape(release.get('version','development'))
     s=s.replace('class="rhy-title">RHYTHMER / EDITOR</a>',f'class="rhy-title">RHYTHMER / EDITOR</a><span class="rhy-build">{version}</span>')
+    # Keep old editor files and older connected firmware readable under the current label.
+    change('const parse = {', 'const engineNameV2 = name => name === "SERUM" || name === "WAVETABL" ? "WAVETABLE" : name;\n\nconst parse = {')
+    change('o.engines.push(r.s())','o.engines.push(engineNameV2(r.s()))')
+    change('engineName: String(pt.engineName ?? "")','engineName: engineNameV2(String(pt.engineName ?? ""))')
+    change('const nm = name || (fileEngines || [])[idx];','const nm = engineNameV2(name || (fileEngines || [])[idx]);')
+    change('obj.presetName || obj.engineName || "PATCH"','obj.presetName || engineNameV2(obj.engineName) || "PATCH"')
+    change('lib = ((await store.all()) || []).filter((p) => p && p.id);','lib = ((await store.all()) || []).filter((p) => p && p.id).map(p => ({ ...p, engineName: engineNameV2(p.engineName) }));')
+    change('libMeta = (await store.getMeta("layout")) || libMeta;','libMeta = (await store.getMeta("layout")) || libMeta;\n      if (Array.isArray(libMeta.engines)) libMeta.engines = libMeta.engines.map(engineNameV2);')
+    change('Array.isArray(obj.engines) ? obj.engines : null','Array.isArray(obj.engines) ? obj.engines.map(engineNameV2) : null')
     (out/'index.html').write_text(s)
     b=(vendor/'fm1backup.js').read_text().replace('length: 32','length: 16')
     # Do not accept foreign ABI backups or allow unknown objects to be skipped during restore.

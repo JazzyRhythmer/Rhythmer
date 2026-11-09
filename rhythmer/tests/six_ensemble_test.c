@@ -18,7 +18,7 @@ static void fixtures(const char *dir){
  for(unsigned md=0;md<2;md++)for(unsigned chord=0;chord<3;chord++){
   setup(md);song.g[G_BPM]=160;
   for(unsigned k=0;k<6;k++){
-   track_t *t=&trk[k];if(!chord&&k>=1&&k<=3){unsigned e=(unsigned[]){ENGI_SERUM,ENGI_PHASE,ENGI_LOFI}[k-1];set_engine_of(t,e);t->engine=e;apply_preset_to(t,0);t->xf=t->xf_on=0;}
+   track_t *t=&trk[k];if(!chord&&k>=1&&k<=3){unsigned e=(unsigned[]){ENGI_WAVETABLE,ENGI_PHASE,ENGI_LOFI}[k-1];set_engine_of(t,e);t->engine=e;apply_preset_to(t,0);t->xf=t->xf_on=0;}
    if(chord&&k>=1&&k<=3)t->p[P_VOICE]=V_POLY;
    t->p[P_MUTE]=chord==1&&k==5;t->p[P_SLEN]=16;t->p[P_SGATE]=127;
    t->p[P_DIST]=chord?0:60;t->p[P_CHOR]=chord?0:90;t->p[P_DLY]=chord?0:80;t->p[P_REV]=chord?0:80;

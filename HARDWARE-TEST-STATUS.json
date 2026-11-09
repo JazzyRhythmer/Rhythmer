@@ -12,14 +12,14 @@
     "migrationAndRecoveryMatrixVerified": false
   },
   "finalRevision": {
-    "buildRevision": "20261110.2",
-    "firmwareSha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a",
+    "buildRevision": "20261110.3",
+    "firmwareSha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023",
     "exactBinaryHardwareClaimed": false,
     "exactBinaryAutomatedScope": "See RELEASE-VALIDATION.json. No device write was performed during publication."
   },
   "previousFinalRevision": {
-    "buildRevision": "20261110.1",
-    "firmwareSha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56",
+    "buildRevision": "20261110.2",
+    "firmwareSha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a",
     "exactBinaryHardwareClaimed": false,
     "exactBinaryAutomatedScope": "See RELEASE-VALIDATION.json. No device write was performed during publication."
   }

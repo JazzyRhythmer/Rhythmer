@@ -1,11 +1,11 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261110.2",
+  "buildRevision": "20261110.3",
   "localOnly": false,
-  "releaseCaution": "Public beta: new tracks start at −10 dB for more room when playing together. Saved mixer levels are retained. Back up before installing.",
+  "releaseCaution": "Public beta: WAVETABLE is the current name of the existing wavetable engine. Existing projects, presets and sounds are compatible. Back up before installing.",
   "ownerTest": null,
-  "sha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a",
+  "sha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023",
   "physicalHardwareTested": false,
   "audioPublicRedistributionCleared": false,
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery is included.",
@@ -17,8 +17,8 @@
     },
     {
       "name": "Rhythmer-0.1.2-dev1-install.zip",
-      "bytes": 3214494,
-      "sha256": "4dbf9caa24993e7383453464383d64720be29e17bc5d4bf6b974fbdff6f52859"
+      "bytes": 3214313,
+      "sha256": "3e16c862112b1df45ca696bb595b80565eba8d9d854a56afe03927b06444a9b2"
     },
     {
       "name": "Rhythmer-Manual-v0.1.1-beta3.pdf",
@@ -27,23 +27,23 @@
     },
     {
       "name": "Rhythmer-Manual-v0.1.2-dev1.pdf",
-      "bytes": 185475,
-      "sha256": "3869cc1b3764749820a84ea4ba18cb7628f0b2dceb7a87fb2d1a3fc3f5717fcd"
+      "bytes": 185476,
+      "sha256": "bbc32f8a6da2cec9c87ea2003dd4604c20b1253ca4f0e891269be9eccc07f149"
     },
     {
       "name": "Rhythmer-start.fm1save",
-      "bytes": 1351517,
-      "sha256": "ba208020ead6dca969f59e9fb68ac59efcde913280e6c40d96a78be0a25a0f98"
+      "bytes": 1351313,
+      "sha256": "8264d67052151f75d267584ac8b5023d6c1670dcc8067d250762106a646dbe44"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2262465,
-      "sha256": "c8042a3f521ac66bf1e1aa3481089e891611cfda7d25a978978ea14518e4096f"
+      "sha256": "ac7e3f783dd2f18339e19781fae481e635d6ee13f58d2e14f8bc87fa8d9eed21"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a"
+      "sha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",

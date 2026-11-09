@@ -427,11 +427,13 @@ class Reader {
   s() { let s = ""; for (;;) { const c = this.b(); if (!c) return s; s += String.fromCharCode(c); } }
 }
 
+const engineNameV2 = name => name === "SERUM" || name === "WAVETABL" ? "WAVETABLE" : name; // prior firmware and patch files
+
 const parse = {
   [CMD.INFO](a) {
     const r = new Reader(a);
     const o = { version: r.s(), nengines: r.b(), pcount: r.b(), gcount: r.b(), nstep: r.b(), pe0: r.b(), engines: [] };
-    for (let i = 0; i < o.nengines; i++) o.engines.push(r.s());
+    for (let i = 0; i < o.nengines; i++) o.engines.push(engineNameV2(r.s()));
     o.chainRows = 0;
     o.ntrk = r.i < a.length ? r.b() : 0;             /* v3: tracks (0 = older firmware, one instrument) */
     o.uiCaps = 0;
@@ -979,7 +981,7 @@ function cleanPatch(pt) {
     : null;
   const o = {
     name: String(pt.name ?? "PATCH").slice(0, 32) || "PATCH",
-    engine: pt.engine | 0, engineName: String(pt.engineName ?? ""),
+    engine: pt.engine | 0, engineName: engineNameV2(String(pt.engineName ?? "")),
     p: Array.from(pt.p || pt.params || [], (v) => (Number.isFinite(v) ? Math.round(v) : null)),
     pattern: patternUsed(grid) ? null : patternUsed(pat) ? pat : null,
     grid: patternUsed(grid) ? grid : null,
@@ -1019,7 +1021,7 @@ function readLibraryFile(obj, ctx) {
   const perc = (pt, pe0) => (pt && fromPerc(pt, ctx.engines, pe0)) || pt;
   const fm4 = (pt, nm, pe0) => (nm === "DIGITAL" && noFm4 ? fromDigital(pt, ctx.engines, pe0) : perc(pt, pe0));
   const engIndex = (name, idx, fileEngines) => {
-    const nm = name || (fileEngines || [])[idx];
+    const nm = engineNameV2(name || (fileEngines || [])[idx]);
     if (ctx.engines && ctx.engines.length) {
       if (nm === "SAMPLE" && ctx.engines.indexOf(nm) < 0) return 4;   /* (JIANT: retired; its PERC sounds still become DRUM) */
       if (nm) return ctx.engines.indexOf(nm);
@@ -1034,7 +1036,7 @@ function readLibraryFile(obj, ctx) {
     if (e < 0) return { patches: [], skipped: 1, keys: null };
     const p = ctx.keys && ctx.pe0 && obj.p.length !== ctx.keys.length ? tailParams(obj.p, ctx.keys.length, ctx.pe0)
       : obj.p.slice(0, ctx.keys ? ctx.keys.length : obj.p.length);
-    const pt = fm4({ name: obj.presetName || obj.engineName || "PATCH", engine: e, engineName: obj.engineName, p,
+    const pt = fm4({ name: obj.presetName || engineNameV2(obj.engineName) || "PATCH", engine: e, engineName: obj.engineName, p,
       pattern: Array.isArray(obj.steps) ? patternFromSteps(obj.steps) : null, tags: ["file"] }, obj.engineName,
       ctx.keys && ctx.pe0 ? ctx.pe0 : p.length - 8);
     return pt ? { patches: [cleanPatch(pt)], skipped: 0, keys: null } : { patches: [], skipped: 1, keys: null };
@@ -4189,8 +4191,9 @@ async function libInit() {
   try {
     libPersistent = await store.ok();
     if (libPersistent) {
-      lib = ((await store.all()) || []).filter((p) => p && p.id);
+      lib = ((await store.all()) || []).filter((p) => p && p.id).map(p => ({ ...p, engineName: engineNameV2(p.engineName) }));
       libMeta = (await store.getMeta("layout")) || libMeta;
+      if (Array.isArray(libMeta.engines)) libMeta.engines = libMeta.engines.map(engineNameV2);
     }
   } catch (e) { console.warn(e); libPersistent = false; }
   renderLib();
@@ -4482,7 +4485,7 @@ $("libfile").addEventListener("change", async () => {
       const ctx = libCtx();
       const r = readLibraryFile(obj, ctx);
       if (!ctx.keys && r.keys) {                     /* no layout yet: the file's becomes the library's */
-        libMeta = { keys: r.keys, engines: Array.isArray(obj.engines) ? obj.engines : null, pe0: obj.pE0 ?? null };
+        libMeta = { keys: r.keys, engines: Array.isArray(obj.engines) ? obj.engines.map(engineNameV2) : null, pe0: obj.pE0 ?? null };
         try { await store.setMeta("layout", libMeta); } catch (e) { console.warn(e); }
       }
       if (obj.kind === "bank") r.patches.forEach((p) => { if (!p.tags.includes("bank")) p.tags.push("bank"); });

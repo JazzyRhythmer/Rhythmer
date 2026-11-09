@@ -46,7 +46,7 @@ def thumbnail(topic,portrait=False):
   tag='UPDATE' if topic=='update' else 'THE MANUAL'
   title(im,(m,720),tag,1900,210)
   u.text(im,(m,985),VERSION if topic=='update' else 'FIND THE BUTTON. MAKE THE MOVE.',70 if topic=='update' else 59,topic!='update',u.GRAY)
-  names=([('drum-sound','01 / SWAP ONE DRUM'),('gen-styles','02 / NEW GENRES'),('gen-target','03 / TARGET GEN'),('gen-break','04 / BREAK GEN'),('acid-generate','05 / ACID'),('break-perform','06 / PERFORMANCE')] if topic=='update' else [('drum','DRUM'),('serum','SERUM'),('phase','PHASE'),('lofi','LOFI'),('acid-generate','ACID / GEN'),('break-perform','BREAK / PERF')])
+  names=([('drum-sound','01 / SWAP ONE DRUM'),('gen-styles','02 / NEW GENRES'),('gen-target','03 / TARGET GEN'),('gen-break','04 / BREAK GEN'),('acid-generate','05 / ACID'),('break-perform','06 / PERFORMANCE')] if topic=='update' else [('drum','DRUM'),('wavetable','WAVETABLE'),('phase','PHASE'),('lofi','LOFI'),('acid-generate','ACID / GEN'),('break-perform','BREAK / PERF')])
   u.text(im,(m,1080),'DRUM SOUNDS / GEN / SAMPLE UPLOAD' if topic=='update' else 'CONTROLS / TRACK MODES / SHORTCUTS',34,True,u.GRAY)
   screen_grid(im,120,1150,540,90,names)
   u.text(im,(m,2500),'SHAPE / SEQUENCE / PERFORM / SAVE',35,True)
@@ -66,7 +66,7 @@ def thumbnail(topic,portrait=False):
    title(im,(m,1295),'MAKE THE MOVE.',1990,104)
    u.text(im,(m,1510),'READ BEFORE YOUR FIRST SESSION',42,True,u.GRAY)
    u.text(im,(m,1655),'SOUND / GEN / SEQUENCE / SAVE',41,True,u.GRAY)
-   screen_grid(im,2260,800,410,65,[('drum','DRUM'),('serum','SERUM'),('phase','PHASE'),('lofi','LOFI'),('acid-generate','ACID / GEN'),('break-perform','BREAK / PERF')])
+   screen_grid(im,2260,800,410,65,[('drum','DRUM'),('wavetable','WAVETABLE'),('phase','PHASE'),('lofi','LOFI'),('acid-generate','ACID / GEN'),('break-perform','BREAK / PERF')])
   u.line(im,[(m,2040),(w-m,2040)])
   u.text(im,(m,2080),'JAZZY RHYTHMER / BUILT ON JIANT',33,True,u.GRAY)
   u.text(im,(2330,2080),'UP TO SIX ASSIGNABLE TRACKS',33,True,u.GRAY)

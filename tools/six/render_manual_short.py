@@ -27,7 +27,7 @@ def fitted(im,x,y,s,max_width=900,size=84,mono=False,color=INK):
     while d.textlength(s,font=font(size,mono))>max_width:size-=1
     text(im,x,y,s,size,mono,color)
 def load():
-    for n in ('drum','serum','phase','lofi','acid','break','acid-generate','break-perform','drum-sound','gen-target','gen-break'):
+    for n in ('drum','wavetable','phase','lofi','acid','break','acid-generate','break-perform','drum-sound','gen-target','gen-break'):
         a=Image.open(R/'site/media/motion'/f'{n}.webp');CLIPS[n]=[]
         for i in range(a.n_frames):a.seek(i);CLIPS[n].append(a.convert('RGB'))
 def clip(n,t):return CLIPS[n][int(t*12.5)%len(CLIPS[n])]
@@ -35,7 +35,7 @@ def screen(im,n,x,y,size,t):
     im.paste(clip(n,t).resize((size,size),Image.Resampling.NEAREST),(x,y))
     ImageDraw.Draw(im).rectangle((x-2,y-2,x+size+1,y+size+1),outline=LINE,width=2)
 def glyphs(im,y,t):
-    for i,n in enumerate(('drum','serum','phase','lofi','acid','break')):
+    for i,n in enumerate(('drum','wavetable','phase','lofi','acid','break')):
         a=clip(n,t+i*.12).crop((15,101,225,191)).resize((130,56),Image.Resampling.NEAREST)
         im.paste(a,(86+i*154,y));text(im,86+i*154,y+72,n.upper(),18,True,GRAY)
 def background(t):

@@ -15,7 +15,7 @@ int main(void){int bad=0;unsigned sid=0,mel=0,unsafe=0,all6=1,pack_ok=1;
    if(e!=ENGI_DRUM)mel++;
    unsigned role=gs.role[k];
    role_models[e][role]++;
-   if(e==ENGI_SERUM||e==ENGI_FMINI||e==ENGI_OBERVAVE){
+   if(e==ENGI_WAVETABLE||e==ENGI_FMINI||e==ENGI_OBERVAVE){
     if(++uses[e]>max_engine_copies)max_engine_copies=uses[e];
    }
    if(e==ENGI_FMINI||e==ENGI_OBERVAVE){
@@ -31,7 +31,7 @@ int main(void){int bad=0;unsigned sid=0,mel=0,unsafe=0,all6=1,pack_ok=1;
    if(e==ENGI_M2SID){sid++;bad+=check("SID automatic assignments are mono leads only",gs.role[k]==RL_LEAD&&(trk[k].p[P_VOICE]==V_MONO||trk[k].p[P_VOICE]==V_LEGATO));for(unsigned j=0;j<NSTEP;j++)if(trk[k].step[j].time==ST_NOTE)bad+=check("SID lead sequences contain single notes",trk[k].step[j].n<=1);}
   }
  }
- bad+=check("full GEN keeps at most one of each of Serum, FMINI and OberVave",max_engine_copies==1);
+ bad+=check("full GEN keeps at most one of each of Wavetable, FMINI and OberVave",max_engine_copies==1);
  bad+=check("imported patches keep their exact engine parameters and fit their role",!wrong_role&&!bad_osc&&!over_poly);
  if(RHYTHMER_FMINI&&RHYTHMER_OBERVAVE&&RHYTHMER_SWAP_WLP){
   bad+=check("FMINI and OberVave occur in real arrangements across bass, chords and melodic roles",

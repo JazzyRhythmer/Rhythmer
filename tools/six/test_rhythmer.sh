@@ -7,7 +7,7 @@ export PYTHONPYCACHEPREFIX=/Volumes/SSD/Development/Caches/rhythmer/python
 mkdir -p "$TMPDIR"
 cd "$(dirname "$0")/../.."
 clang -w -O0 -g -fwrapv -DJUNGLE_AUDIO_CODE= -fsanitize=address,undefined -I${RHYTHMER_BUILD_DIR:-rhythmer/build}/gen -Irhythmer/firmware/src rhythmer/tests/six_integration_test.c rhythmer/firmware/six/jungle.c rhythmer/firmware/six/tb3po.c rhythmer/firmware/six/acid_generate.c -lm -o ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_integration_test
-${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_integration_test ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-demo.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-mono.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-audition.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-serum-stress.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-m2stat-stress.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-m2saw-stress.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-m2sid-stress.project
+${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_integration_test ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-demo.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-mono.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-audition.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-wavetable-stress.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-m2stat-stress.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-m2saw-stress.project ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six-m2sid-stress.project
 clang -w -O0 -fsanitize=address,undefined rhythmer/tests/six_upload_test.c -o ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_upload_test
 ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_upload_test build/six/original-loop-1.slot
 
@@ -17,8 +17,8 @@ ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_break_test
 clang -w -O0 -g -fwrapv -DJUNGLE_AUDIO_CODE= -fsanitize=address,undefined -I${RHYTHMER_BUILD_DIR:-rhythmer/build}/gen -Irhythmer/firmware/src rhythmer/tests/six_gen_test.c rhythmer/firmware/six/jungle.c rhythmer/firmware/six/tb3po.c rhythmer/firmware/six/acid_generate.c -lm -o ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_gen_test
 ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_gen_test
 
-clang -w -O1 -g -fwrapv -DJUNGLE_AUDIO_CODE= -fsanitize=address,undefined -I${RHYTHMER_BUILD_DIR:-rhythmer/build}/gen -Irhythmer/firmware/src rhythmer/tests/serum_test.c rhythmer/firmware/six/jungle.c rhythmer/firmware/six/tb3po.c rhythmer/firmware/six/acid_generate.c -lm -o ${RHYTHMER_BUILD_DIR:-rhythmer/build}/serum_test
-${RHYTHMER_BUILD_DIR:-rhythmer/build}/serum_test
+clang -w -O1 -g -fwrapv -DJUNGLE_AUDIO_CODE= -fsanitize=address,undefined -I${RHYTHMER_BUILD_DIR:-rhythmer/build}/gen -Irhythmer/firmware/src rhythmer/tests/wavetable_test.c rhythmer/firmware/six/jungle.c rhythmer/firmware/six/tb3po.c rhythmer/firmware/six/acid_generate.c -lm -o ${RHYTHMER_BUILD_DIR:-rhythmer/build}/wavetable_test
+${RHYTHMER_BUILD_DIR:-rhythmer/build}/wavetable_test
 
 clang -w -O1 -g -fwrapv -DJUNGLE_AUDIO_CODE= -fsanitize=address,undefined -I${RHYTHMER_BUILD_DIR:-rhythmer/build}/gen -Irhythmer/firmware/src rhythmer/tests/six_models_test.c rhythmer/firmware/six/jungle.c rhythmer/firmware/six/tb3po.c rhythmer/firmware/six/acid_generate.c -lm -o ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_models_test
 ${RHYTHMER_BUILD_DIR:-rhythmer/build}/six_models_test

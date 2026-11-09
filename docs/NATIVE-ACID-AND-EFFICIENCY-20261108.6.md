@@ -63,6 +63,6 @@ Actual candidate FWSC, community emulator 0.4.0, strict mode, 320 MHz, two cores
 
 Both candidate runs had zero audio deadline misses, lost buffers and core loss; the five-Acid USB run also reported no USB underruns. CPU percentages are final firmware measurement windows, not whole-run averages. These are emulator comparisons, not promised real-device percentages. The native Acid sound is intentionally different from X0X, so equal MIDI does not imply equal waveform.
 
-A fresh actual-binary boot verified both embedded banks (mask 3), default engines DRUM/SERUM/PHASE/LOFI/EMPTY/EMPTY, four-track mode, two cores and silent empty sequences. Corrected Think and Amen bank hashes remain unchanged. Browser installation simulation passed 49 checks without accessing a physical FM-1.
+A fresh actual-binary boot verified both embedded banks (mask 3), default engines DRUM/WAVETABLE/PHASE/LOFI/EMPTY/EMPTY, four-track mode, two cores and silent empty sequences. Corrected Think and Amen bank hashes remain unchanged. Browser installation simulation passed 49 checks without accessing a physical FM-1.
 
 Host regression, exact-generator, editor, uploader and manual results are recorded in the hash-bound candidate validation report. The user is testing this exact candidate separately. No automatic physical firmware write or public deployment was performed in this work.

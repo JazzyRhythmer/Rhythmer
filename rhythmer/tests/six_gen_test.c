@@ -21,8 +21,8 @@ int main(void){
   bad+=check("GEN keeps T5 pattern",steps_sig(&trk[4])==ac_saved);
   bad+=check("GEN keeps T6 pattern",steps_sig(&trk[5])==br_saved);
   bad+=check("GEN keeps six-track mode",six_machine_mask==3);
-  unsigned serum=0;for(unsigned k=six_gen_next(1);k<SIX_GEN_TRACKS;k=six_gen_next(k+1u)){bad+=check("GEN excludes heavy automatic synths",gen_auto_synth_ok(trk[k].eng_req));serum+=trk[k].eng_req==ENGI_SERUM;}
-  bad+=check("GEN allocates at most one Serum",serum<=1);
+  unsigned wavetable=0;for(unsigned k=six_gen_next(1);k<SIX_GEN_TRACKS;k=six_gen_next(k+1u)){bad+=check("GEN excludes heavy automatic synths",gen_auto_synth_ok(trk[k].eng_req));wavetable+=trk[k].eng_req==ENGI_WAVETABLE;}
+  bad+=check("GEN allocates at most one Wavetable",wavetable<=1);
   for(unsigned k=0;k<4;k++)if(proj_import(&proj_scratch,&proj_slot[k],sizeof proj_slot[k])){
    int ok=!memcmp(proj_scratch.t[4].step,trk[4].step,sizeof trk[4].step)&&!memcmp(proj_scratch.t[5].step,trk[5].step,sizeof trk[5].step);
    bad+=check("generated section preserves T5/6 patterns",ok);
@@ -31,10 +31,10 @@ int main(void){
  }
  /* The final sound-admission fence also covers EXPLORE's forced candidates. */
  for(unsigned k=1;k<4;k++)set_engine_of(&trk[k],ENGI_ANALOG);
- gx.eng=ENGI_SERUM;gen_sound(&trk[1],RL_LEAD,gsnd(RL_LEAD));
- bad+=check("Serum remains available to GEN",trk[1].eng_req==ENGI_SERUM);
+ gx.eng=ENGI_WAVETABLE;gen_sound(&trk[1],RL_LEAD,gsnd(RL_LEAD));
+ bad+=check("Wavetable remains available to GEN",trk[1].eng_req==ENGI_WAVETABLE);
  gen_sound(&trk[2],RL_LEAD,gsnd(RL_LEAD));
- bad+=check("GEN prevents duplicate automatic Serum",trk[2].eng_req!=ENGI_SERUM);
+ bad+=check("GEN prevents duplicate automatic Wavetable",trk[2].eng_req!=ENGI_WAVETABLE);
  static const unsigned heavy[]={ENGI_M2SAW,ENGI_M2STAT,ENGI_FM6};
  for(unsigned j=0;j<3;j++){
   gx.eng=(int8_t)heavy[j];gen_sound(&trk[2],RL_LEAD,gsnd(RL_LEAD));

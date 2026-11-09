@@ -6,7 +6,7 @@ Revision of 0.1.1-beta3; the version label is unchanged. Package hashes identify
 
 The existing voice-leading planner keeps common tones and penalizes large jumps and muddy low-register intervals. Ableton's [voicings lesson](https://learningmusic.ableton.com/advanced-topics/voicings.html) explains why register and inversion change a chord's character without changing its harmony. This is a design reference, not imported Ableton music or code.
 
-Curated genres now keep factory oscillator tuning, ratios and wave settings instead of perturbing every continuous engine control. Bass selection uses bass-tagged presets; chord parts use keys/pad presets, and ordinary melodic parts exclude effect presets. The light-engine pool and one automatically assigned Serum ceiling remain. Manual browsing is unrestricted.
+Curated genres now keep factory oscillator tuning, ratios and wave settings instead of perturbing every continuous engine control. Bass selection uses bass-tagged presets; chord parts use keys/pad presets, and ordinary melodic parts exclude effect presets. The light-engine pool and one automatically assigned Wavetable ceiling remain. Manual browsing is unrestricted.
 
 Seventh/ninth colour is consistent within a generated progression. Modal profiles may deliberately retain a pedal rather than forcing every seed into a progression. Foreground melodies leave alternate-bar space for an answer; G-funk hooks and abstract cycles retain their own roles. Trip-hop, lo-fi house and atmospheric breaks use sparser foreground figures. Ambient IDM has a pedal option. These are composition heuristics, not a promise to reproduce any artist.
 

@@ -59,7 +59,7 @@ def landscape(t):
  if 18<=t<24:
   m.text(im,100,710,'OCT+  ENABLE SIX TRACKS',34,True);m.text(im,100,775,'OCT−  CANCEL / KEEP FOUR',30,True,m.GRAY)
  if n=='machines':
-  for i,k in enumerate(('drum','serum','phase','lofi','acid','break')):
+  for i,k in enumerate(('drum','wavetable','phase','lofi','acid','break')):
    x=1090+(i%3)*235;y=225+(i//3)*290
    im.paste(m.clip(k,t).resize((215,215),Image.Resampling.NEAREST),(x,y));m.text(im,x,y+230,k.upper(),20,True,m.GRAY)
  elif n=='guide':

@@ -10,7 +10,7 @@
 #endif
 #include "eng_phase.c"
 #include "eng_lofi.c"
-#include "eng_serum.c"
+#include "eng_wavetable.c"
 #include "eng_mono2k.c"
 #include "eng_formant.c"
 #include "eng_wheel.c"
@@ -117,7 +117,7 @@ static const engine_t *const ENGINES[NENGINES] = {
     &ENG_FM6,                    /* 12 (ENGI_FM6) */
     &ENG_GONE,                   /* 13: reserved (SLICE, retired in JIANT) */
     &ENG_ANIMAL,                 /* 14 retired in SIX */
-    &ENG_BREAK, &ENG_ACID, &ENG_SERUM, &ENG_M2STAT, &ENG_M2SAW, &ENG_M2SID, &ENG_EMPTY,
+    &ENG_BREAK, &ENG_ACID, &ENG_WAVETABLE, &ENG_M2STAT, &ENG_M2SAW, &ENG_M2SID, &ENG_EMPTY,
 #if RHYTHMER_NEW_SYNTHS
     &ENG_FMINI,&ENG_PROPHET,
 #endif
@@ -135,7 +135,7 @@ static inline uint32_t eng_idx(uint32_t e) { return e < NENGINES ? e : 0u; }
  * at power-on (TRK_DEF: T1..T6 are its first six), then PHASE WHEEL NOISE; was ANALOG FM6 PHASE LOFI VOICE WHEEL
  * NOISE DRUM ANIMAL. PROGRAM CHANGE numbers the sounds in this order too (ui.c midi_pc_poll) */
 static const uint8_t ENGINE_ORDER[NENG_SHOWN] = {
- ENGI_SERUM,
+ ENGI_WAVETABLE,
 #if RHYTHMER_NEW_SYNTHS
  ENGI_FMINI,ENGI_PROPHET,
 #endif
@@ -213,12 +213,12 @@ static const struct {
 #define NPATTERNS (sizeof PATTERNS / sizeof PATTERNS[0])
 
 /* (0.9.9) the parts at power-on, INIT SYSTEM and NEW PROJECT (engine, preset, PATTERNS[n - 1] in the sequencer,
- * 0 = empty: all are), T1 DRUM, T2 SERUM, T3 PHASE, T4 LOFI, T5/T6 EMPTY. Populated tracks start dry (ui.c
+ * 0 = empty: all are), T1 DRUM, T2 WAVETABLE, T3 PHASE, T4 LOFI, T5/T6 EMPTY. Populated tracks start dry (ui.c
  * power_sound_of: no DIST CHOR DLY REV send, the effects are the player's to add) */
 #define TRK_PR_VOICE 9u          /* SINGER EN (eng_formant.c FORMANT_PRESETS) */
 #define TRK_PR_ANALOG 14u        /* FAT BASS (eng_analog.c) */
 static const uint8_t TRK_DEF[NPART][3] = {
-    {ENGI_DRUM,0,0}, {ENGI_SERUM,0,0},
+    {ENGI_DRUM,0,0}, {ENGI_WAVETABLE,0,0},
 #if RHYTHMER_FMINI && RHYTHMER_OBERVAVE
     {ENGI_FMINI,0,0}, {ENGI_OBERVAVE,1,0},
 #else

@@ -49,7 +49,7 @@ def manual_l(t):
  m.text(im,100,65,'R / OS   RHYTHMER',26,True);m.text(im,1190,65,'v0.1.1-beta3 / THE MANUAL',24,True,m.GRAY);d.line((100,120,1820,120),fill=m.LINE,width=2)
  a,b,c,e,n,s,dur=manual_scene(t);m.fitted(im,95,210,a,900,76);m.fitted(im,95,305,b,900,76);m.fitted(im,100,490,c,880,31);m.fitted(im,100,548,e,880,29,color=m.GRAY)
  if n in ['intro','outro']:
-  for i,k in enumerate(('drum','serum','phase','lofi','acid','break')):
+  for i,k in enumerate(('drum','wavetable','phase','lofi','acid','break')):
    x=1090+(i%3)*235;y=225+(i//3)*290;im.paste(m.clip(k,t).resize((215,215),Image.Resampling.NEAREST),(x,y));m.text(im,x,y+230,k.upper(),20,True,m.GRAY)
   if n=='intro':m.text(im,100,710,'16 SECTIONS / PDF + WEB GUIDE',30,True)
  elif n=='guide':guidepanel(im,s,(1020,270),810)

@@ -11,7 +11,7 @@ FONTS=Path(__file__).parent/'fonts'
 if not FONTS.is_dir():FONTS=ROOT/'rhythmer/assets/fonts'
 MOTION=Path(__file__).parent/'motion'
 if not MOTION.is_dir():MOTION=ROOT/'site/media/motion'
-DEMO_NAMES=['drum','serum','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']
+DEMO_NAMES=['drum','wavetable','phase','lofi','analog','fm6','wheel','fmstat','swavsaw','sid','acid','break']
 SCREENS={}
 for name in ['acid-generate','break-perform']+(DEMO_NAMES if a.extended_machines else []):
  with Image.open(MOTION/(name+'.webp')) as clip:
@@ -36,7 +36,7 @@ def line(d,points,ink=255,width=2):d.line([(round(x),round(y)) for x,y in points
 def dots(d,x,y,w,h,spacing=22,ink=25):
  for yy in range(int(y),int(y+h),spacing):
   for xx in range(int(x),int(x+w),spacing):d.rectangle((xx,yy,xx+1,yy+1),fill=ink)
-NAMES=['DRUM','SERUM','PHASE','LOFI','ACID','BREAK']
+NAMES=['DRUM','WAVETABLE','PHASE','LOFI','ACID','BREAK']
 def pulse(t,offset=0):return math.exp(-((t-offset)%.375)*12)
 def glyph(d,kind,x,y,w,h,t,amp=1.,ink=255):
  cy=y+h/2;p=pulse(t,kind*.04);g=.42+.58*p
@@ -127,7 +127,7 @@ def showcase(t):
  im=Image.new('L',(W,H),0);u=t-6.65
  if not 0<=u<INSERT:return im
  d=ImageDraw.Draw(im);j=min(11,int(u/1.5));v=u-j*1.5
- names=['DRUM','SERUM','PHASE','LOFI','ANALOG','FM6','WHEEL','FM+STAT','SWAV-SAW','SID-6581','ACID','BREAK']
+ names=['DRUM','WAVETABLE','PHASE','LOFI','ANALOG','FM6','WHEEL','FM+STAT','SWAV-SAW','SID-6581','ACID','BREAK']
  descriptions=[('SYNTHESIZED PERCUSSION','KITS / HATS / METAL'),('WAVETABLE SYNTHESIS','MORPH / WARP / DETUNE'),('PHASE DISTORTION','ROUND KEYS / DIGITAL EDGE'),('LOW-RESOLUTION SYNTHESIS','STEPPED WAVES / GRAIN'),('CLASSIC WAVEFORMS','DETUNE / RESONANT FILTER'),('SIX-OPERATOR FM','RATIOS / FEEDBACK / NETWORKS'),('HARMONIC LAYERS','TONEWHEEL / ROTATION'),('COMPACT FM','SHIFTING RATIOS / FEEDBACK'),('LAYERED SAW WAVES','BRIGHT LEADS / WIDE TEXTURES'),('CHIP-STYLE SYNTHESIS','PULSE / SAW / TRIANGLE'),('303-STYLE BASS','ACCENTS / SLIDES / GENERATE'),('SEQUENCED BREAKBEATS','CHOP / REPEAT / SWITCH A-B')]
  label(d,(100,222),f'{j+1:02} / 12     THE MACHINES',24,130)
  label(d,(96,342),names[j],100,245)

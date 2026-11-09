@@ -113,7 +113,7 @@ def cover(c,doc):
  c.setFont('Body-Bold',50);c.drawString(M,H-144,'RHYTHMER');c.setFont('Body-Bold',18);c.drawString(M,H-185,'SOUND INTO MOTION.')
  c.setStrokeColor(colors.HexColor('#66706c'));c.line(M,H-218,W-M,H-218)
  c.setFont('Body-Bold',24);c.drawString(M,H-265,'USER MANUAL');c.setFont('Body',10.5);c.drawString(M,H-294,f'v{VERSION} / Build {BUILD} / English')
- labels=[('drum','DRUM'),('serum','SERUM'),('fmini','FMINI-1'),('obervave','OBERVAVE'),('acid-generate','ACID'),('break-perform','BREAK')]
+ labels=[('drum','DRUM'),('wavetable','WAVETABLE'),('fmini','FMINI-1'),('obervave','OBERVAVE'),('acid-generate','ACID'),('break-perform','BREAK')]
  for i,(name,label) in enumerate(labels):
   x=M+(i%3)*172;y=275-(i//3)*170
   c.drawImage(str(R/'site/media/motion'/(name+'.png')),x,y,145,145,mask='auto')

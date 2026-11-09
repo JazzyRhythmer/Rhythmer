@@ -2,7 +2,7 @@
 #define UI_TEST_NO_MAIN 1
 #include "ui_test.c"
 static int break_in_browser(void){unsigned n,found=0;preset_all_pos(NENGINES,&n);for(unsigned i=0;i<n;i++){unsigned k,e=preset_all_at(NENGINES,i,&k);found+=e==ENGI_BREAK||(e==NENGINES&&up_engine(k)==ENGI_BREAK);}return found;}
-static int break_in_models(void){unsigned e=ENGI_SERUM,found=0;for(unsigned i=0;i<NENG_SHOWN;i++){e=eng_step(e,1);found+=e==ENGI_BREAK;}return found;}
+static int break_in_models(void){unsigned e=ENGI_WAVETABLE,found=0;for(unsigned i=0;i<NENG_SHOWN;i++){e=eng_step(e,1);found+=e==ENGI_BREAK;}return found;}
 static void settle(void){int32_t out[64];for(unsigned i=0;i<24;i++)mix_block(out,32);}
 static void save_fixture(const char *path){project_capture(&proj_scratch);if(!proj_pack(&proj_wire,&proj_scratch))exit(3);FILE *f=fopen(path,"wb");if(!f)exit(4);fwrite(&proj_wire,1,sizeof proj_wire,f);fclose(f);}
 int main(int argc,char **argv){
@@ -12,7 +12,7 @@ int main(int argc,char **argv){
   song.sel=k;int own=k==5;
   bad+=check("assigned BREAK visibility follows owner in factory and user presets",break_in_browser()==(own?ENG_BREAK.npresets+1:0));
   bad+=check("assigned BREAK visibility follows owner in model chooser",(break_in_models()>0)==own);
-  unsigned e=ENGI_SERUM;int backwards=0;for(unsigned j=0;j<NENG_SHOWN;j++){e=eng_step(e,-1);backwards|=e==ENGI_BREAK;}bad+=check("reverse model browsing obeys BREAK ownership",backwards==own);
+  unsigned e=ENGI_WAVETABLE;int backwards=0;for(unsigned j=0;j<NENG_SHOWN;j++){e=eng_step(e,-1);backwards|=e==ENGI_BREAK;}bad+=check("reverse model browsing obeys BREAK ownership",backwards==own);
   list_put(1);unsigned filtered; preset_pos(&filtered);int fav_ok=1;for(unsigned j=0;j<filtered;j++){unsigned slot,e=preset_at(j,&slot);if(!own)fav_ok&=e!=ENGI_BREAK&&(e!=NENGINES||up_engine(slot)!=ENGI_BREAK);}bad+=check("favorites obey BREAK ownership",fav_ok);list_put(0);
   if(!own){unsigned before=trk[k].eng_req;set_engine_of(TSEL,ENGI_BREAK);bad+=check("direct model selection cannot duplicate BREAK",TSEL->eng_req==before);bad+=check("direct user preset load cannot duplicate BREAK",up_load(0)!=0&&TSEL->eng_req==before);}
  }

@@ -6,15 +6,15 @@ These are original Rhythmer arrangements informed by production practices, not r
 
 | Display name | Tempo | Arrangement identity | Preferred sounds, with alternatives still eligible |
 |---|---:|---|---|
-| BOUNCE HOUSE | 108–120 | Soulful swung house/disco; syncopated bass, late offbeat hats, compact extended chords and two-bar kick answers | Analog/Lo-Fi/SID bass; Phase/Wheel/Serum keys; warm pluck or a short lead hook |
-| 90S HOUSE | 120–128 | Firm quarter-note kick, house hats, offbeat bass and short piano/organ stabs; hook/arp alternatives | Analog bass; Wheel/Phase/Serum organ and keys; restrained bright lead |
-| G-FUNK | 88–102 | Relaxed funk backbeat, melodic bass answers, extended EP chords and a high legato lead with glide | Analog/SID bass and lead; Wheel/Phase keys; occasional Serum colour |
-| NOCTURNAL HH | 132–156, half-time feel | Night-time hip-hop: one main snare on beat 3, deep held bass, slow dark harmony and a sparse upper phrase | Analog/Serum sub; Phase/Wheel/Serum pad; sparse bell or sine-key hook |
+| BOUNCE HOUSE | 108–120 | Soulful swung house/disco; syncopated bass, late offbeat hats, compact extended chords and two-bar kick answers | Analog/Lo-Fi/SID bass; Phase/Wheel/Wavetable keys; warm pluck or a short lead hook |
+| 90S HOUSE | 120–128 | Firm quarter-note kick, house hats, offbeat bass and short piano/organ stabs; hook/arp alternatives | Analog bass; Wheel/Phase/Wavetable organ and keys; restrained bright lead |
+| G-FUNK | 88–102 | Relaxed funk backbeat, melodic bass answers, extended EP chords and a high legato lead with glide | Analog/SID bass and lead; Wheel/Phase keys; occasional Wavetable colour |
+| NOCTURNAL HH | 132–156, half-time feel | Night-time hip-hop: one main snare on beat 3, deep held bass, slow dark harmony and a sparse upper phrase | Analog/Wavetable sub; Phase/Wheel/Wavetable pad; sparse bell or sine-key hook |
 | TRIP HOP | 76–96 | Slow broken backbeat, quiet ghosts, late groove, minor/modal harmony and a recurring restrained motif | Analog/Lo-Fi bass; Phase/Wheel/Lo-Fi keys; dark upper motif |
-| LOFI HOUSE | 112–124 | Four-on-the-floor foundation with softer timing, deep offbeat bass and warm recurring dub/keys chords | Analog bass; Lo-Fi/Phase/Wheel keys, with Serum also eligible |
-| ABSTRACT IDM | 94–138 | Rule-based Euclidean drums, three-step velocity accents, sparse quartal harmony, cycle-3/5 arp and a 15-step melodic cycle at higher complexity | Phase/Lo-Fi/SID/Analog, plus limited Serum colour; no permanently running generative DSP |
-| AMBIENT IDM | 104–128 | Gentle broken/electro drums beneath slow suspended/extended harmony and a repeating bell/sine-key figure; quieter high percussion | Phase/Serum/Wheel pads; Analog sub; Phase/Lo-Fi bell or sine-key motif |
-| ATMOS BREAKS | 128–146 | Rolling syncopated breaks, quiet ghosts, deep sustained bass, short dub chords and an airy melodic figure | Analog/Serum sub; Phase/Wheel/Serum dub keys; soft bell/pluck |
+| LOFI HOUSE | 112–124 | Four-on-the-floor foundation with softer timing, deep offbeat bass and warm recurring dub/keys chords | Analog bass; Lo-Fi/Phase/Wheel keys, with Wavetable also eligible |
+| ABSTRACT IDM | 94–138 | Rule-based Euclidean drums, three-step velocity accents, sparse quartal harmony, cycle-3/5 arp and a 15-step melodic cycle at higher complexity | Phase/Lo-Fi/SID/Analog, plus limited Wavetable colour; no permanently running generative DSP |
+| AMBIENT IDM | 104–128 | Gentle broken/electro drums beneath slow suspended/extended harmony and a repeating bell/sine-key figure; quieter high percussion | Phase/Wavetable/Wheel pads; Analog sub; Phase/Lo-Fi bell or sine-key motif |
+| ATMOS BREAKS | 128–146 | Rolling syncopated breaks, quiet ghosts, deep sustained bass, short dub chords and an airy melodic figure | Analog/Wavetable sub; Phase/Wheel/Wavetable dub keys; soft bell/pluck |
 | DRUNKEN HH | 76–96 | Anchored downbeat, pushed secondary kicks, delayed main snares and alternating early/late hat events; warm close-voiced chords and a short answering motif | Analog/Lo-Fi bass; Phase/Wheel/Lo-Fi EP; short keys or restrained lead |
 
 The selected genre is also shown at full width below the four generated-track previews, so the knob card can remain compact. NOCTURNAL HH is the compact FM-1 display name for Nocturnal Hip-Hop. LOFI HOUSE and TRIP HOP omit hyphens for the small pixel display. These tempo ranges and weights are Rhythmer design choices, not historical definitions of a genre.
@@ -29,9 +29,9 @@ The three melodic tracks always retain bass and harmony. The remaining role is a
 
 ## Synth selection and CPU policy
 
-For each role, all six light GEN engines remain eligible: Analog, Phase, Lo-Fi, Wheel, SID-6581 and Serum. Genre/role-specific integer weights favour suitable engines rather than fixing one machine to a track. Bass presets get higher probability on bass; keys/pads on harmony; plucks and leads on the final role. Matching recipe keywords and avoiding repeated presets provide a second layer of selection. Non-bass roles exclude bass-tagged presets; Lo-Fi byte/noise modes remain out of automatic pitched roles. Manual engine selection is unrestricted.
+For each role, all six light GEN engines remain eligible: Analog, Phase, Lo-Fi, Wheel, SID-6581 and Wavetable. Genre/role-specific integer weights favour suitable engines rather than fixing one machine to a track. Bass presets get higher probability on bass; keys/pads on harmony; plucks and leads on the final role. Matching recipe keywords and avoiding repeated presets provide a second layer of selection. Non-bass roles exclude bass-tagged presets; Lo-Fi byte/noise modes remain out of automatic pitched roles. Manual engine selection is unrestricted.
 
-GEN still changes only tracks 1–4. Tracks 5–6 are not repopulated with Acid or Break notes. At most one Serum is allocated automatically, counting Serum already assigned to untouched tracks. There is no new audio buffer, ordinary voice reduction, DSP synthesis engine or audio-interrupt random generator. The additional planning runs when GEN is invoked. Polyphony and existing dual-core scheduling remain as before; actual synth choice, notes and effects still affect render cost.
+GEN still changes only tracks 1–4. Tracks 5–6 are not repopulated with Acid or Break notes. At most one Wavetable is allocated automatically, counting Wavetable already assigned to untouched tracks. There is no new audio buffer, ordinary voice reduction, DSP synthesis engine or audio-interrupt random generator. The additional planning runs when GEN is invoked. Polyphony and existing dual-core scheduling remain as before; actual synth choice, notes and effects still affect render cost.
 
 ## Primary research and existing assets
 
@@ -45,4 +45,4 @@ GEN still changes only tracks 1–4. Tracks 5–6 are not repopulated with Acid 
 
 ## Acceptance and limits
 
-Native checks cover 18 refined profiles × 12 seeds, seeded variation, chord presence, bounded note counts, role engine variety, safe engine selection, one-Serum ceiling, half-time / four-kick / glide / 15-step identities and the complete menu permutation. Actual-FW emulator checks cover one arrangement from each profile plus Acid, MD and six-track ensembles. These objective checks establish that the intended rules execute; they do not prove every seed sounds good. Listening on the real FM-1 and long dense/FX-heavy sessions remain required for final musical and performance judgement. No popularity ranking is asserted.
+Native checks cover 18 refined profiles × 12 seeds, seeded variation, chord presence, bounded note counts, role engine variety, safe engine selection, one-Wavetable ceiling, half-time / four-kick / glide / 15-step identities and the complete menu permutation. Actual-FW emulator checks cover one arrangement from each profile plus Acid, MD and six-track ensembles. These objective checks establish that the intended rules execute; they do not prove every seed sounds good. Listening on the real FM-1 and long dense/FX-heavy sessions remain required for final musical and performance judgement. No popularity ranking is asserted.

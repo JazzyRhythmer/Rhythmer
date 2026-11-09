@@ -16,7 +16,7 @@ def write_presets(root, dist):
     firmware = root/'rhythmer/firmware'
     presets = {}
     for filename,symbol,model in [
-        ('src/eng_serum.c','SERUM_PRESETS','SERUM'),
+        ('src/eng_wavetable.c','WAVETABLE_PRESETS','WAVETABLE'),
         ('ports/fmini_programs.h','FMINI_PROGRAMS','FMINI-1'),
         ('ports/obervave_programs.h','OBERVAVE_PROGRAMS','OBERVAVE'),
         ('src/eng_mono2k.c','M2STAT_PRESETS','FM+STAT'),

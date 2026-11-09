@@ -2244,7 +2244,7 @@ static uint32_t mc_cost(const track_t *t)               /* a part's share of the
     const engine_t *e = ENGINES[t->engine];
     /* Seed a newly struck expensive model realistically before measured timing
      * catches up. The actual per-track timings still drive steady-state split. */
-    uint32_t k, v = 0, w = e == &ENG_ACID ? 6u : e == &ENG_SERUM ? 6u :
+    uint32_t k, v = 0, w = e == &ENG_ACID ? 6u : e == &ENG_WAVETABLE ? 6u :
 #if RHYTHMER_PROPHET
         e == &ENG_PROPHET ? 7u :
 #endif

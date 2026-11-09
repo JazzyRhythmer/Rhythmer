@@ -48,7 +48,7 @@ class Poster:
    for xx in range(x,x1,step):self.rect((xx,yy,xx+1,yy+1),fill='#383a34')
  def glyph(self,kind,x,y,w,h,color=PAPER):
   # Use the real model animation, not an independently drawn approximation.
-  frames={'DRUM':0,'SERUM':0,'PHASE':0,'LOFI':0,'ACID':0,'BREAK':16}
+  frames={'DRUM':0,'WAVETABLE':0,'PHASE':0,'LOFI':0,'ACID':0,'BREAK':16}
   src=ROOT/'site/media/motion'/f'{kind.lower()}.webp'
   anim=Image.open(src);anim.seek(frames[kind])
   im=anim.convert('RGBA').crop((15,101,225,191))
@@ -90,7 +90,7 @@ def reddit():
  p.text((m,737),'BUILD PATTERNS.',65,'display',tracking=-2)
  p.text((m,853),'Your sounds. Your machines.',32,'sans',GREY)
  p.text((m,902),'A new workflow for the FM–1.',32,'sans',GREY)
- kinds=['DRUM','SERUM','PHASE','LOFI','ACID','BREAK']
+ kinds=['DRUM','WAVETABLE','PHASE','LOFI','ACID','BREAK']
  for i,k in enumerate(kinds):
   x=m+i*135;p.glyph(k,x,1010,124,70);p.text((x,1116),k,18,color=GREY)
  p.text((m,1190),'FIND YOUR OWN GROOVE.',23,color=GREY)
@@ -116,7 +116,7 @@ def instagram():
  p.card(m,1205,930,'acid-generate','ACID GENERATOR',13,'05 / CREATE + MUTATE','SCALE / ACCENT / SLIDE')
  p.card(1110,1205,930,'break-perform','BREAK MANIPULATOR',8,'06 / CHOP + PERFORM','CHOP / REPEAT / SWITCH A–B')
  # Six graphics extracted directly from the real website model animations.
- for i,k in enumerate(['DRUM','SERUM','PHASE','LOFI','ACID','BREAK']):
+ for i,k in enumerate(['DRUM','WAVETABLE','PHASE','LOFI','ACID','BREAK']):
   x=m+i*326;p.glyph(k,x,2370,225,88);p.text((x,2487),k,24,color=GREY)
  p.line([(m,2305),(2040,2305)])
  p.text((m,2575),'JAZZY RHYTHMER / BUILT ON JIANT',26,color=GREY)

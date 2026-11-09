@@ -34,17 +34,17 @@ run(device+'\nconst markup=fm1Device(\"assets/home.png\"); if((markup.match(/dat
 result=run(model+'\n'+midi+'''\n
 const checks=[];function check(ok,label){if(!ok)throw Error(label);checks.push(label);}
 let p=makeProject();check(validateProject(p).tracks.length===6,'default project round trip');
-check(p.mode===6&&p.tracks.map(t=>t.model).join(',')==='DRUM,SERUM,FMINI-1,OBERVAVE,ACID,BREAK','default track layout');
+check(p.mode===6&&p.tracks.map(t=>t.model).join(',')==='DRUM,WAVETABLE,FMINI-1,OBERVAVE,ACID,BREAK','default track layout');
 check(!availableModels(p,0).includes('BREAK'),'hide owned Break');
 let rejected=false;try{setModel(p,0,'BREAK');}catch{rejected=true;}check(rejected,'reject second Break');
-setModel(p,5,'SERUM');check(availableModels(p,0).includes('BREAK'),'release Break ownership');
+setModel(p,5,'WAVETABLE');check(availableModels(p,0).includes('BREAK'),'release Break ownership');
 setModel(p,0,'BREAK');check(!availableModels(p,5).includes('BREAK'),'move Break ownership');
 setModel(p,1,'ACID');setModel(p,2,'ACID');check(p.tracks.filter(t=>t.model==='ACID').length===3,'multiple Acid allowed');
 p.mode=4;check(!availableModels(p,3).includes('BREAK'),'4-track mode preserves Break ownership');
 const before=JSON.stringify(p.sections[0][5]);p.mode=6;check(JSON.stringify(p.sections[0][5])===before,'mode switch retains inactive pattern');
 const q=validateProject(p);q.sections[0][0][0].note=60;check(p.sections[0][0][0].note!==60,'import/save deep copy');
 for(let root=0;root<12;root++)for(const scale of Object.keys(SCALES)){p.root=root;p.scale=scale;randomDraft(p,1,0,()=>.6);check(p.sections[0][1].every(s=>SCALES[scale].includes((s.note-root)%12)),'scale draft '+root+' '+scale);}
-for(const mutate of [x=>x.tracks.push({}),x=>x.tracks[0].model='UNKNOWN',x=>x.tracks[5].model='BREAK',x=>x.sections[0][0][0].command='<script>',x=>x.sections[0][0][0].velocity=999,x=>x.sections[0][0].push({}),x=>x.scale='__proto__']){let bad=makeProject();bad.tracks[0].model='BREAK';bad.tracks[5].model='SERUM';mutate(bad);let threw=false;try{validateProject(bad);}catch{threw=true;}check(threw,'reject malformed draft');}
+for(const mutate of [x=>x.tracks.push({}),x=>x.tracks[0].model='UNKNOWN',x=>x.tracks[5].model='BREAK',x=>x.sections[0][0][0].command='<script>',x=>x.sections[0][0][0].velocity=999,x=>x.sections[0][0].push({}),x=>x.scale='__proto__']){let bad=makeProject();bad.tracks[0].model='BREAK';bad.tracks[5].model='WAVETABLE';mutate(bad);let threw=false;try{validateProject(bad);}catch{threw=true;}check(threw,'reject malformed draft');}
 let raw=JSON.parse(JSON.stringify(makeProject()));raw.__proto_test='unwanted';check(!Object.hasOwn(validateProject(raw),'__proto_test'),'whitelist imported fields');
 function infoFrame(name,n=21,tracks=6){return [240,125,70,76,1,...Array.from(name,c=>c.charCodeAt(0)),0,n,60,30,64,20,...Array.from({length:n},()=>[65,0]).flat(),tracks,247];}
 check(parseInfo(infoFrame('Rhythmer dev')).isRhythmer,'Rhythmer data-engine identity');
@@ -66,7 +66,7 @@ config=json.loads((DIST/'config.json').read_text());assert isinstance(config['lo
 release=json.loads((DIST/'release.json').read_text())
 for f in release['files']:
  p=DIST/'downloads'/f['name'];assert p.stat().st_size==f['bytes'];assert hashlib.sha256(p.read_bytes()).hexdigest()==f['sha256']
-presets=json.loads((DIST/'presets.json').read_text());assert {k:len(v) for k,v in presets.items()}=={'SERUM': 8, 'FMINI-1': 43, 'OBERVAVE': 32, 'FM+STAT': 5, 'SWAV-SAW': 6, 'SID-6581': 6, 'ANALOG': 25, 'FM6': 15, 'ACID': 4}
+presets=json.loads((DIST/'presets.json').read_text());assert {k:len(v) for k,v in presets.items()}=={'WAVETABLE': 8, 'FMINI-1': 43, 'OBERVAVE': 32, 'FM+STAT': 5, 'SWAV-SAW': 6, 'SID-6581': 6, 'ANALOG': 25, 'FM6': 15, 'ACID': 4}
 for name in ['home.png','acid-1.png','acid-2.png','break-1.png','break-2.png','break-3.png','LICENSE.txt','favicon.svg']:assert (DIST/'assets'/name).is_file()
 report['static_checks']='assets, canonical hashes, active synth preset names and counts, explicit local/public config, INFO-only MIDI sender'
 (Path('/Volumes/SSD/Development/TestResults/rhythmer/installer')/'results.json').write_text(json.dumps(report,indent=2)+'\n')

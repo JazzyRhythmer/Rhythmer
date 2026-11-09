@@ -11,7 +11,7 @@ Current firmware lives in `rhythmer/`. Root `firmware/six` is an earlier X0X-bas
 Rhythmer is an independent integration. References and retained notices identify the source projects; they do not imply endorsement.
 
 
-Garden-FM is pinned to [3e6821b87a460e74b7b05545701f924bb9eb9359](https://github.com/nvhhh/Garden-FM/tree/3e6821b87a460e74b7b05545701f924bb9eb9359). Serum remains selectable. PHASE and LOFI are retired alongside WHEEL; their IDs remain reserved for project migration. Rhythmer draws its own note-reactive geometric views.
+Garden-FM is pinned to [3e6821b87a460e74b7b05545701f924bb9eb9359](https://github.com/nvhhh/Garden-FM/tree/3e6821b87a460e74b7b05545701f924bb9eb9359). Wavetable remains selectable. PHASE and LOFI are retired alongside WHEEL; their IDs remain reserved for project migration. Rhythmer draws its own note-reactive geometric views.
 
 FMINI-1 uses the Felucca-derived synth port from Jazzy, and OberVave uses zvenson's [OberVave](https://github.com/zvenson/obervave) design and factory programs. The GPL notices are retained in `rhythmer/LICENSES/ported-fmini` and `rhythmer/LICENSES/ported-obervave`. Both engines keep their filter designs and use Rhythmer's sequencing, mixer and display.
 

@@ -41,8 +41,8 @@
     }
   },
   "releaseHold": null,
-  "buildRevision": "20261110.2",
-  "releaseCaution": "Public beta: new tracks start at −10 dB for more room when playing together. Saved mixer levels are retained. Back up before installing.",
+  "buildRevision": "20261110.3",
+  "releaseCaution": "Public beta: WAVETABLE is the current name of the existing wavetable engine. Existing projects, presets and sounds are compatible. Back up before installing.",
   "previousOwnerTests": [
     {
       "date": "2026-11-08",

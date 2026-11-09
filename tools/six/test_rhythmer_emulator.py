@@ -35,7 +35,7 @@ def validate(report):
  assert report['runs']['six-current-four']['six_machine_mask']==0
  assert report['runs']['six-current-strict']['six_machine_mask']==3
 
- for n in ('six-current-strict','six-current-usb48','six-current-four','six-current-triple-serum','six-current-triple-m2stat','six-current-triple-m2saw','six-current-triple-m2sid'):
+ for n in ('six-current-strict','six-current-usb48','six-current-four','six-current-triple-wavetable','six-current-triple-m2stat','six-current-triple-m2saw','six-current-triple-m2sid'):
   d=report['runs'][n]
   assert d['usb_capture_frames']>1000 and d['usb_peak_pcm16']>0,(n,d)
   assert d['usb_starts']>0 and not d['usb_underruns'] and not d['usb_overruns'],(n,d)
@@ -43,14 +43,14 @@ def validate(report):
   d=report['runs']['six-current-'+case]
   assert d['track_engines']==engines and d['max_us']<HALF/44100*1e6 and d['peak_pcm16']>0,(case,d)
   assert d['usb_capture_frames']>1000 and not(d['usb_underruns'] or d['usb_overruns'] or d['usb_missed']),(case,d)
- assert report['runs']['six-current-triple-serum']['six_machine_mask']==3
- assert report['runs']['six-current-triple-serum']['max_us']<HALF/44100*1e6
+ assert report['runs']['six-current-triple-wavetable']['six_machine_mask']==3
+ assert report['runs']['six-current-triple-wavetable']['max_us']<HALF/44100*1e6
  for model in ('m2stat','m2saw','m2sid'):
   d=report['runs']['six-current-triple-'+model];assert d['six_machine_mask']==3 and d['max_us']<HALF/44100*1e6 and d['peak_pcm16']>0
  if 'six-current-audition' in report['runs']:
   d=report['runs']['six-current-audition'];assert d['six_machine_mask']==3 and d['peak_pcm16']>0
   assert d['usb_capture_frames']>1000 and not(d['usb_underruns'] or d['usb_overruns'] or d['usb_missed'])
- for model,track in [('serum',1),('phase',2),('lofi',3)]:
+ for model,track in [('wavetable',1),('phase',2),('lofi',3)]:
   for name in ('six-current-edit-'+model,'rhythmer-note-'+model+'-hit','rhythmer-note-'+model+'-release'):
    if name in report['runs']:assert report['runs'][name].get('selected_track')==track,(name,'wrong model selected')
  print("Rhythmer emulator validation PASS",flush=True)
@@ -181,7 +181,7 @@ if sys.argv[1:]==['--garden-views']:
  flash=bytearray(base.read_bytes())
  for s in saved['sectors']:flash[s['at']:s['at']+4096]=base64.b64decode(s['data'])
  seed=OUT/'six-current-garden-views.flash'
- for label,track in [('serum',1),('phase',2),('lofi',3)]:
+ for label,track in [('wavetable',1),('phase',2),('lofi',3)]:
   turns=','.join(f'{2500+i*350}:e1:1' for i in range(track))
   for suffix,ms in [('hit',4200),('release',5500)]:
    seed.write_bytes(flash);n='rhythmer-note-'+label+'-'+suffix
@@ -307,8 +307,8 @@ run('six-current-strict',24000,'1200:12,1320:12^,1800:e1:1,2100:6,2220:6^,2500:e
 seed.write_bytes(flash)
 run('six-current-usb48',8000,'1200:12,1320:12^',seed,True,48000)
 stress=bytearray(flash)
-record(0x97000,1,(OUT/'six-serum-stress.project').read_bytes());record(0xE5000,9,(OUT/'six-serum-stress.project').read_bytes())
-seed.write_bytes(flash);run('six-current-triple-serum',12000,'1200:12,1320:12^',seed,True)
+record(0x97000,1,(OUT/'six-wavetable-stress.project').read_bytes());record(0xE5000,9,(OUT/'six-wavetable-stress.project').read_bytes())
+seed.write_bytes(flash);run('six-current-triple-wavetable',12000,'1200:12,1320:12^',seed,True)
 flash=stress
 for model in ('m2stat','m2saw','m2sid'):
  snapshot=bytearray(flash)

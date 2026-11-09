@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments */
-/* SERUM test (src/eng_serum.c, src/serum_tables.c) on the host, through hostsim.c as voice_test.c.
- *   gcc -O2 -w -Ibuild/gen -Ifirmware/src -o build/host/serum_test tests/serum_test.c -lm
- *   build/host/serum_test
+/* WAVETABLE test (src/eng_wavetable.c, src/wavetable_tables.c) on the host, through hostsim.c as voice_test.c.
+ *   gcc -O2 -w -Ibuild/gen -Ifirmware/src -o build/host/wavetable_test tests/wavetable_test.c -lm
+ *   build/host/wavetable_test
  * 1. every preset renders finite samples, none at or above full scale, and sustains a held note (1 s);
  * 2. WT 0 against WT 127 gives different spectra (the first difference's energy against the signal's);
  * 3. RES 127 with each FILT, CUT 127 and DRIVE 127, over 10 s at a low and a high note: no NaN (ints: no overflow),
@@ -12,8 +12,8 @@
 #define main hostsim_main
 #include "hostsim.c"
 #undef main
-#include "../firmware/src/serum_tables.c"
-#include "../firmware/src/eng_serum.c"
+#include "../firmware/src/wavetable_tables.c"
+#include "../firmware/src/eng_wavetable.c"
 
 #define SR 44100u
 #define NOTE_LO 36
@@ -21,13 +21,13 @@
 #define FULL 32767                  /* a sample's full scale in the voice's units (before the output stage) */
 /* the bound on a voice's output: the filters' soft knee caps the signal at 16000 + 16384 (softclip), and the
  * voice's output is voice_amp(y << 1) << 1 = 2 * 0.73 * 2 * y: at most about 95000 < 3 * FULL. ANALOG's RES 127
- * reaches 78680 on the same bound; SERUM's presets sit at 8000..33000 (the firmware's level convention). */
+ * reaches 78680 on the same bound; WAVETABLE's presets sit at 8000..33000 (the firmware's level convention). */
 #define LIMIT (3 * FULL)
 
 static int bad;
 static void check(const char *what, int ok)
 {
-    printf("serum: %-96s %s\n", what, ok ? "ok" : "FAIL");
+    printf("wavetable: %-96s %s\n", what, ok ? "ok" : "FAIL");
     bad += !ok;
 }
 
@@ -52,7 +52,7 @@ static void setup(const int8_t *e, int note)
     MO.pitch16 = VO.pitch16;
     MO.amp0 = MO.amp1 = 32767;
     MO.shape = 64 << 8;                       /* no SHAPE offset: the matrix's neutral */
-    ENG_SERUM.note_on(&TR, &VO);
+    ENG_WAVETABLE.note_on(&TR, &VO);
 }
 
 /* n samples (a multiple of CTL) of the voice into out, one control block at a time */
@@ -61,7 +61,7 @@ static void render(int32_t *out, uint32_t n)
     uint32_t b;
     memset(out, 0, n * sizeof *out);
     for (b = 0; b < n / CTL; b++)
-        ENG_SERUM.render(&TR, &VO, out + b * CTL, CTL, &MO);
+        ENG_WAVETABLE.render(&TR, &VO, out + b * CTL, CTL, &MO);
 }
 
 static int32_t peak(const int32_t *x, uint32_t n)
@@ -124,8 +124,8 @@ int main(void)
     static const char *const names[3] = {"LADDER", "ACID", "SVF"};
 
     /* 1. presets */
-    for (k = 0; k < ENG_SERUM.npresets; k++) {
-        const preset_t *pr = &ENG_SERUM.presets[k];
+    for (k = 0; k < ENG_WAVETABLE.npresets; k++) {
+        const preset_t *pr = &ENG_WAVETABLE.presets[k];
         char what[128];
         int32_t pk;
         double tail;
@@ -148,7 +148,7 @@ int main(void)
         setup(b, 48);
         render(BUF, SR / 2);
         hb = hf_share(BUF, SR / 2);
-        printf("serum: (WT 0 hf share %.5f, WT 127 %.5f)\n", ha, hb);
+        printf("wavetable: (WT 0 hf share %.5f, WT 127 %.5f)\n", ha, hb);
         check("WT 0 against WT 127: the spectra differ (WT 127 at least 3x the high share)", hb > 3.0 * ha && ha > 0.0);
     }
 
@@ -169,7 +169,7 @@ int main(void)
             }
             if (worst >= LIMIT || rms(BUF + 9 * SR, SR) <= 1.0)
                 ok = 0;
-            printf("serum:   %-6s RES 127 CUT 127 DRIVE 127 note %d: peak %d over 10 s\n", names[f], note, worst);
+            printf("wavetable:   %-6s RES 127 CUT 127 DRIVE 127 note %d: peak %d over 10 s\n", names[f], note, worst);
         }
         {
             char what[96];
@@ -188,10 +188,10 @@ int main(void)
         setup(on, 60);
         render(BUF, SR / 2);
         a1 = tone(BUF + SR / 10, SR / 2 - SR / 10, f0);
-        printf("serum:   (at %.1f Hz: SUB 0 %.1f, SUB 127 %.1f)\n", f0, a0, a1);
+        printf("wavetable:   (at %.1f Hz: SUB 0 %.1f, SUB 127 %.1f)\n", f0, a0, a1);
         check("SUB 127 adds energy an octave below (at least 10x SUB 0 there, and audible)", a1 > 10.0 * a0 && a1 > 100.0);
     }
 
-    printf("serum: %s (%d failed)\n", bad ? "FAIL" : "all ok", bad);
+    printf("wavetable: %s (%d failed)\n", bad ? "FAIL" : "all ok", bad);
     return bad ? 1 : 0;
 }

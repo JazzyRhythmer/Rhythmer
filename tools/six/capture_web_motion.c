@@ -21,8 +21,8 @@ int main(int argc,char **argv){
   draw_splash();for(unsigned n=0;n<48;n++){splash_sig(0,n*44u);write_frame(f);}fclose(f);
   return 0;
  }
- static const unsigned engines[]={ENGI_DRUM,ENGI_SERUM,ENGI_FMINI,ENGI_OBERVAVE,ENGI_ANALOG,ENGI_FM6,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID,ENGI_ACID,ENGI_BREAK,ENGI_ACID,ENGI_BREAK};
- static const char *names[]={"drum","serum","fmini","obervave","analog","fm6","fmstat","swavsaw","sid","acid","break","acid-generate","break-perform"};
+ static const unsigned engines[]={ENGI_DRUM,ENGI_WAVETABLE,ENGI_FMINI,ENGI_OBERVAVE,ENGI_ANALOG,ENGI_FM6,ENGI_M2STAT,ENGI_M2SAW,ENGI_M2SID,ENGI_ACID,ENGI_BREAK,ENGI_ACID,ENGI_BREAK};
+ static const char *names[]={"drum","wavetable","fmini","obervave","analog","fm6","fmstat","swavsaw","sid","acid","break","acid-generate","break-perform"};
  for(unsigned k=0;k<sizeof engines/sizeof engines[0];k++){
   const char *only=getenv("RHYTHMER_CAPTURE_ONLY");if(only&&strcmp(only,names[k]))continue;
   int generator=!strcmp(names[k],"acid-generate"), performance=!strcmp(names[k],"break-perform");
@@ -44,7 +44,7 @@ int main(int argc,char **argv){
    if(n%4==0){unsigned note=e==ENGI_DRUM?36+(n/4)%8:e==ENGI_BREAK?(n/4)%16:36+(n/4)%7;previous=note;seq_note_on(t,note,70+(n/4*17)%58);}
    if(n%4==2)seq_note_off(t,previous);
    for(unsigned b=0;b<110;b++){engine_block(t);track_lfo_tick(t);six_lfo2_tick(t);if(e==ENGI_BREAK)six_break_clock(CTL,CTL,beat_samples());mod_begin(t);track_render(t,audio,CTL);if(MOD.on)mod_end(t);}
-   ui.force=1;frame();write_frame(f);
+   ui.msg_t=0;ui.force=1;frame();write_frame(f);
   }
   fclose(f);seq_note_off(t,previous);song.playing=0;fprintf(stderr,"Captured %s\n",names[k]);
  }

@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   for(unsigned k=1;k<4;k++){unsigned e=trk[k].eng_req;ok&=e!=ENGI_BREAK&&e!=ENGI_DRUM&&(e!=ENGI_ACID||(gs.role[k]==RL_BASS&&gsnd(RL_BASS)==SR_ACID));seen|=1u<<e;}
   if(!ok||saved[0]!=steps_sig(&trk[4])||saved[1]!=steps_sig(&trk[5])){bad+=check("GEN preserves machines 5/6 and melodic engine allowlist",0);break;}
  }
- unsigned newer=(1u<<ENGI_SERUM)|(1u<<ENGI_PHASE)|(1u<<ENGI_LOFI);
+ unsigned newer=(1u<<ENGI_WAVETABLE)|(1u<<ENGI_PHASE)|(1u<<ENGI_LOFI);
  bad+=check("normal and EXPLORE GEN reach the three core added synth models",(seen&newer)==newer);
  bad+=check("automatic GEN never selects the excluded heavy engines",!(seen&((1u<<ENGI_M2STAT)|(1u<<ENGI_M2SAW)|(1u<<ENGI_FM6))));
  ui.home=ui.confirm=0; song.playing=0; ui_prefs&=~PREF_ANIM_OFF;

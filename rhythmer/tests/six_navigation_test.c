@@ -22,7 +22,7 @@ int main(int argc,char **argv){
   nav_select(2);bad+=check("SELECT still reaches GEN 1",!strcmp(cur_page()->title,"303 GEN 1"));nav_select(1);bad+=check("SELECT still reaches GEN 2",!strcmp(cur_page()->title,"303 GEN 2"));
  }
  for(unsigned pass=0;pass<2;pass++){
-  unsigned k=pass?1:5;if(pass)set_engine_of(&trk[5],ENGI_SERUM);song.sel=k;if(pass)set_engine_of(TSEL,ENGI_BREAK);go_title("EDIT 1");frame();
+  unsigned k=pass?1:5;if(pass)set_engine_of(&trk[5],ENGI_WAVETABLE);song.sel=k;if(pass)set_engine_of(TSEL,ENGI_BREAK);go_title("EDIT 1");frame();
   press(B_EDIT);bad+=check("EDIT from Break SOUND opens BREAK / PERF",six_perf_page()&&tabs_match("BREAK"));
   press(B_EDIT);bad+=check("repeated EDIT reaches BREAK / SEQ",!strcmp(cur_page()->title,"BRK SEQ")&&tabs_match("BREAK"));
   press(B_EDIT);bad+=check("repeated EDIT reaches BREAK / RETURN",six_return_page()&&tabs_match("BREAK"));

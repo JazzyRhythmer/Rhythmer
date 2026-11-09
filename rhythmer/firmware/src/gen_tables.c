@@ -674,7 +674,7 @@ static const uint8_t GX_LEADS[8] = {SR_LEAD, SR_VOXLEAD, SR_CHIP, SR_HOOVER, SR_
 static const uint8_t GX_TEX[8] = {SR_NOISE, SR_TEXTURE, SR_DRONE, SR_CHOIR, SR_PAD, SR_ORGAN, SR_BELL, SR_STRINGS};
 /* any engine on any role (the weights a role, RL_BASS .. RL_TEX; NOISE never a bass, a lead or an arp: unpitched) */
 #define GX_NENG 9u
-static const uint8_t GX_ENG[GX_NENG] = {ENGI_SERUM, EG_PH, EG_LO, ENGI_M2STAT, ENGI_M2SAW, ENGI_M2SID, EG_A, EG_FM, EG_WH};
+static const uint8_t GX_ENG[GX_NENG] = {ENGI_WAVETABLE, EG_PH, EG_LO, ENGI_M2STAT, ENGI_M2SAW, ENGI_M2SID, EG_A, EG_FM, EG_WH};
 static const uint8_t GX_ENG_W[RL_N][GX_NENG] = {
  {0}, {28,18,14,6,10,12,6,4,2}, {26,24,10,12,8,4,6,6,4}, {28,18,14,10,6,10,6,4,4}, {28,16,14,6,12,12,6,4,2}, {28,20,12,10,8,8,6,4,4},
 };
