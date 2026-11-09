@@ -1,0 +1,17 @@
+/* The local Rhythmer preview shares the dual firmware links with JAZZY. */
+body { background-color: #000; }
+.rhy-site-header .rhy-site-inner .firmware-links a:hover,
+.topbar .firmware-links a:hover { color: #fff; }
+.rhy-brand-mark { display: block; width: 27px; height: 27px; flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .topbar, .rhy-site-header .rhy-site-inner { flex-wrap: wrap; gap: 8px 12px; }
+  .topbar nav, .rhy-site-header .rhy-site-inner nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 400px) {
+  .topbar .brand, .rhy-site-header .rhy-site-inner .rhy-site-brand { font-size: 16px; gap: 5px; }
+  .rhy-brand-mark { width: 21px; height: 21px; }
+}
