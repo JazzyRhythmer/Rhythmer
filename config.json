@@ -41,8 +41,8 @@
     }
   },
   "releaseHold": null,
-  "buildRevision": "20261110.1",
-  "releaseCaution": "Public beta: reduces clicks on note onset and crackle in layered chords. Back up before installing. This exact build has been tested in software.",
+  "buildRevision": "20261110.2",
+  "releaseCaution": "Public beta: new tracks start at −10 dB for more room when playing together. Saved mixer levels are retained. Back up before installing.",
   "previousOwnerTests": [
     {
       "date": "2026-11-08",
