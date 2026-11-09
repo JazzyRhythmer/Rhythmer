@@ -277,5 +277,15 @@
   "previousBuild": {
     "buildRevision": "20261110.1",
     "firmwareSha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56"
+  },
+  "pdf": {
+    "file": "Rhythmer-Manual-v0.1.2-dev1.pdf",
+    "pages": 24,
+    "chapters": 16,
+    "edition": "0.1.2-dev1 / 20261110.3",
+    "sha256": "bbc32f8a6da2cec9c87ea2003dd4604c20b1253ca4f0e891269be9eccc07f149",
+    "manualSourceSha256": "a3e4de3aefb52bab39952eae3a45a7b12635c59570902cbf5d5094c0933e3997",
+    "links": 50,
+    "scope": "Complete English print edition from current web manual chapters, with actual host-rendered UI and credits."
   }
 }
