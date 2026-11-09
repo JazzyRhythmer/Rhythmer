@@ -34,7 +34,7 @@ run(device+'\nconst markup=fm1Device(\"assets/home.png\"); if((markup.match(/dat
 result=run(model+'\n'+midi+'''\n
 const checks=[];function check(ok,label){if(!ok)throw Error(label);checks.push(label);}
 let p=makeProject();check(validateProject(p).tracks.length===6,'default project round trip');
-check(p.mode===6&&p.tracks.map(t=>t.model).join(',')==='DRUM,SERUM,PHASE,LOFI,ACID,BREAK','default track layout');
+check(p.mode===6&&p.tracks.map(t=>t.model).join(',')==='DRUM,SERUM,FMINI-1,OBERVAVE,ACID,BREAK','default track layout');
 check(!availableModels(p,0).includes('BREAK'),'hide owned Break');
 let rejected=false;try{setModel(p,0,'BREAK');}catch{rejected=true;}check(rejected,'reject second Break');
 setModel(p,5,'SERUM');check(availableModels(p,0).includes('BREAK'),'release Break ownership');
@@ -66,9 +66,9 @@ config=json.loads((DIST/'config.json').read_text());assert isinstance(config['lo
 release=json.loads((DIST/'release.json').read_text())
 for f in release['files']:
  p=DIST/'downloads'/f['name'];assert p.stat().st_size==f['bytes'];assert hashlib.sha256(p.read_bytes()).hexdigest()==f['sha256']
-presets=json.loads((DIST/'presets.json').read_text());assert {k:len(v) for k,v in presets.items()}=={'SERUM':8,'PHASE':16,'LOFI':17,'FM+STAT':5,'SWAV-SAW':6,'SID-6581':6}
+presets=json.loads((DIST/'presets.json').read_text());assert {k:len(v) for k,v in presets.items()}=={'SERUM': 8, 'FMINI-1': 43, 'OBERVAVE': 32, 'FM+STAT': 5, 'SWAV-SAW': 6, 'SID-6581': 6, 'ANALOG': 25, 'FM6': 15, 'ACID': 4}
 for name in ['home.png','acid-1.png','acid-2.png','break-1.png','break-2.png','break-3.png','LICENSE.txt','favicon.svg']:assert (DIST/'assets'/name).is_file()
-report['static_checks']='assets, canonical hashes, all 58 selected synth preset names, explicit local/public config, INFO-only MIDI sender'
+report['static_checks']='assets, canonical hashes, active synth preset names and counts, explicit local/public config, INFO-only MIDI sender'
 (Path('/Volumes/SSD/Development/TestResults/rhythmer/installer')/'results.json').write_text(json.dumps(report,indent=2)+'\n')
 print('PASS:',report['passed'],'JavaScript checks + static package checks')
 jsc.JSGlobalContextRelease(ctx)

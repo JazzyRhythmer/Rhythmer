@@ -12,6 +12,27 @@ from release_rights import public_audio_release_blockers
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / 'site'
 
+def write_presets(root, dist):
+    firmware = root/'rhythmer/firmware'
+    presets = {}
+    for filename,symbol,model in [
+        ('src/eng_serum.c','SERUM_PRESETS','SERUM'),
+        ('ports/fmini_programs.h','FMINI_PROGRAMS','FMINI-1'),
+        ('ports/obervave_programs.h','OBERVAVE_PROGRAMS','OBERVAVE'),
+        ('src/eng_mono2k.c','M2STAT_PRESETS','FM+STAT'),
+        ('src/eng_mono2k.c','M2SAW_PRESETS','SWAV-SAW'),
+        ('src/eng_mono2k.c','M2SID_PRESETS','SID-6581'),
+        ('src/eng_analog.c','ANALOG_PRESETS','ANALOG'),
+        ('src/eng_fm6.c','FM6_PRESETS','FM6'),
+        ('src/eng_acid.c','ACID_PRESETS','ACID'),
+    ]:
+        text = (firmware/filename).read_text()
+        block = re.search(r'static const preset_t '+symbol+r'\[\]\s*=\s*\{(.*?)\n\};',text,re.S)
+        if not block: raise SystemExit('Missing presets: '+symbol)
+        presets[model] = re.findall(r'\{\s*"([^"]+)"',block.group(1))
+    (dist/'presets.json').write_text(json.dumps(presets,indent=2)+'\n')
+    return presets
+
 def build():
     if not Path('/Volumes/SSD/Development').is_dir(): raise SystemExit('Configured SSD Development storage is not mounted.')
     config = json.loads(Path(os.environ.get('RHYTHMER_SITE_CONFIG',SITE/'site.config.json')).read_text())
@@ -89,13 +110,7 @@ def build():
             shutil.copy2(candidate,validation_file)
             break
     (dist/'config.json').write_text(json.dumps({k:v for k,v in config.items() if k!='buildDirectory'},ensure_ascii=False,indent=2)+'\n')
-    presets = {}
-    for filename,symbol,model in [('eng_serum.c','SERUM','SERUM'),('eng_phase.c','PHASE','PHASE'),('eng_lofi.c','LOFI','LOFI'),('eng_mono2k.c','M2STAT','FM+STAT'),('eng_mono2k.c','M2SAW','SWAV-SAW'),('eng_mono2k.c','M2SID','SID-6581')]:
-        text = (ROOT/'rhythmer/firmware/src'/filename).read_text()
-        block = re.search(r'static const preset_t '+symbol+r'_PRESETS\[\]\s*=\s*\{(.*?)\n\};',text,re.S)
-        if not block: raise SystemExit('Missing presets: '+symbol)
-        presets[model] = re.findall(r'\{\s*"([^"]+)"',block.group(1))
-    (dist/'presets.json').write_text(json.dumps(presets,indent=2)+'\n')
+    presets = write_presets(ROOT, dist)
     build_emulator(ROOT, dist, digest)
     if config.get('localOnly') is False:
         p=dist/'emulator/firmwares.json';catalog=json.loads(p.read_text())

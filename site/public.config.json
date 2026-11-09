@@ -15,20 +15,8 @@
   "linkEvidence": "YouTube @jazzyrhythmer About links verified 2026-11-06. Spotify artist verified by matching I'm Not, Hangang Highway, The Angel, Flying and the I Saw The Heaven Yesterday EP to the official YouTube discography. Spotify artist URL confirmed by owner on 2026-11-06. Ko-fi URL provided by owner on 2026-11-06.",
   "emulator": "https://joakimeriksson.github.io/fm1-emu/?fw=local&mhz=240",
   "language": "en",
-  "ownerTest": {
-    "date": "2026-11-08",
-    "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "buildRevision": "20261108.6",
-    "method": "Owner-reported physical FM-1 installation and listening",
-    "result": "Owner reports this native Hortator/buffer build works very well, without the earlier buffering issue.",
-    "verifiedScope": [
-      "Installed build 20261108.6",
-      "Physical playback/listening, owner reported"
-    ],
-    "migrationAndRecoveryMatrixVerified": false
-  },
-  "version": "0.1.1-beta3",
-  "product": "FM-1_748005",
+  "version": "0.1.2-dev1",
+  "product": "FM-1_748023",
   "githubRepository": "JazzyRhythmer/Rhythmer",
   "previousOwnerTest": {
     "date": "2026-11-06",
@@ -53,10 +41,21 @@
     }
   },
   "releaseHold": null,
-  "buildRevision": "20261108.9",
-  "releaseCaution": "Startup and identity copy maintenance: fixed Drum, Analog, Phase, LoFi, Acid and Break symbols animate independently of your track assignments. The boot is about 2.1 seconds and uses Sound into motion / Find your own groove. Audio DSP, sequences, buffers, voice management and core scheduling retain the creator-tested native Hortator audio base. Back up before installation.",
-  "buildDirectory": "/Volumes/SSD/Development/BuildCache/rhythmer/startup-motion-20261108.9",
+  "buildRevision": "20261109.18",
+  "releaseCaution": "Public beta: FMINI-1, OberVave, LXR-X, per-track SEQ generation and USB MIDI Host. Back up first. Projects that used PHASE, LOFI or WHEEL open with Analog in this build.",
   "previousOwnerTests": [
+    {
+      "date": "2026-11-08",
+      "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
+      "buildRevision": "20261108.6",
+      "method": "Owner-reported physical FM-1 installation and listening",
+      "result": "Owner reports this native Hortator/buffer build works very well, without the earlier buffering issue.",
+      "verifiedScope": [
+        "Installed build 20261108.6",
+        "Physical playback/listening, owner reported"
+      ],
+      "migrationAndRecoveryMatrixVerified": false
+    },
     {
       "date": "2026-11-08",
       "firmwareSha256": "1dd2fa25f5270529832172b3cdb4edf97f384a8dc66209bf431ebe61fc3cb16d",
@@ -90,26 +89,5 @@
       }
     }
   ],
-  "audioBaseTest": {
-    "ownerConfirmed": true,
-    "buildRevision": "20261108.6",
-    "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
-    "finalRevision": "20261108.9",
-    "firmwareSourceDifferences": [
-      "rhythmer/firmware/src/ui.c",
-      "rhythmer/firmware/src/ui_draw.c",
-      "rhythmer/firmware/src/ui_input.c",
-      "rhythmer/firmware/src/ui_menu.c"
-    ],
-    "change": "Display and identity-copy maintenance only; audio DSP, buffers, voice management and core algorithms unchanged."
-  },
-  "maintenanceDelta": {
-    "previousBuild": "20261108.8",
-    "previousFirmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
-    "firmwareFilesChanged": [
-      "rhythmer/firmware/src/ui_draw.c",
-      "rhythmer/firmware/src/ui_menu.c"
-    ],
-    "scope": "Startup renderer and About-page product copy only; no audio, sequencing, voice-budget, buffer, core or track-assignment changes."
-  }
+  "ownerTest": null
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=3156538adfcd';
-import {mountProgress} from './progress.mjs?v=3156538adfcd';
+import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=f4a3fd0a6f94';
+import {mountProgress} from './progress.mjs?v=f4a3fd0a6f94';
 const $=s=>document.querySelector(s),mode=new URLSearchParams(location.search).get('mode')==='stock'?'stock':'rhythmer';
 let manifest,target,recovery,source,up,access,working=false,writing=false,backupReady=false,bundleReady=false,releaseLock,heartbeat,channel;
 document.body.dataset.mode=mode;
@@ -103,7 +103,7 @@ async function review(){
   if(mode==='stock'){transferView.enter('final','Official V15 identity matched; finishing verification.');transferView.finish('Official V15 verified: the device returned as FM-1_015.');sessionStorage.removeItem(checkpointKey);state('Verified: FM-1_015 returned. Official V15 firmware restored; custom musical data was not imported.');closeConnection();return;}
   transferView.model.done('identity');
   transferView.enter('final','Verifying Rhythmer and its included factory audio.');
-  await verifyEmbeddedBanks(source);await verifyRhythmer(up);
+  await verifyEmbeddedBanks(source);await verifyRhythmer(up,target);
   transferView.finish('Rhythmer with included Amen and Think verified.');sessionStorage.removeItem(checkpointKey);state('Verified: Rhythmer INFO matches and both embedded audio banks pass firmware validation. Check sound and controls on the FM-1 next.');closeConnection();
  });
 }

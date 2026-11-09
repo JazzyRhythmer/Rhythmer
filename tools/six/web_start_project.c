@@ -4,7 +4,7 @@
 #include "../../rhythmer/tests/ui_test.c"
 int main(int argc,char **argv){
  if(argc!=2)return 1;
- ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(1);
+ ui_power_on();fm6_init();power_on_parts();six_native_init();trks_put(0);
  for(unsigned k=0;k<6;k++){
   track_t *t=&trk[k];motion_clear(t);t->p[P_MUTE]=0;
   for(unsigned i=0;i<NSTEP;i++)step_clear(&t->step[i]);

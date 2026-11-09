@@ -12,6 +12,12 @@
     "migrationAndRecoveryMatrixVerified": false
   },
   "finalRevision": {
+    "buildRevision": "20261109.18",
+    "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac",
+    "exactBinaryHardwareClaimed": false,
+    "exactBinaryAutomatedScope": "See RELEASE-VALIDATION.json. No new device write was performed during publication."
+  },
+  "previousFinalRevision": {
     "buildRevision": "20261108.9",
     "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
     "exactBinaryHardwareClaimed": false,

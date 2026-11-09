@@ -18,7 +18,7 @@ def build_installer(root, dist, release):
         if not release.get('physicalHardwareTested') and release.get('audioBaseTest'):
             html=html.replace('Development build · physical-device validation pending.','Public beta · creator-tested audio base.').replace('This installer is for deliberate development testing.','The creator confirmed stable playback on the native Hortator audio base. Review the build notes for this maintenance revision and its exact test scope.')
         elif not release.get('physicalHardwareTested'):
-            html=html.replace('Development build · physical-device validation pending.','Optimized public beta · this exact binary awaits physical FM-1 revalidation.').replace('This installer is for deliberate development testing.','The reported real-device audio-load issue is not yet confirmed resolved.')
+            html=html.replace('Development build · physical-device validation pending.','Public beta · review the exact-build test scope.').replace('This installer is for deliberate development testing.','Back up before installing. Use official V15 when switching firmware families.')
     page.write_text(html)
     shutil.copy2(root/'site/src/midi.mjs',dest/'midi.mjs')
     transport=(dest/'fm1ota.js').read_text().replace('/fm-?1|felucca|','/rhythmer|fm-?1|felucca|')
@@ -123,7 +123,7 @@ Read THIRD-PARTY-AUDIO.txt and audio-rights.json. Credits are not a license.
         elixir=root/'rhythmer/LICENSES/GPL-3.0-Elixir-LXR.txt'
         if elixir.is_file():z.write(elixir,'licenses/'+elixir.name)
     archives=Path('/Volumes/SSD/Development/Archives/rhythmer')
-    if local and release.get('buildRevision'):
+    if release.get('buildRevision'):
         archives=archives/('install-'+release['buildRevision'])
     archives.mkdir(parents=True,exist_ok=True)
     shutil.copy2(archive,archives/archive.name)

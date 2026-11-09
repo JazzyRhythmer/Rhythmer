@@ -100,7 +100,7 @@ async function openWorkspace(onStatus,releaseLease) {
   const currentStored=localStorage.getItem(KEY);
   const previousStored=currentStored?null:localStorage.getItem('rhythmer-workspace-v1');
   const stored=currentStored||previousStored;
-  if(stored){restoring=true;try{const file=readBackup(stored);if(!['Rhythmer dev','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(file.firmware))throw Error('Unsupported workspace firmware');await restoreBackup(request,file);if(previousStored)localStorage.setItem(KEY,stored);onStatus(previousStored?'Previous workspace copied into this editor · original browser data kept':'Browser workspace restored');}catch(e){throw Error('Stored workspace could not be restored; original data is kept. '+e.message);}finally{restoring=false;}}
+  if(stored){restoring=true;try{const file=readBackup(stored);if(!['Rhythmer dev','Rhythmer v0.1.2-dev1','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(file.firmware))throw Error('Unsupported workspace firmware');await restoreBackup(request,file);if(previousStored)localStorage.setItem(KEY,stored);onStatus(previousStored?'Previous workspace copied into this editor · original browser data kept':'Browser workspace restored');}catch(e){throw Error('Stored workspace could not be restored; original data is kept. '+e.message);}finally{restoring=false;}}
   else onStatus('Browser workspace ready · edits autosave locally');
   const input={id:'rhythmer-workspace-in',name:'Rhythmer Browser Workspace',manufacturer:'Rhythmer',type:'input',state:'connected',connection:'open',onmidimessage:null,open:async()=>input,close:async()=>{}};
   const reads=new Set([1,2,4,5,6,10,16,17,25,29,34,36,37,65,66,68,70,77]);

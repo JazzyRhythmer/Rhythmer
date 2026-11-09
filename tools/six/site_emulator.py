@@ -13,7 +13,7 @@ def build_emulator(root, dist, firmware_hash):
         (target/name).write_bytes(data)
     shutil.copy2(vendor/'LICENSE',target/'LICENSE.txt')
     shutil.copy2(vendor/'UPSTREAM.json',target/'UPSTREAM.json')
-    source=(vendor/'main.js').read_text()
+    source=(vendor/'main.js').read_text().replace('fetch("firmwares.json")','fetch("firmwares.json", {cache:"no-store"})')
     anchor='''      if (seq !== bootSeq) return false;
       await flushRunning(true);'''
     replacement='''      // Rhythmer: seed only a new session. Saved flash for this exact hash always wins.

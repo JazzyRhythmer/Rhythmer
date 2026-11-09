@@ -146,11 +146,9 @@
 
 
 <style id="jiant-brand">/*JIANT_UI*/</style>
-<link rel="stylesheet" href="rhythmer.css?v=2d4a2ea5495e"><link rel="stylesheet" href="../assets/site-navigation.css?v=1cb9fcb83709"><script>if(window.self!==window.top)document.documentElement.setAttribute("data-rhythmer-framed","");</script><link rel="stylesheet" href="../firmware-links.css">
-<link rel="stylesheet" href="../jazzy-bridge.css">
-</head>
+<link rel="stylesheet" href="rhythmer.css?v=fb260d9a8907"><link rel="stylesheet" href="../assets/site-navigation.css?v=1cb9fcb83709"><link rel="stylesheet" href="../firmware-links.css"><link rel="stylesheet" href="../jazzy-bridge.css"><script>if(window.self!==window.top)document.documentElement.setAttribute("data-rhythmer-framed","");</script></head>
 <body class="jiant-editor"><header class="rhy-site-header" data-rhythmer-navigation><div class="rhy-site-inner"><a class="rhy-site-brand" href="../#home" target="_top" aria-label="Rhythmer home"><img class="rhy-brand-mark" src="../rhythmer-mark.svg" alt="" width="27" height="27"> RHYTHMER</a><nav aria-label="Main navigation"><a href="../#play" target="_top">PLAY</a><a href="../#guide" target="_top">GUIDE</a><a href="../#install" target="_top">INSTALL</a><a href="../#editor" target="_top" aria-current="page">EDITOR</a></nav><div class="firmware-links" role="group" aria-label="Firmwares and support"><a href="../../Jazzy/" target="_top"><img class="firmware-mark" src="../../Jazzy/jazzy-mark.svg" alt="" width="14" height="14">JAZZY</a><a href="../#home" target="_top" aria-current="true"><img class="firmware-mark" src="../rhythmer-mark.svg" alt="" width="14" height="14">RHYTHMER</a><a class="firmware-support" href="../#support" target="_top">SUPPORT ↗</a></div></div></header>
-<main><section id="rhythmer-mode"><a href="../#editor" target="_top" class="rhy-title">RHYTHMER / EDITOR</a><span class="rhy-build">0.1.1-beta3</span><div class="bar"><a id="mode-browser" href="?target=browser">BROWSER WORKSPACE</a><a id="mode-usb" href="?target=usb">USB FM-1</a></div><p id="workspace-status" role="status"></p><p id="mode-note"></p></section>
+<main><section id="rhythmer-mode"><a href="../#editor" target="_top" class="rhy-title">RHYTHMER / EDITOR</a><span class="rhy-build">0.1.2-dev1</span><div class="bar"><a id="mode-browser" href="?target=browser">BROWSER WORKSPACE</a><a id="mode-usb" href="?target=usb">USB FM-1</a></div><p id="workspace-status" role="status"></p><p id="mode-note"></p></section>
   <button class="lang" id="lang"></button>
   
   <p class="dim"><a href="../#install" style="color:inherit" data-t="installer"></a></p>
@@ -814,7 +812,7 @@ async function openEditorMidi(access, hooks = {}, selected = {}) {
       if (output.open) await output.open();
       input.onmidimessage = e => link.receive(e.data);
       const info = parse[CMD.INFO](await link.request(req.info(), { timeout: 800, retries: 2, quiet: true }));
-      if (!["Rhythmer dev","Rhythmer v0.1.1-beta3","JIANT Rhythmer dev","JIANT v0.1.1-beta3"].includes(info.version) || ![21,22].includes(info.nengines) || info.ntrk !== 6 || info.pcount !== 127 || info.gcount !== 71 || info.pe0 !== 119) throw new Error("This editor requires the matching Rhythmer firmware");
+      if (!(["Rhythmer dev","Rhythmer v0.1.2-dev1"].includes(info.version) && info.nengines === 25 && info.gcount === 77 || ["Rhythmer dev","Rhythmer v0.1.1-beta3","JIANT Rhythmer dev","JIANT v0.1.1-beta3"].includes(info.version) && [21,22].includes(info.nengines) && info.gcount === 71) || info.ntrk !== 6 || info.pcount !== 127 || info.pe0 !== 119) throw new Error("This editor requires the matching Rhythmer firmware");
       return {input, output, link, info};
     } catch (e) {
       last = e; link.close(); input.onmidimessage = null;
@@ -2426,7 +2424,7 @@ function enumShown(d) { if(d.names?.[1]==="LFO 1"&&d.names?.[15]==="LFO 2")retur
 const ENGINE_ORDER = ["DRUM", "VOICE", "ANIMAL", "LOFI", "ANALOG", "FM6", "PHASE", "WHEEL", "NOISE", "STRING", "SAMPLE", "DIGITAL"];   /* (0.9.9: DRUM-X, VOICE,
    ANIMAL first, as the parts at power-on; DIGITAL, FELUCCA_FM4 builds only, last; was ANALOG FM6 DIGITAL PHASE LOFI VOICE WHEEL NOISE
    DRUM ANIMAL, the order PROGRAM CHANGE still numbers the sounds in: engines.c ENGINE_PC_ORDER) */
-function engineOrder(names) { return [10,17,2,3,18,19,20,0,12,7,16,15,21].filter(i => names[i] && names[i] !== "-"); }
+function engineOrder(names) { return [10,17,22,24,2,3,18,19,20,0,12,7,16,15,21].filter(i => names[i] && names[i] !== "-"); }
 function upstreamEngineOrder(names) {
   const rank = (n) => { const k = ENGINE_ORDER.indexOf(n); return k < 0 ? ENGINE_ORDER.length : k; };
   return (names || []).map((n, i) => i).filter((i) => names[i] !== "-")
@@ -2836,7 +2834,7 @@ const stepEdit = new Map(); /* index -> time of the last edit */
 const EXPECT = { pcount: 91, gcount: 27, pe0: 83 };
 /* the same layout without the chord keys (P_COUNT 89, P_E0 81), the FM operator ENVs too (69, 61) or the matrix
    (firmware 1.0: 57, 49) */
-const knownLayout = (info) => [71].includes(info.gcount) &&   /* (JIANT FUNB: 5, 9, then 10 more globals; 0.6.3: the SLICER's 29) */
+const knownLayout = (info) => [71, 77].includes(info.gcount) &&   /* (JIANT FUNB: 5, 9, then 10 more globals; 0.6.3: the SLICER's 29) */
   [[127, 119]].some(([c, e]) => info.pcount === c && info.pe0 === e);
 const P = { LEVEL: 0, SLEN: 29 };
 const LAYOUT = (pe0) => [
@@ -2910,7 +2908,7 @@ async function connect() {
   sayK("connecting");
   try {
     if (!access) {
-      if (WORKSPACE) { const w = await import("./workspace.mjs?v=2d4a2ea5495e"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }
+      if (WORKSPACE) { const w = await import("./workspace.mjs?v=fb260d9a8907"); workspace = await w.createWorkspace(m => {$("workspace-status").textContent=m;}); access = workspace.access; }
       else {
         try { access = await navigator.requestMIDIAccess({ sysex: true }); }
         catch (e) { sayK("denied"); return; }
@@ -4858,7 +4856,7 @@ download=function(name,obj){
 };
 // Audio is intentionally separate from the musical archive protocol.
 const samplePanel=document.getElementById('p-samples');
-import('./break-samples.mjs?v=2d4a2ea5495e').then(({initBreakSamples})=>initBreakSamples({
+import('./break-samples.mjs?v=fb260d9a8907').then(({initBreakSamples})=>initBreakSamples({
  container:samplePanel,mode:WORKSPACE?'browser':'usb',getWorkspace:()=>workspace,getDevice:()=>dev,
  request:(d,r,o)=>sessionRequest(d,r,o),
  operation:async fn=>{if(!dev)throw Error('Connect Rhythmer first');const release=beginBusy();try{return await fn();}finally{release();}},

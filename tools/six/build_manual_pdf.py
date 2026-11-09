@@ -3,7 +3,7 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from html import escape
-import hashlib,json,re
+import hashlib,json,re,os
 from reportlab.platypus import (BaseDocTemplate,PageTemplate,Frame,Paragraph,Spacer,
  PageBreak,Table,TableStyle,Image,NextPageTemplate)
 from reportlab.platypus.tableofcontents import TableOfContents
@@ -14,9 +14,12 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 R=Path(__file__).resolve().parents[2]
-OUT=R/'output/pdf/Rhythmer-Manual-v0.1.1-beta3.pdf'
-QA=R/'qa/hub-submission-20261108'
-DATA=R/'tmp/pdfs/manual-sections.json'
+CONFIG=json.loads((R/'site/public.config.json').read_text())
+VERSION=CONFIG['version']
+BUILD=CONFIG['buildRevision']
+OUT=Path(os.environ.get('RHYTHMER_MANUAL_OUT',R/'output/pdf'/f'Rhythmer-Manual-v{VERSION}.pdf'))
+QA=Path(os.environ.get('RHYTHMER_MANUAL_QA',R/'qa/hub-submission-20261108'))
+DATA=Path(os.environ.get('RHYTHMER_MANUAL_SECTIONS',R/'tmp/pdfs/manual-sections.json'))
 WEB='https://jazzyrhythmer.github.io/Rhythmer/'
 assert OUT.parent.resolve().is_relative_to(Path('/Volumes/SSD/Development'))
 for name,file in [('Body','Arial.ttf'),('Body-Bold','Arial Bold.ttf'),('Body-Italic','Arial Italic.ttf'),('Body-BoldItalic','Arial Bold Italic.ttf')]:
@@ -109,8 +112,8 @@ def cover(c,doc):
  c.setFont('Body',10);c.drawString(M,H-58,'R / OS');c.drawRightString(W-M,H-58,'M-VAVE FM-1')
  c.setFont('Body-Bold',50);c.drawString(M,H-144,'RHYTHMER');c.setFont('Body-Bold',18);c.drawString(M,H-185,'SOUND INTO MOTION.')
  c.setStrokeColor(colors.HexColor('#66706c'));c.line(M,H-218,W-M,H-218)
- c.setFont('Body-Bold',24);c.drawString(M,H-265,'USER MANUAL');c.setFont('Body',10.5);c.drawString(M,H-294,'v0.1.1-beta3 / Build 20261108.8 / English')
- labels=[('drum','DRUM'),('serum','SERUM'),('phase','PHASE'),('lofi','LOFI'),('acid-generate','ACID'),('break-perform','BREAK')]
+ c.setFont('Body-Bold',24);c.drawString(M,H-265,'USER MANUAL');c.setFont('Body',10.5);c.drawString(M,H-294,f'v{VERSION} / Build {BUILD} / English')
+ labels=[('drum','DRUM'),('serum','SERUM'),('fmini','FMINI-1'),('obervave','OBERVAVE'),('acid-generate','ACID'),('break-perform','BREAK')]
  for i,(name,label) in enumerate(labels):
   x=M+(i%3)*172;y=275-(i//3)*170
   c.drawImage(str(R/'site/media/motion'/(name+'.png')),x,y,145,145,mask='auto')
@@ -119,9 +122,9 @@ def cover(c,doc):
  c.setFont('Body',8.5);c.drawString(M,45,'Jazzy Rhythmer / Built on JIANT / Free and open source')
  c.linkURL(WEB,(M,37,W-M,60),relative=0);c.restoreState()
 def regular(c,doc):
- c.saveState();c.setFillColor(GRAY);c.setFont('Body',8);c.drawString(M,H-30,'RHYTHMER / USER MANUAL');c.drawRightString(W-M,H-30,'v0.1.1-beta3 / 20261108.8')
+ c.saveState();c.setFillColor(GRAY);c.setFont('Body',8);c.drawString(M,H-30,'RHYTHMER / USER MANUAL');c.drawRightString(W-M,H-30,f'v{VERSION} / {BUILD}')
  c.setStrokeColor(LINE);c.line(M,38,W-M,38);c.setFont('Body',8);c.drawString(M,24,'Jazzy Rhythmer / Sound into motion.');c.drawRightString(W-M,24,str(doc.page));c.restoreState()
-doc=ManualDoc(str(OUT),pagesize=A4,leftMargin=M,rightMargin=M,topMargin=54,bottomMargin=55,title='Rhythmer User Manual / v0.1.1-beta3',author='Jazzy Rhythmer',subject='Sound into motion. Complete FM-1 firmware manual.')
+doc=ManualDoc(str(OUT),pagesize=A4,leftMargin=M,rightMargin=M,topMargin=54,bottomMargin=55,title=f'Rhythmer User Manual / v{VERSION}',author='Jazzy Rhythmer',subject='Sound into motion. Complete FM-1 firmware manual.')
 doc.addPageTemplates([PageTemplate(id='Cover',frames=Frame(M,55,CW,H-110,id='cover'),onPage=cover),PageTemplate(id='Body',frames=Frame(M,55,CW,H-109,id='body',leftPadding=0,rightPadding=0,topPadding=0,bottomPadding=0),onPage=regular)])
 toc=TableOfContents();toc.levelStyles=[styles['TOC']]
 story=[Spacer(1,1),NextPageTemplate('Body'),PageBreak(),para('Find the button.<br/>Make the move.','Chapter'),para('Read the manual before your first session. Follow a chapter, try its controls, then return when you need the next move. This print edition contains the same sixteen chapters as the web guide, plus credits and useful links.'),para('Up to six assignable tracks are available. Fresh settings activate four; Chapter 03 explains how to enable six and confirm the CPU notice.'),para('<a href="'+WEB+'#guide">Open the searchable web manual</a> / <a href="'+WEB+'#play">Play in the browser</a>'),Spacer(1,12),toc]
@@ -130,7 +133,7 @@ for ident,title,html in sections:
  story.append(PageBreak());p=para(escape(clean(title)),'Chapter');p._bookmarkName=ident;story.append(p);story.extend(blocks(DOM(html).root.children))
 story.append(PageBreak());p=para('Credits & useful links','Chapter');p._bookmarkName='credits';story.append(p)
 for h,t in [
- ('Built on shared work','Rhythmer is developed by Jazzy Rhythmer on JIANT\'s sequencing and system foundation. Felucca provides the platform; Hortator provides native Acid and MD percussion; X0X / TB-3PO contributes MIDI generation; Amenity contributes Break manipulation; Garden-FM and MONO2K contribute selected synthesis models. Original authors, source links and component licenses remain credited in the repository.'),
+ ('Built on shared work','Rhythmer is developed by Jazzy Rhythmer on JIANT\'s sequencing and system foundation. Felucca provides the platform; Hortator provides native Acid and MD percussion; X0X / TB-3PO contributes MIDI generation; Amenity contributes Break manipulation; Garden-FM and MONO2K contribute synthesis models; Felucca and OberVave contribute the two new synths; Elixir contributes SEQ generation and inspires the LXR-X kits. Original authors, source links and component licenses remain credited in the repository.'),
  ('Code and recordings are different','The source is GPL-3.0-only with retained component notices. Amen / The Winstons and Think / Lyn Collins are third-party recordings, separate from the code license. The owner directs their inclusion with credits; recording/composition redistribution permission is not documented. Credits or installation acknowledgements do not grant a sample license. Replace either audio bank with your own material or obtain rights appropriate to your use.'),
  ('Independent community firmware','Rhythmer is not affiliated with M-VAVE or Elektron. Product names belong to their owners. Follow the installer\'s backup, power, risk and audio-rights notices. This manual describes the current controls; it does not establish physical installation or recovery results for a package.')]:story.extend([para(h,'h2'),para(escape(t))])
 for label,url in [('Project / manual',WEB+'#guide'),('Install / official V15 return',WEB+'installer/'),('Web editor',WEB+'editor/'),('Source / licenses','https://github.com/JazzyRhythmer/Rhythmer'),('Third-party credits','https://github.com/JazzyRhythmer/Rhythmer/blob/main/docs/THIRD_PARTY.md'),('Creator','https://jazzyrhythmer.github.io/')]:story.append(para('<b>'+label+'</b><br/><a href="'+url+'">'+url+'</a>'))
@@ -141,6 +144,6 @@ for phrase in ['STRAIGHT','MUTATE','RANDOM','LFO 2','CPU HIGH','Hortator','Sourc
  assert phrase.lower() in text.lower(),phrase
 assert len(pdf.pages)>16
 assert len(sections)==16
-report={'file':OUT.name,'pages':len(pdf.pages),'chapters':16,'edition':'0.1.1-beta3 / 20261108.8','sha256':hashlib.sha256(OUT.read_bytes()).hexdigest(),'manualSourceSha256':hashlib.sha256((R/'site/src/manual.mjs').read_bytes()).hexdigest(),'links':sum(len(p.get('/Annots',[])) for p in pdf.pages),'scope':'Complete English print edition from current web manual chapters, with actual host-rendered UI and credits.'}
+report={'file':OUT.name,'pages':len(pdf.pages),'chapters':16,'edition':f'{VERSION} / {BUILD}','sha256':hashlib.sha256(OUT.read_bytes()).hexdigest(),'manualSourceSha256':hashlib.sha256((R/'site/src/manual.mjs').read_bytes()).hexdigest(),'links':sum(len(p.get('/Annots',[])) for p in pdf.pages),'scope':'Complete English print edition from current web manual chapters, with actual host-rendered UI and credits.'}
 (QA/'pdf-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))
