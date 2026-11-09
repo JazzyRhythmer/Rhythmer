@@ -21,6 +21,7 @@ def apply_site_navigation(root,dist):
         links=''.join('<a href="../#'+route+'" target="_top"'+(' aria-current="page"' if route==active else '')+'>'+label+'</a>' for label,route in routes)
         firmwares = (
             '<div class="firmware-links" role="group" aria-label="Firmwares and support">'
+            '<a href="../../Jazzy/" target="_top"><img class="firmware-mark" src="../../Jazzy/jazzy-mark.svg" alt="" width="14" height="14">JAZZY</a>'
             '<a href="../#home" target="_top" aria-current="true"><img class="firmware-mark" src="../rhythmer-mark.svg" alt="" width="14" height="14">RHYTHMER</a>'
             '<a class="firmware-support" href="../#support" target="_top">SUPPORT ↗</a></div>'
         )
