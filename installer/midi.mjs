@@ -13,7 +13,8 @@ export function parseInfo(data){
  // This public release supplies FELUCCA_VERSION; the browser data engine
  // retains its development ABI label. Do not accept arbitrary JIANT versions.
  const knownName=['Rhythmer dev','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(name);
- return {name,engines,tracks,isRhythmer:knownName&&[21,22].includes(engines)&&tracks===6};
+ const knownLayout=name==='Rhythmer v0.1.2-dev1'?engines===25:knownName&&[21,22].includes(engines);
+ return {name,engines,tracks,isRhythmer:knownLayout&&tracks===6};
 }
 export async function getMidi(){if(!navigator.requestMIDIAccess)throw Error('Web MIDI is unavailable in this browser. Use Chrome or Edge on a computer.');return navigator.requestMIDIAccess({sysex:true});}
 export async function queryInfo(access,inputID,outputID){

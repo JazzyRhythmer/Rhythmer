@@ -1,5 +1,5 @@
 // Local Rhythmer integration; upstream MIT license in LICENSE.txt.
-const RHYTHMER_HASH = "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1";
+const RHYTHMER_HASH = "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac";
 // The page: the front panel (drawn by the same Rust code as the native window, in its own wasm
 // instance), the pointer and keyboard input, the firmware and clock pickers, and the audio graph
 // that runs the emulator. Every firmware boots from its whole update package (.fwsc), unpacked
@@ -23,7 +23,7 @@ const params = new URLSearchParams(location.search);
 const stored = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const store = (k, v) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } };
 
-const catalog = await (await fetch("firmwares.json")).json();
+const catalog = await (await fetch("firmwares.json", {cache:"no-store"})).json();
 const byId = new Map(catalog.firmwares.map((f) => [f.id, f]));
 // the FM-1 Firmware Hub's ids too, where they differ (its cards link here with ?fw=<its id>)
 for (const f of catalog.firmwares) if (f.hub && !byId.has(f.hub)) byId.set(f.hub, f);

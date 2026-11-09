@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Browser transport for the real Rhythmer C data engine. No audio or device I/O.
-import {readBackup,restoreBackup} from './fm1backup.js?v=2d4a2ea5495e';
-import {validateBreakSlot} from './break-audio.mjs?v=2d4a2ea5495e';
+import {readBackup,restoreBackup} from './fm1backup.js?v=fb260d9a8907';
+import {validateBreakSlot} from './break-audio.mjs?v=fb260d9a8907';
 // Web MIDI delivers one complete SysEx message per event. The C USB drain can
 // contain a RELOAD push followed by a reply: preserve that same boundary here.
 export function splitEditorFrames(bytes){
@@ -100,7 +100,7 @@ async function openWorkspace(onStatus,releaseLease) {
   const currentStored=localStorage.getItem(KEY);
   const previousStored=currentStored?null:localStorage.getItem('rhythmer-workspace-v1');
   const stored=currentStored||previousStored;
-  if(stored){restoring=true;try{const file=readBackup(stored);if(!['Rhythmer dev','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(file.firmware))throw Error('Unsupported workspace firmware');await restoreBackup(request,file);if(previousStored)localStorage.setItem(KEY,stored);onStatus(previousStored?'Previous workspace copied into this editor · original browser data kept':'Browser workspace restored');}catch(e){throw Error('Stored workspace could not be restored; original data is kept. '+e.message);}finally{restoring=false;}}
+  if(stored){restoring=true;try{const file=readBackup(stored);if(!['Rhythmer dev','Rhythmer v0.1.2-dev1','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(file.firmware))throw Error('Unsupported workspace firmware');await restoreBackup(request,file);if(previousStored)localStorage.setItem(KEY,stored);onStatus(previousStored?'Previous workspace copied into this editor · original browser data kept':'Browser workspace restored');}catch(e){throw Error('Stored workspace could not be restored; original data is kept. '+e.message);}finally{restoring=false;}}
   else onStatus('Browser workspace ready · edits autosave locally');
   const input={id:'rhythmer-workspace-in',name:'Rhythmer Browser Workspace',manufacturer:'Rhythmer',type:'input',state:'connected',connection:'open',onmidimessage:null,open:async()=>input,close:async()=>{}};
   const reads=new Set([1,2,4,5,6,10,16,17,25,29,34,36,37,65,66,68,70,77]);

@@ -4,12 +4,12 @@
     {
       "id": "rhythmer",
       "name": "Rhythmer",
-      "version": "0.1.1-beta3",
+      "version": "0.1.2-dev1",
       "author": "Jazzy Rhythmer",
       "license": "GPL-3.0",
       "repo": "../#releases",
       "package": "../downloads/Rhythmer.fwsc",
-      "about": "Hands-on groovebox firmware for the FM-1. Public beta candidate; see release-specific test scope."
+      "about": "Rhythmer for M-VAVE FM-1 · build 20261109.18"
     }
   ]
 }

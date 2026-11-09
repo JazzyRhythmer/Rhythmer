@@ -1,21 +1,30 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=3156538adfcd';
-import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=3156538adfcd';
-import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=3156538adfcd';
-import {parseInfo} from './midi.mjs?v=3156538adfcd';
+import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=f4a3fd0a6f94';
+import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=f4a3fd0a6f94';
+import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=f4a3fd0a6f94';
+import {parseInfo} from './midi.mjs?v=f4a3fd0a6f94';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
-const RHYTHMER_PRODUCTS=['FM-1_900','FM-1_748001','FM-1_748005'];
-export function strictInfo(body){
+const RHYTHMER_DEV_PRODUCTS=['FM-1_748007','FM-1_748008','FM-1_748010','FM-1_748011','FM-1_748012','FM-1_748013','FM-1_748014','FM-1_748015','FM-1_748016','FM-1_748017','FM-1_748018','FM-1_748019','FM-1_748020','FM-1_748021','FM-1_748022','FM-1_748023'];
+const RHYTHMER_PRODUCTS=['FM-1_900','FM-1_748001','FM-1_748005',...RHYTHMER_DEV_PRODUCTS];
+const engineCount=product=>RHYTHMER_DEV_PRODUCTS.includes(product)?25:22;
+const globalCount=product=>['FM-1_748020','FM-1_748021','FM-1_748022','FM-1_748023'].includes(product)?77:
+ ['FM-1_748018','FM-1_748019'].includes(product)?76:71;
+export function strictInfo(body,product){
  const v=parseInfo([240,125,70,76,1,...body,247]);
  if(!v?.isRhythmer)return null;
  const z=body.indexOf(0);
- return body[z+2]===127&&body[z+3]===71&&body[z+4]===64&&body[z+5]===119?v:null;
+ const globals=body[z+3];
+ const validGlobals=product?globals===globalCount(product):
+  globals===71||(v.engines===25&&[76,77].includes(globals));
+ return body[z+2]===127&&validGlobals&&body[z+4]===64&&body[z+5]===119?{...v,globals}:null;
 }
 export function sourceKind(id,info){
  if(id.model==='ota-FM-1')return 'loader';
  if(id.model!=='FM-1')return 'unsupported';
- if(RHYTHMER_PRODUCTS.includes(id.text)&&strictInfo(info||[]))return 'rhythmer';
+ const layout=strictInfo(info||[],id.text);
+ if(RHYTHMER_PRODUCTS.includes(id.text)&&layout&&
+    (engineCount(id.text)===25?layout.engines===25:layout.engines===21||layout.engines===22))return 'rhythmer';
  if(id.version>=1&&id.version<=16)return id.version===15?'v15':'stock';
  return 'custom';
 }
@@ -88,8 +97,12 @@ export async function backup(source,progress){
  const c=new BackupConnection(source.input,source.output);
  try{return await captureBackup((r,o)=>c.request(r,o),String.fromCharCode(...source.info.slice(0,source.info.indexOf(0))),progress,{complete:true});}finally{c.close();}
 }
-export async function verifyRhythmer(up){
- const s=await inspect(up);ensure(s.kind==='rhythmer'&&strictInfo(s.info)?.engines===22,'Firmware returned but the current Rhythmer INFO/ABI did not match (22 engine entries including EMPTY). Installation is not verified.');return s;
+export async function verifyRhythmer(up,target){
+ const s=await inspect(up);
+ const expected=target?.product??s.id.text;
+ ensure(s.kind==='rhythmer'&&s.id.text===expected&&strictInfo(s.info,expected)?.engines===engineCount(expected),
+   'Firmware returned but its product identity or Rhythmer INFO layout did not match the selected build. Installation is not verified.');
+ return s;
 }
 export async function verifyEmbeddedBanks(source){
  const c=new BackupConnection(source.input,source.output);
@@ -109,5 +122,5 @@ export async function transfer(up,source,target,progress,{resume=false}={}){
  const guarded=(stage,value,detail)=>{if(stage==='start')ensure(value===source.id.text,'Firmware identity changed before writing.');progress(stage,value,detail);};
  if(resume)ensure(await up.resume(target.image,guarded,target.product),'Loader resume did not complete. Keep the same target file and reconnect.');
  else await up.install(target.image,target.product,guarded);
- return RHYTHMER_PRODUCTS.includes(target.product)?await verifyRhythmer(up):null;
+ return RHYTHMER_PRODUCTS.includes(target.product)?await verifyRhythmer(up,target):null;
 }

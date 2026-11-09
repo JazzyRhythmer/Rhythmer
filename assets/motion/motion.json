@@ -1,28 +1,30 @@
 [
   {
     "id": "acid-generate",
-    "frames": 42,
-    "uniqueFrames": 32,
-    "durationMs": 3360,
-    "capture": "Current native Hortator Acid firmware UI, host-rendered; not physical FM-1 footage",
-    "webpSha256": "944df1e9beb81a5bc3f8e955aa38194390826fc94ccd0280bee5525a31334f7e"
+    "frames": 48,
+    "uniqueFrames": 23,
+    "durationMs": 3840,
+    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
+    "gifBytes": 71596,
+    "gifSha256": "8fa0ef35563119eb58833c29bfbaa4e4dc9bf00cc634fe654ed1da5dec2efadf"
   },
   {
     "id": "acid",
-    "frames": 21,
-    "uniqueFrames": 16,
-    "durationMs": 1680,
-    "capture": "Current native Hortator Acid firmware UI, host-rendered; not physical FM-1 footage",
-    "webpSha256": "624d4cdf04eeb6ff6fcdda74532a1dfe5f1a5e3b27d5413540985ffd19da2e4f"
+    "frames": 48,
+    "uniqueFrames": 6,
+    "durationMs": 3840,
+    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
+    "gifBytes": 110903,
+    "gifSha256": "3934c55b1329ff7fb4466527aa54549a89806c8b9a445e1861759d5238e5471d"
   },
   {
     "id": "analog",
     "frames": 48,
-    "uniqueFrames": 21,
+    "uniqueFrames": 15,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 161081,
-    "gifSha256": "a31944f8e711a9761a4f01740c56f565ec124dec9f4abc46c31154fddbb828ef"
+    "gifBytes": 156642,
+    "gifSha256": "701906e7ee9c32afd2f469133a6ca34ffe2eb5fb1706293bb1b6141c7fb83318"
   },
   {
     "id": "break-perform",
@@ -30,8 +32,8 @@
     "uniqueFrames": 44,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 154935,
-    "gifSha256": "10706417fe637eb686d7a24a7c6d158b49bb1c6d77cca3746d852c2d48410a71"
+    "gifBytes": 157167,
+    "gifSha256": "dce09449c482437466d8c04c4f906c6326a1a27b765354f4fe6eb469302bb6bd"
   },
   {
     "id": "break",
@@ -39,17 +41,17 @@
     "uniqueFrames": 41,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 130992,
-    "gifSha256": "c37038d68b0cdc0ffb2e3e1aa9f74395f9789f2ef15af5dea767e1d8e71e5108"
+    "gifBytes": 147273,
+    "gifSha256": "af6259c4eae3c91f166d8b71924f2f07982cf9acf9cf1521eb809f3491f7e6ba"
   },
   {
     "id": "drum",
     "frames": 48,
-    "uniqueFrames": 19,
+    "uniqueFrames": 25,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 127398,
-    "gifSha256": "f7cfea80a4c45dce69e0c36ff3240d19262d5b1b33548f92865ae64e641ca18e"
+    "gifBytes": 155115,
+    "gifSha256": "2df7670922037dc852792af72a15fb44a95abb4af0d7ca430c31ea535e65fb28"
   },
   {
     "id": "fm6",
@@ -57,8 +59,17 @@
     "uniqueFrames": 6,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 18295,
-    "gifSha256": "67286125101c68f2d8e1c59dc43f48638b8c36668f3b6ec5983d42a2b5b6964d"
+    "gifBytes": 18316,
+    "gifSha256": "68787db0cfb7f256b3c1d32b370751a7ae68d86b8cf9b35373e8b342ef7b5289"
+  },
+  {
+    "id": "fmini",
+    "frames": 48,
+    "uniqueFrames": 23,
+    "durationMs": 3840,
+    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
+    "gifBytes": 162413,
+    "gifSha256": "259cc4fb0fb112ad12cecb3fcfbbeab8f64fcb938035282c50554e2864119cb4"
   },
   {
     "id": "fmstat",
@@ -66,26 +77,17 @@
     "uniqueFrames": 14,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 138876,
-    "gifSha256": "35e1f778e3915e5cb2267231bf7ee1909d3d432cb2e6c00debce77653c14df7a"
+    "gifBytes": 139402,
+    "gifSha256": "e7173a6656c2f280c6d4c474c8c87daf79e65d04e76d11ed355a3e4659081e91"
   },
   {
-    "id": "lofi",
+    "id": "obervave",
     "frames": 48,
-    "uniqueFrames": 21,
+    "uniqueFrames": 15,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 159207,
-    "gifSha256": "ee1662e57b64fa1524af00f7fe15b2b01b908f9c4bc3f5ac154da1f7705d1c97"
-  },
-  {
-    "id": "phase",
-    "frames": 48,
-    "uniqueFrames": 21,
-    "durationMs": 3840,
-    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 152884,
-    "gifSha256": "0b57bc2dafb8813f250841fd918cadd2f6066603a4c6d8dbb650eb6d7aa70a0a"
+    "gifBytes": 144973,
+    "gifSha256": "b6e0b6d7b4e637478d92871257975574f6716218538f5aaf441d87691ffb830c"
   },
   {
     "id": "serum",
@@ -93,34 +95,25 @@
     "uniqueFrames": 21,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 158899,
-    "gifSha256": "a4a0ba42d6621069044cb2fb781553d01d4cceb836c1da85bee369cee66b1540"
+    "gifBytes": 144931,
+    "gifSha256": "1412d543ad992b0137d95c26240103f2103f4cdd01d229352d6b812f1949fb56"
   },
   {
     "id": "sid",
     "frames": 48,
-    "uniqueFrames": 21,
+    "uniqueFrames": 15,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 145576,
-    "gifSha256": "ad48a01681629aa243d2267e3530c722e03910534afddd4d40b30715b078a5f2"
+    "gifBytes": 138226,
+    "gifSha256": "c624f0de42588f8ad2e4129191261258ed5f1be291f651900f38bdda1fece393"
   },
   {
     "id": "swavsaw",
     "frames": 48,
-    "uniqueFrames": 21,
+    "uniqueFrames": 13,
     "durationMs": 3840,
     "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 141087,
-    "gifSha256": "12e360620f432f3a7a395bb0709f80687694d28bd8e823abb4742ce87c9443eb"
-  },
-  {
-    "id": "wheel",
-    "frames": 48,
-    "uniqueFrames": 17,
-    "durationMs": 3840,
-    "capture": "Host-rendered unchanged firmware UI with note/envelope and preset input; not physical FM-1 footage",
-    "gifBytes": 138788,
-    "gifSha256": "021b768472a0f64a998741c9712282cc6bfbcb1308b91682e4990d4b2f6a49f2"
+    "gifBytes": 142743,
+    "gifSha256": "d2b17717dc1c24b9a1bfcdafb2ce6eeaf38c67a0e20584c8fb0dfc0691caac99"
   }
 ]
