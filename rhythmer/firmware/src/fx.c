@@ -2479,6 +2479,7 @@ static __attribute__((noinline)) void mix_silent(int32_t *out, uint32_t n, uint3
 {
     uint32_t k;
     for (k = 0; k < NPART; k++) {
+        voice_edge[k] = 0;
         if(!six_track_enabled(k)||trk[k].eng_req==ENGI_EMPTY)continue;
         track_lfo_tick(&trk[k]);six_lfo2_tick(&trk[k]);                        /* (the LFOs turn on: their pages, the next note's phase; */
         drift_clk[k] += ENGINES[trk[k].engine] != &ENG_DRUM && trk[k].p[P_DRIFT] < 127;   /* DRIFT's clock as well) */

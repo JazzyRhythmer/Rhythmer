@@ -67,7 +67,7 @@ static uint8_t fmini_patch[NTRK][FG_SIZE];
 static uint8_t fmini_loaded[NTRK];                 /* program + 1, zero before first use */
 static int32_t fmini_nst[NTRK] = {0x2F6E2B1, 0x1A2B3C5, 0x3C4D5E7, 0x0F1E2D3};   /* a part's noise generator */
 static int32_t fmini_pk[NTRK][3];                 /* its pink filter */
-static int32_t fmini_nbuf[NTRK][CTL];             /* the part's noise for this block, +-32768: one source, all its voices */
+static int32_t fmini_nbuf[NTRK][CTL];             /* leveled noise for this block: one source shared by the track's voices */
 static int32_t fmini_sm[NTRK][3];                 /* the smoothed CUTOFF, EMPH, CNTR knobs (Q16): the encoder's steps become ramps */
 static uint8_t fmini_sm_ok;                       /* bit tr: fmini_sm[tr] follows the knobs (clear = snap to them) */
 
@@ -123,6 +123,8 @@ static void fmini_block(track_t *t)
         return;                                              /* nothing sounds: no noise to make */
     (void)noise32(&fmini_nst[tr]); /* Keep the noise phase and oscillator drift unchanged. */
     if (g[FG_SW1] & FS_NZ) {
+        /* The pink filter can exceed Q15. Apply the squared noise level once with room for its peaks. */
+        uint32_t gain = (uint32_t)g[FG_LN] * g[FG_LN] * 4u;
         int32_t b0 = fmini_pk[tr][0], b1 = fmini_pk[tr][1], b2 = fmini_pk[tr][2];
         for (i = 0; i < CTL; i++) {
             int32_t w = (int32_t)(noise32(&fmini_nst[tr]) >> 16) - 32768;   /* white, +-32768 */
@@ -132,7 +134,7 @@ static void fmini_block(track_t *t)
                 b2 += ((w * 34495) >> 15) - ((b2 * 14090) >> 15);          /* 1.0527 in, 0.57 kept */
                 w = (b0 + b1 + b2 + ((w * 6056) >> 15)) >> 1;
             }
-            fmini_nbuf[tr][i] = w;
+            fmini_nbuf[tr][i] = mulq16(w, gain);
         }
         fmini_pk[tr][0] = b0;
         fmini_pk[tr][1] = b1;
@@ -256,7 +258,7 @@ static void fmini_render(track_t *t, voice_t *v, int32_t *out, uint32_t n, const
     const uint8_t *g = fmini_patch[(uint32_t)(t - trk)];
     int32_t mix[CTL];
     int32_t env15, lfo, vib, lc, p16, fine, k12, G16, gx16, c0, c1, c2, c3, inv14, kinv12, trim12;
-    int32_t l1 = 0, l2 = 0, l3 = 0, ln = 0, dr1, dr2, dr3;
+    int32_t l1 = 0, l2 = 0, l3 = 0, dr1, dr2, dr3;
     uint32_t hp = (uint32_t)(g[FG_SW2] & FMINI_HP) ? 1u : 0u;      /* the output: LP (the last stage) or HP ((1 - LP)^4 of the same stages) */
     uint32_t tr = (uint32_t)(t - trk) % NTRK, i, sw = g[FG_SW1];
     uint32_t inc1, inc2, inc3;
@@ -294,7 +296,6 @@ static void fmini_render(track_t *t, voice_t *v, int32_t *out, uint32_t n, const
     if (sw & FS_O1) l1 = (int32_t)(g[FG_L1] * g[FG_L1] * 2) + 0;
     if (sw & FS_O2) l2 = (int32_t)(g[FG_L2] * g[FG_L2] * 2);
     if (sw & FS_O3) l3 = (int32_t)(g[FG_L3] * g[FG_L3] * 2);
-    if (sw & FS_NZ) ln = (int32_t)(g[FG_LN] * g[FG_LN] * 2);
     for (i = 0; i < n; i++)
         mix[i] = 0;
     if (l1)
@@ -309,9 +310,9 @@ static void fmini_render(track_t *t, voice_t *v, int32_t *out, uint32_t n, const
         fmini_wave(g[FG_W3], &ph2, inc3, l3, mix, n);
     else
         ph2 += inc3 * n;
-    if (ln)
+    if ((sw & FS_NZ) && g[FG_LN])
         for (i = 0; i < n; i++)
-            mix[i] += mulq15(fmini_nbuf[tr][i], ln);
+            mix[i] += fmini_nbuf[tr][i];
 
     /* the singing pitch (MIDI x 16): the CUTOFF knob's dial, the contour, the keyboard, the modulation, the host's (LFO / matrix / ENV routings) */
     {

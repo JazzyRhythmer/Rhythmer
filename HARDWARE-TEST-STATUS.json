@@ -12,23 +12,15 @@
     "migrationAndRecoveryMatrixVerified": false
   },
   "finalRevision": {
+    "buildRevision": "20261110.1",
+    "firmwareSha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56",
+    "exactBinaryHardwareClaimed": false,
+    "exactBinaryAutomatedScope": "See RELEASE-VALIDATION.json. No device write was performed during publication."
+  },
+  "previousFinalRevision": {
     "buildRevision": "20261109.18",
     "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac",
     "exactBinaryHardwareClaimed": false,
     "exactBinaryAutomatedScope": "See RELEASE-VALIDATION.json. No new device write was performed during publication."
-  },
-  "previousFinalRevision": {
-    "buildRevision": "20261108.9",
-    "firmwareSha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
-    "exactBinaryHardwareClaimed": false,
-    "maintenanceDelta": {
-      "previousBuild": "20261108.8",
-      "previousFirmwareSha256": "53a9f77571691902609322ab15ebea9fe7c63f4af9f37d9563b69dff802b1ed5",
-      "firmwareFilesChanged": [
-        "rhythmer/firmware/src/ui_draw.c",
-        "rhythmer/firmware/src/ui_menu.c"
-      ],
-      "scope": "Startup renderer and About-page product copy only; no audio, sequencing, voice-budget, buffer, core or track-assignment changes."
-    }
   }
 }

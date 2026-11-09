@@ -604,6 +604,9 @@ static int32_t trk_trans(const track_t *t)
     const engine_t *e = ENGINES[t->engine % NENGINES];
     return e->oneshot || e->keys ? 0 : t->p[P_TRANS];
 }
+/* Last sample in the high bits, rendered in bit 1, pending fade in bit 0. */
+static int32_t voice_edge[NTRK];
+
 static void voice_start(track_t *t, voice_t *v, uint32_t note, uint32_t vel, int glide)
 {
     const engine_t *e = ENGINES[t->engine];
@@ -611,6 +614,10 @@ static void voice_start(track_t *t, voice_t *v, uint32_t note, uint32_t vel, int
     uint32_t ph0 = v->ph[0], ph1 = v->ph[1], ph2 = v->ph[2];
     int32_t s0 = v->s[0], s1 = v->s[1], s4 = v->s[4], s5 = v->s[5], s6 = v->s[6], s7 = v->s[7];
     uint32_t keep = e->keep;
+    int32_t *edge = &voice_edge[t - trk];
+    if ((sounding && v->env_out && !e->sampled && !e->oneshot) ||
+        (!*edge && (t->engine == ENGI_PHASE || t->engine == ENGI_ANALOG)))
+        *edge |= 1;
     v->note = (uint8_t)note;
     v->vel = (uint8_t)vel;
     v->gate = 1;
@@ -1027,28 +1034,52 @@ static uint32_t drift_clk[NTRK];
 /* render one block of a part into out (cleared here); returns the voices rendered */
 /* Channel bend is live performance state, outside projects/presets. Q8 semitones. */
 static int32_t midi_bend_q8[NTRK], midi_bend_target[NTRK];
+/* Bridge a reused voice or a sharp onset from silence over one control block. */
+static __attribute__((noinline, minsize)) void voice_finish(int32_t *out, uint32_t n, int32_t *edge)
+{
+    if (*edge == 1) {
+        /* Bring the first block up to the envelope with a smooth gain curve. */
+        static const uint8_t gain[CTL] = {
+              0,   0,   1,   3,   5,   8,  12,  16,
+             20,  25,  30,  35,  41,  46,  52,  58,
+             64,  70,  76,  82,  88,  93,  98, 103,
+            108, 112, 116, 120, 123, 125, 127, 128
+        };
+        for (uint32_t i = 0; i < n; i++)
+            out[i] = (out[i] * gain[i]) >> 7;
+    } else if (*edge & 1) {
+        int32_t last = *edge >> 2;
+        for (uint32_t i = 0; i < n; i++)
+            out[i] += ((last - out[i]) * (int32_t)(CTL - i)) >> CTL_LOG2;
+    }
+    *edge = out[n - 1u] * 4 | 2;
+}
+/* Break is a singleton, so share its renderer between the two mixer cores. */
+static __attribute__((noinline)) uint32_t track_render_break(track_t *t, int32_t *out, uint32_t n)
+{
+    voice_t *v=&t->v[0];vmod_t m={0};if(n>CTL)n=CTL;if(!n)return 0;
+    track_lfo_tick(t);six_lfo2_tick(t);
+    int32_t lfo=mulq15(t->lfo_val,t->lfo_fade),env=env_tick(t,v);
+    t->m_env=env;m.envq15=env;m.amp0=v->env_out;m.amp1=mulq15(env,v->vel*258);
+    m.pitch16=clamp(60*16+((lfo*t->p[P_LD_PIT]*3)>>15)+((env*t->p[P_ED_PIT]*3)>>15),0,2047);
+    if(t->p[P_LD_AMP])m.amp1=mulq15(m.amp1,32767-mulq15((lfo+32768)>>1,t->p[P_LD_AMP]*258));
+    if(MOD.on)mod_voice(t,v,&m,0);
+    v->s[BENV_CUT]=m.cutoff;v->env_out=m.amp1;
+    if(!env&&v->s[BENV_OFF]){jungle_sequence_off((unsigned)v->s[BENV_OFF]-1u);v->s[BENV_OFF]=0;}
+    jungle_pitch((m.pitch16-60*16)/16);
+    jungle_feedback((unsigned)t->p[P_E0]);jungle_variation((unsigned)t->p[P_E1]);
+    jungle_warp((unsigned)t->p[P_E2]);jungle_filter((unsigned)t->p[P_E3]);
+    six_break_render(t,out,n);uint32_t nr=0;
+    track_post(t,ENGINES[ENGI_BREAK],out,n);
+    int32_t gain=m.amp0,delta=(m.amp1-m.amp0)/(int32_t)n;
+    for(unsigned j=0;j<n;j++){gain+=delta;out[j]=mulq15(out[j],gain);nr|=out[j]!=0;}
+    if(t->xf_on&&t->xf)t->xf--; /* control state is never an allocated synthesis voice */
+    return nr;
+}
 static uint32_t track_render(track_t *t, int32_t *out, uint32_t n)
 {
-    if(t->engine==ENGI_BREAK){
-        voice_t *v=&t->v[0];vmod_t m={0};if(n>CTL)n=CTL;if(!n)return 0;
-        track_lfo_tick(t);six_lfo2_tick(t);
-        int32_t lfo=mulq15(t->lfo_val,t->lfo_fade),env=env_tick(t,v);
-        t->m_env=env;m.envq15=env;m.amp0=v->env_out;m.amp1=mulq15(env,v->vel*258);
-        m.pitch16=clamp(60*16+((lfo*t->p[P_LD_PIT]*3)>>15)+((env*t->p[P_ED_PIT]*3)>>15),0,2047);
-        if(t->p[P_LD_AMP])m.amp1=mulq15(m.amp1,32767-mulq15((lfo+32768)>>1,t->p[P_LD_AMP]*258));
-        if(MOD.on)mod_voice(t,v,&m,0);
-        v->s[BENV_CUT]=m.cutoff;v->env_out=m.amp1;
-        if(!env&&v->s[BENV_OFF]){jungle_sequence_off((unsigned)v->s[BENV_OFF]-1u);v->s[BENV_OFF]=0;}
-        jungle_pitch((m.pitch16-60*16)/16);
-        jungle_feedback((unsigned)t->p[P_E0]);jungle_variation((unsigned)t->p[P_E1]);
-        jungle_warp((unsigned)t->p[P_E2]);jungle_filter((unsigned)t->p[P_E3]);
-        six_break_render(t,out,n);uint32_t nr=0;
-        track_post(t,ENGINES[ENGI_BREAK],out,n);
-        int32_t gain=m.amp0,delta=(m.amp1-m.amp0)/(int32_t)n;
-        for(unsigned j=0;j<n;j++){gain+=delta;out[j]=mulq15(out[j],gain);nr|=out[j]!=0;}
-        if(t->xf_on&&t->xf)t->xf--; /* control state is never an allocated synthesis voice */
-        return nr;
-    }
+    if (t->engine == ENGI_BREAK)
+        return track_render_break(t, out, n);
     const engine_t *e = ENGINES[t->engine];
     const int16_t *p = t->p;
     uint32_t i;
@@ -1180,6 +1211,8 @@ static uint32_t track_render(track_t *t, int32_t *out, uint32_t n)
                tf_xb[(uint32_t)(t - trk) % NTRK] || tf_cmb[(uint32_t)(t - trk) % NTRK]))
         /* (JIANT 0.5) the FILTER (track_post); 0.6.8: and a block more to leave the chain (track_filter's fade) */
         track_post(t, e, out, n);
+    if (nr && !e->oneshot) voice_finish(out, n, &voice_edge[ti]);
+    else voice_edge[ti] = 0;
     if (snap)
         memcpy(t->p, p_new, sizeof p_new);
     else if (fade)

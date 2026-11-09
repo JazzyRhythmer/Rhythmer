@@ -1,5 +1,5 @@
 // Local Rhythmer integration; upstream MIT license in LICENSE.txt.
-const RHYTHMER_HASH = "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac";
+const RHYTHMER_HASH = "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56";
 // The page: the front panel (drawn by the same Rust code as the native window, in its own wasm
 // instance), the pointer and keyboard input, the firmware and clock pickers, and the audio graph
 // that runs the emulator. Every firmware boots from its whole update package (.fwsc), unpacked

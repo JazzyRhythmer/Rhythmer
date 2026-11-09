@@ -1,461 +1,21 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261109.18",
-  "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac",
-  "localBaseline": "8818 local installer, byte-identical release package reproduced from source",
+  "buildRevision": "20261110.1",
+  "firmwareSha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56",
   "physicalHardwareTested": false,
-  "nativeScenarios": 6,
-  "editorActualCStorageChecks": 132,
-  "samplePreparationChecks": 30,
-  "installerSimulatedChecks": 52,
-  "manualInteractionChecks": 9,
-  "siteModelChecks": 135,
+  "nativeScenarios": 1,
+  "exactBuildSummary": "The actual firmware passed a strict three-track stacked-chord run with no missing audio blocks. The simulated updater verified both Break banks, interrupted-write recovery, and project and settings preservation.",
   "memory": {
-    "appBytes": 583632,
+    "appBytes": 583352,
     "appSlotBytes": 584336,
-    "appSlotFreeBytes": 704,
-    "audioHalfFrames": 512
+    "appSlotFreeBytes": 984
   },
   "emulator": {
-    "half_frames": 512,
-    "sample_manifest": [
-      {
-        "name": "amen-160",
-        "source_url": "https://github.com/ejtb76/amenity/blob/main/assets/third-party/amen/amen.wav",
-        "source_sha256": "6a750fc1722773749fa2f6783c85f3a17b1291a54c4b033ed5636884ba2e0025",
-        "source_rate": 48000,
-        "source_frames": 144000,
-        "crop_frames": [
-          0,
-          144000
-        ],
-        "crop_seconds": 3.0,
-        "bars": 2,
-        "beats": 8,
-        "bpm": 160,
-        "output_rate": 16000,
-        "output_frames": 48000,
-        "bits": 12,
-        "payload_bytes": 72000,
-        "slot_bytes": 81920,
-        "slot_sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
-        "processing": "mono, DC removal, Kaiser polyphase anti-alias repitch, 0.5ms/3ms endpoint fades, -1dBFS peak, PCM12",
-        "pitch_semitones": 0.0,
-        "seam_jump_pcm16": 0,
-        "peak_pcm16": 29200,
-        "rms_pcm16": 6280.791897417607,
-        "quantization_max_error": 8.0
-      },
-      {
-        "name": "think-160",
-        "edit": "Think drums / two complementary assembled bars",
-        "source": "user-supplied Classic Break Pack",
-        "sources": [
-          {
-            "name": "lyncollins_think_1.wav",
-            "sha256": "940003936ea19125942ca953e2910ce666a6eb7d694bd159da826350af87fd15",
-            "rate": 44100,
-            "frames": 93761,
-            "source_beats": 4
-          },
-          {
-            "name": "lyncollins_think_2.wav",
-            "sha256": "0f2517a607ca16598fdd67336c90df211d7e958a6b23cb481df331efc9939eec",
-            "rate": 44100,
-            "frames": 92698,
-            "source_beats": 4
-          }
-        ],
-        "edit_segments": [
-          {
-            "source": 1,
-            "beats": [
-              0,
-              3
-            ]
-          },
-          {
-            "source": 2,
-            "beats": [
-              3,
-              4
-            ]
-          },
-          {
-            "source": 1,
-            "beats": [
-              0,
-              1
-            ]
-          },
-          {
-            "source": 2,
-            "beats": [
-              1,
-              4
-            ]
-          }
-        ],
-        "excluded_segments": [
-          {
-            "source": 1,
-            "beats": [
-              3,
-              4
-            ],
-            "reason": "pitched tail"
-          },
-          {
-            "source": 2,
-            "beats": [
-              0,
-              1
-            ],
-            "reason": "pitched carry-in"
-          }
-        ],
-        "bars": 2,
-        "beats": 8,
-        "bpm": 160,
-        "output_rate": 16000,
-        "output_frames": 48000,
-        "bits": 12,
-        "payload_bytes": 72000,
-        "slot_bytes": 81920,
-        "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
-        "processing": "mono, DC removal, per-bar Kaiser anti-alias repitch, drum interval assembly, 0.5ms/3ms edge fades at every splice, common -1dBFS peak, PCM12; offline 4x circular look-ahead level match, no hard clipping",
-        "boundaries": [
-          0,
-          18000,
-          24000,
-          30000,
-          48000
-        ],
-        "seam_jump_pcm16": 0,
-        "peak_pcm16": 27968,
-        "rms_pcm16": 4978.657262087172,
-        "level_match": {
-          "source_slot_sha256": "a3d0ec9f0bc0e56310d94024f5530caf255303a2aac7f95748815596a6285a9d",
-          "slot_sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3",
-          "gain_db": 9.0,
-          "max_peak_attenuation_db": 9.674933884213901,
-          "amen_rms": 0.19167527341802548,
-          "think_before_rms": 0.08451214112044729,
-          "think_after_rms": 0.15193656195334387,
-          "rms_difference_db": -2.0180759309055034,
-          "true_peak_dbfs": -1.3702431050771096,
-          "clipped_samples": 0,
-          "frames": 48000,
-          "seam_jump_pcm16": 0,
-          "runtime_cpu_cost_added": 0
-        }
-      }
-    ],
-    "firmware_sha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac",
-    "physical_hardware_tested": false,
-    "runs": {
-      "public-fresh": {
-        "magic": 1145194289,
-        "halves": 232,
-        "max_us": 2495,
-        "nested": 3235,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 26851,
-        "ui_frames": 6,
-        "last_us": 803,
-        "cpu_q8": 16,
-        "boots": 1,
-        "stage": 4,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 0,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 0,
-        "usb_starts": 1,
-        "usb_packets": 2530,
-        "usb_frames": 111612,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 111964,
-        "usb_peak_pcm16": 0,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 0
-      },
-      "public-empty-play": {
-        "magic": 1145194289,
-        "halves": 327,
-        "max_us": 2495,
-        "nested": 5189,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 37790,
-        "ui_frames": 19,
-        "last_us": 1621,
-        "cpu_q8": 35,
-        "boots": 1,
-        "stage": 6,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 0,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 0,
-        "usb_starts": 1,
-        "usb_packets": 3624,
-        "usb_frames": 159881,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 160233,
-        "usb_peak_pcm16": 0,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 0
-      },
-      "public-verify-drum": {
-        "magic": 1145194289,
-        "halves": 460,
-        "max_us": 2676,
-        "nested": 6462,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 53288,
-        "ui_frames": 38,
-        "last_us": 1605,
-        "cpu_q8": 36,
-        "boots": 1,
-        "stage": 6,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 0,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 0,
-        "selected_track": 0,
-        "track_engines": [
-          10,
-          17,
-          22,
-          24,
-          21,
-          21
-        ],
-        "usb_starts": 1,
-        "usb_packets": 5174,
-        "usb_frames": 228261,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 228613,
-        "usb_peak_pcm16": 11869,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 5935
-      },
-      "public-verify-serum": {
-        "magic": 1145194289,
-        "halves": 460,
-        "max_us": 2805,
-        "nested": 6482,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 53286,
-        "ui_frames": 38,
-        "last_us": 1606,
-        "cpu_q8": 36,
-        "boots": 1,
-        "stage": 6,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 0,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 0,
-        "selected_track": 1,
-        "track_engines": [
-          10,
-          17,
-          22,
-          24,
-          21,
-          21
-        ],
-        "usb_starts": 1,
-        "usb_packets": 5174,
-        "usb_frames": 228261,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 228613,
-        "usb_peak_pcm16": 9737,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 4868
-      },
-      "public-verify-fmini": {
-        "magic": 1145194289,
-        "halves": 460,
-        "max_us": 3052,
-        "nested": 6846,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 53284,
-        "ui_frames": 38,
-        "last_us": 1606,
-        "cpu_q8": 37,
-        "boots": 1,
-        "stage": 6,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 0,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 0,
-        "selected_track": 2,
-        "track_engines": [
-          10,
-          17,
-          22,
-          24,
-          21,
-          21
-        ],
-        "usb_starts": 1,
-        "usb_packets": 5174,
-        "usb_frames": 228261,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 228613,
-        "usb_peak_pcm16": 8363,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 4182
-      },
-      "public-verify-obervave": {
-        "magic": 1145194289,
-        "halves": 460,
-        "max_us": 2495,
-        "nested": 6214,
-        "in_audio": 0,
-        "late": 0,
-        "timer_irqs": 53286,
-        "ui_frames": 38,
-        "last_us": 1606,
-        "cpu_q8": 36,
-        "boots": 1,
-        "stage": 6,
-        "page": 0,
-        "home": 1,
-        "six_loop_mask": 3,
-        "six_machine_mask": 0,
-        "fm1_mc_on": 1,
-        "fm1_mc_lost": 0,
-        "core1_track_mask": 0,
-        "selected_track": 3,
-        "track_engines": [
-          10,
-          17,
-          22,
-          24,
-          21,
-          21
-        ],
-        "usb_starts": 1,
-        "usb_packets": 5174,
-        "usb_frames": 228261,
-        "usb_underruns": 0,
-        "usb_overruns": 0,
-        "usb_missed": 0,
-        "usb_capture_frames": 228613,
-        "usb_peak_pcm16": 4420,
-        "usb_rate": 44100,
-        "audio_lost": 0,
-        "peak_pcm16": 2210
-      }
-    }
+    "summary": "steady: Some(0.3353738815140637)x real time; 150528 real audio frames\nicache: 20437 decodes for 408300000 instructions\ncpu1: 89714663 instructions (23.0 M per emulated s)\naudio: 301056 samples -> /Volumes/SSD/Development/BuildCache/rhythmer/attack-audio-20261110.1/emu-attack-final-stack.pcm\nusb audio: 2 ch at 44100 Hz, 285716 samples in 3238 packets (0 empty, 0 of them underruns) -> /Volumes/SSD/Development/BuildCache/rhythmer/attack-audio-20261110.1/emu-attack-final-stack.usb.pcm\nflash: 5 erases / programs\n3900 ms emulated at 240 MHz in 11.00 s wall: 0.35x real time, 37.1 M instructions/s, 20% of cycles skipped as idle\n"
   },
   "loader": {
-    "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac",
-    "appSha256": "f58b4965fa1fbb1cfcf9afb7e44f7c4bf9562b3b6e22baed54fcccfb276dbe62",
-    "appUnchanged": false,
-    "audioRegressionRequired": true,
-    "physicalHardwareTested": false,
-    "writeRanges": [
-      [
-        16384,
-        602112
-      ],
-      [
-        655360,
-        819200
-      ]
-    ],
-    "sampleHeaderSectorCommittedLast": true,
-    "powerInterruptionResumeCases": 5,
-    "negativePackagesRejectedBeforeErase": 4,
-    "legacyCodeOnlyPackageSupported": true,
-    "banks": [
-      "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
-      "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
-    ]
-  },
-  "browser": {
-    "engines": [
-      "DRUM",
-      "SERUM",
-      "FMINI-1",
-      "OBERVAVE",
-      "ANALOG",
-      "FM6",
-      "FM+STAT",
-      "SWAV-SAW",
-      "SID-6581",
-      "ACID",
-      "BREAK"
-    ],
-    "sections": [
-      "opening",
-      "opening-title",
-      "instrument",
-      "machine-demo",
-      "machine-demo-title",
-      "machine-demo-description",
-      "motion-toggle",
-      "hear",
-      "hear-title",
-      "update",
-      "manual",
-      "companion",
-      "companion-title",
-      "notes",
-      "studio-notes-title",
-      "studio-notes-consent",
-      "studio-notes-form"
-    ],
-    "version": "PUBLIC BETA / 0.1.2-dev1 / 20261109.18",
-    "iframeStatus": "booting Rhythmer…",
-    "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac"
-  },
-  "pdf": {
-    "file": "Rhythmer-Manual-v0.1.2-dev1.pdf",
-    "pages": 24,
-    "chapters": 16,
-    "edition": "0.1.2-dev1 / 20261109.18",
-    "sha256": "3869cc1b3764749820a84ea4ba18cb7628f0b2dceb7a87fb2d1a3fc3f5717fcd",
-    "manualSourceSha256": "99865d4549a8c09211f604fd1f5a7b484f6e40a2bfc38a48525d601c3f2593b3",
-    "links": 50,
-    "scope": "Complete English print edition from current web manual chapters, with actual host-rendered UI and credits."
+    "summary": "damaged package (flash.bin CRC) refused, nothing erased  ok\n  rc 0, 3361 requests, 185 sector erases\ninstall completes                                        ok\na sector changed in transfer after the check is read again ok\napp area == the new package's flash.bin                  ok\nflash head [0, 0x4000) untouched                         ok\nfinish asked (0xF0000000)                                ok\nupdate records cleared (RAM + flash 0xE4F00, the stock firmware's 0xE8F00) ok\nintegrated A/B bytes match exact bundled banks           ok\neach bank's header sector is committed after its payload ok\nno write outside the allowed windows                     ok\nprojects/settings outside declared banks and records preserved ok\napp_area_head and app.bin entries decrypt (CRC16)        ok\napp_area_head block CRC16                                ok\napp.bin CRC16 (the whole slot, as the SPL checks it)     ok\n  app.bin slot 584336 B (0x8ea90), region [0x4000, 0x92ffe), 2 B of 0xFF up to 0x93000\napp.bin slot is the packager's APP_SLOT                  ok\ncfg directory entry decrypts                             ok\nregion ends inside the loader's range, then 0xFF         ok\nre-run with the same package erases nothing              ok\nchanged bank transfer sector is reread, not written corrupt ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\nforeign key / damaged app head refused, nothing erased   ok\nloader test passed\n"
   },
   "sourceFiles": {
     "assets/breaks/amen-160.slot": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
@@ -497,7 +57,7 @@
     "rhythmer/firmware/mono2k/tables.h": "bf0b171ce397d05057363ab475c76c84921c5df85457198a58e5a24fddb99bcb",
     "rhythmer/firmware/ports/eng_fmini_filter.h": "78164f1ebbf66cb94de04e3dd1d64f5793156742071e3ad6a520d547e75f03f2",
     "rhythmer/firmware/ports/eng_fmini_presets.h": "8853a180a3cc5f4d407969d40069cafd50dfe7434a9ae12a9571da3d691fe777",
-    "rhythmer/firmware/ports/fmini.c": "19021988e1491e47d119df12570466f6ed0fa80de0673913ce35edd322603a77",
+    "rhythmer/firmware/ports/fmini.c": "49b504aec7381b1cd94c0e71c449d74547bfbd70835fe85a72f317788a26af0f",
     "rhythmer/firmware/ports/fmini_factory_packed.h": "a80bc6b7d8faa06a1d9bad615669dbadb729f1e1dbf0515e91289e2e990346fb",
     "rhythmer/firmware/ports/fmini_programs.h": "0cf69619921f3b50eb629ea4778e065bf484d5d811dc20000f959861857e923d",
     "rhythmer/firmware/ports/jo_dsp.h": "5ef8acde3313ebc5e2573afbfaaa3627870aff7ff01dfc0406b4fbd770165710",
@@ -553,7 +113,7 @@
     "rhythmer/firmware/src/fm6_core.c": "400f140dcc9a4093035ea27ca7593a3d89218a21ebfad82c94ff07b0920c6ae1",
     "rhythmer/firmware/src/fm6_vbank.c": "087b8e515930a77395596935549f7376539b64c3df444f5e5d471e5909e90231",
     "rhythmer/firmware/src/fugue.c": "c17ed109eea8a6d1c64515569ba3a3ffe39ea82445ea85b4b54d4ab0deb7f509",
-    "rhythmer/firmware/src/fx.c": "36c5287846549c98f116fdb8caac586e5f295916eac9576b067237e34a056f07",
+    "rhythmer/firmware/src/fx.c": "67a194c7e529fec16721892e78df16c23e4b597568c2732e988ad8a2fae1c841",
     "rhythmer/firmware/src/gen.c": "581b850d3183ac7df6d6a60608bc8cf6dd835ad80220b0fbb558f9f697c09d56",
     "rhythmer/firmware/src/gen_bass_sound.c": "8f32b5d67dd65cb3d2a7a451c054b7f372249d18f393a610cd390c9aeee559ce",
     "rhythmer/firmware/src/gen_jr_progressions.h": "58e44bf183acb533fbec6986b6507a5789d94816ff7b0b9488374b798f53a9eb",
@@ -644,7 +204,7 @@
     "rhythmer/firmware/src/usb.c": "09fc3a018bc7a31577ea9186ca0b34d57dcbcbde3bd201cf0567784a4a0fed19",
     "rhythmer/firmware/src/usb_host.c": "0c44066e99747c73c1eb0b3e5880b2ab8d9b5250b7168be47d7a1f6a843b65f2",
     "rhythmer/firmware/src/usb_host_desc.h": "d85ed2a621f0d2566a44d7935af58493c08b2fd9af86016441b3ede68d9d0a06",
-    "rhythmer/firmware/src/voice.c": "d0115ddc190f819355c2148dabddfbb16dc2deb4029e69a34524715cc95473c1",
+    "rhythmer/firmware/src/voice.c": "076d7762c69d6ec8b743c75d5286dd7bd72ec034b320842152969a601e6b246f",
     "rhythmer/tools/aa_raster.py": "befb234f24f23f1eb53b1893717e3a8a0173f1694ca8a1816bc8157e894aa929",
     "rhythmer/tools/build.py": "b3f564afcfdc7dad84a6df80687233067bcd1105cdf623a8ecf12d0c71c8ee1c",
     "rhythmer/tools/crash_decode.py": "451c49f51db4174ef3926e6ee567a797a633df85418b6d8dac412cfef5be2071",
@@ -713,5 +273,9 @@
     "rhythmer/tools/video/update.html": "fe205b6dd40b7875c3a78ed36adb20ba2767ce2cb44382cb37207080fad73b1f",
     "rhythmer/tools/video/visuals.html": "ea418ba62b0a3a8c1e406874c1abc6736a92d17bbc407e758f4b373698166348",
     "rhythmer/tools/video/visuals_film.mjs": "c347e657def510b6b5f82cb26e82bf9afe16461fb8d40b03dc5242dd373dfbac"
+  },
+  "previousBuild": {
+    "buildRevision": "20261109.18",
+    "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac"
   }
 }
