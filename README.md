@@ -1,30 +1,12 @@
-# Rhythmer
+# RHYTHMER
 
-![Rhythmer machines in motion](docs/launch/card.png)
+[![Rhythmer — Sound into motion. Startup and Break screens from the FM-1 firmware.](docs/github/hero.png)](https://jazzyrhythmer.github.io/Rhythmer/)
 
-**SOUND INTO MOTION.**
+**Sound into motion.** Build a groove one track at a time. Swap a drum voice, generate a fresh part, or slice a break and play the changes into the sequence. Rhythmer is an open-source groovebox for the M‑VAVE FM‑1, with up to six assignable tracks.
 
-A hands-on groovebox firmware for the M-VAVE FM-1. Shape sounds, build patterns, and find your own groove.
+[**Play in your browser**](https://jazzyrhythmer.github.io/Rhythmer/#play) · [**Install Rhythmer**](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [**Web editor**](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Manual](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [PDF](https://jazzyrhythmer.github.io/Rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
 
-Rhythmer is an alternative firmware made for exploring sound and developing ideas through play. Move between sound design, sequencing and performance. Keep what works, try a new direction, and make the groove your own.
-
-Up to six assignable tracks, with flexible machine choices, a shared sequencer and a browser editor.
-
-Free, open-source firmware by [Jazzy Rhythmer](https://www.youtube.com/@jazzyrhythmer). Optional support: [Ko-fi](https://ko-fi.com/jazzyrhythmer).
-
-**Built on [JIANT](https://github.com/juanjiant-bit/JIANT).** Rhythmer keeps its sequencing, project management and system foundation, with a new monochrome interface and additional machines. The native Acid synth comes from Hortator, paired with X0X-derived TB-3PO MIDI generation; Break manipulation comes from Amenity. Original authors and licenses remain credited.
-
-## Watch Rhythmer
-
-[![Watch Rhythmer — Sound into motion.](site/media/video/rhythmer-opening-poster.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
-
-[Watch the 36-second opening with sound](https://jazzyrhythmer.github.io/Rhythmer/#opening) · [Download the Amen mix MP4](https://jazzyrhythmer.github.io/Rhythmer/assets/video/rhythmer-opening-36s-amen.mp4). Original opening sound plus an Amen Break section; sample credits below. The film shows host-rendered firmware UI, not physical-device footage.
-
-## Start here
-
-[Play](https://jazzyrhythmer.github.io/Rhythmer/#play) · [Detailed manual](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [PDF manual](https://jazzyrhythmer.github.io/Rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf) · [Web editor](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Install / official V15 return](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
-
-**Use official V15 when moving from another custom firmware to Rhythmer, or from Rhythmer to another custom firmware.** Direct foreign-custom transitions are unsupported. For a first install, official V15 is the recommended starting point. Back up the music you want to keep before changing firmware. The installer requires a final V15 recommendation acknowledgement, backup/risk acknowledgements and a separate audio-rights acknowledgement. Use Chrome or Edge and keep USB/power connected until verification finishes. A matching Rhythmer can be updated directly after backup.
+Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/Jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/Rhythmer/#companion).
 
 ## Explore the machines
 
@@ -41,8 +23,14 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 | --- | --- | --- |
 | **DRUM**<br><img src="docs/motion/drum.gif" alt="DRUM firmware UI animation" width="240"><br>Synthesized percussion | **SERUM**<br><img src="docs/motion/serum.gif" alt="SERUM firmware UI animation" width="240"><br>Wavetable morphing | **FMINI-1**<br><img src="docs/motion/fmini.gif" alt="FMINI-1 firmware UI animation" width="240"><br>Ladder-filter basses and leads |
 | **OBERVAVE**<br><img src="docs/motion/obervave.gif" alt="OBERVAVE firmware UI animation" width="240"><br>Vintage polysynth textures | **ANALOG**<br><img src="docs/motion/analog.gif" alt="ANALOG firmware UI animation" width="240"><br>Classic waveforms | **FM6**<br><img src="docs/motion/fm6.gif" alt="FM6 firmware UI animation" width="240"><br>Six-operator patch networks |
-| **FM+STAT**<br><img src="docs/motion/fmstat.gif" alt="FM+STAT firmware UI animation" width="240"><br>Compact FM | **SWAV-SAW**<br><img src="docs/motion/swavsaw.gif" alt="SWAV-SAW firmware UI animation" width="240"><br>Layered saws | |
-| **SID-6581**<br><img src="docs/motion/sid.gif" alt="SID-6581 firmware UI animation" width="240"><br>Chip-style synthesis | **ACID**<br><img src="docs/motion/acid.gif" alt="ACID firmware UI animation" width="240"><br>303-style bass | **BREAK**<br><img src="docs/motion/break.gif" alt="BREAK firmware UI animation" width="240"><br>Sequenced chops |
+| **FM+STAT**<br><img src="docs/motion/fmstat.gif" alt="FM+STAT firmware UI animation" width="240"><br>Compact FM | **SWAV-SAW**<br><img src="docs/motion/swavsaw.gif" alt="SWAV-SAW firmware UI animation" width="240"><br>Layered saws | **SID-6581**<br><img src="docs/motion/sid.gif" alt="SID-6581 firmware UI animation" width="240"><br>Chip-style synthesis |
+
+## Build the pattern
+
+| HOME GEN / Target MIDI | DRUM / Sound select | GEN / Break chops |
+| --- | --- | --- |
+| ![Targeted generation on the firmware](docs/motion/gen-target.gif) | ![Choosing an individual Drum-X sound](docs/motion/drum-sound.gif) | ![Genre-aware Break generation](docs/motion/gen-break.gif) |
+| Generate one track's notes in the selected genre. | Swap one sound without replacing the rest of the kit. | Generate chops for the Break track, wherever it is assigned. |
 
 ## Machines and sequencing
 
@@ -75,3 +63,7 @@ Amen: The Winstons, *Amen, Brother*, Gregory C. Coleman on drums; source via Ame
 Built from community work including Felucca, JIANT, X0X, Amenity, Garden-FM, MONO2K, Hortator, Elixir and OberVave. Neither those authors nor M-VAVE or Elektron are claimed to endorse Rhythmer. Machinedrum and other referenced product names belong to their owners.
 
 Independent community firmware, supplied without warranty to the extent permitted by law. Firmware changes can affect data or device operation. Mandatory legal rights and non-excludable liability remain unaffected. Read `LEGAL-NOTICE.txt`.
+
+## Watch Rhythmer
+
+[![Watch the Rhythmer opening film](docs/github/film.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
