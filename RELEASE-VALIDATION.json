@@ -1,21 +1,21 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261110.1",
-  "firmwareSha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56",
+  "buildRevision": "20261110.2",
+  "firmwareSha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a",
   "physicalHardwareTested": false,
   "nativeScenarios": 1,
-  "exactBuildSummary": "The actual firmware passed a strict three-track stacked-chord run with no missing audio blocks. The simulated updater verified both Break banks, interrupted-write recovery, and project and settings preservation.",
+  "exactBuildSummary": "Fresh tracks start at −10 dB; saved mixer levels survive project reload. A three-track chord test in the firmware emulator reported no missing audio blocks. Both embedded Break banks match the previous release byte for byte.",
   "memory": {
     "appBytes": 583352,
     "appSlotBytes": 584336,
     "appSlotFreeBytes": 984
   },
   "emulator": {
-    "summary": "steady: Some(0.3353738815140637)x real time; 150528 real audio frames\nicache: 20437 decodes for 408300000 instructions\ncpu1: 89714663 instructions (23.0 M per emulated s)\naudio: 301056 samples -> /Volumes/SSD/Development/BuildCache/rhythmer/attack-audio-20261110.1/emu-attack-final-stack.pcm\nusb audio: 2 ch at 44100 Hz, 285716 samples in 3238 packets (0 empty, 0 of them underruns) -> /Volumes/SSD/Development/BuildCache/rhythmer/attack-audio-20261110.1/emu-attack-final-stack.usb.pcm\nflash: 5 erases / programs\n3900 ms emulated at 240 MHz in 11.00 s wall: 0.35x real time, 37.1 M instructions/s, 20% of cycles skipped as idle\n"
+    "summary": "headroom stack DAC PCM 156672 peak 7065 max_us 2479 late 0 missing halves 0 core1 lost 0 load (21, 0, 0) USB frames 149109\n"
   },
   "loader": {
-    "summary": "damaged package (flash.bin CRC) refused, nothing erased  ok\n  rc 0, 3361 requests, 185 sector erases\ninstall completes                                        ok\na sector changed in transfer after the check is read again ok\napp area == the new package's flash.bin                  ok\nflash head [0, 0x4000) untouched                         ok\nfinish asked (0xF0000000)                                ok\nupdate records cleared (RAM + flash 0xE4F00, the stock firmware's 0xE8F00) ok\nintegrated A/B bytes match exact bundled banks           ok\neach bank's header sector is committed after its payload ok\nno write outside the allowed windows                     ok\nprojects/settings outside declared banks and records preserved ok\napp_area_head and app.bin entries decrypt (CRC16)        ok\napp_area_head block CRC16                                ok\napp.bin CRC16 (the whole slot, as the SPL checks it)     ok\n  app.bin slot 584336 B (0x8ea90), region [0x4000, 0x92ffe), 2 B of 0xFF up to 0x93000\napp.bin slot is the packager's APP_SLOT                  ok\ncfg directory entry decrypts                             ok\nregion ends inside the loader's range, then 0xFF         ok\nre-run with the same package erases nothing              ok\nchanged bank transfer sector is reread, not written corrupt ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\ninterrupted write keeps resume record and never reports success ok\nresume completes with exact banks and preserved projects/settings ok\nforeign key / damaged app head refused, nothing erased   ok\nloader test passed\n"
+    "summary": "Both embedded factory Break banks are byte-identical to the previous release. No physical device write was performed."
   },
   "sourceFiles": {
     "assets/breaks/amen-160.slot": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0",
@@ -178,7 +178,7 @@
     "rhythmer/firmware/src/storage.c": "e316eb23b4ddc10f8b6427b0d95ebbb985f27293eac9657e8c14da183484f60d",
     "rhythmer/firmware/src/storage_hw.c": "afbd29b540e3c6f85cacdfaa3449258a936f467f5c3d12cb1f9c489d31958eff",
     "rhythmer/firmware/src/uac_fir.h": "10f3b8f54f175302c8bfa5503cb2bb99d252d214a37ee758a405837d6064c5a3",
-    "rhythmer/firmware/src/ui.c": "d4c304d0e85a9f96beae4b71913fe79d161a0a20e0d345ed44fd804bfa6a92f8",
+    "rhythmer/firmware/src/ui.c": "549f78a2e1b15e3fef858f3016054c7460c36bfbfac3a098e78ab4edbf67b643",
     "rhythmer/firmware/src/ui_break_tools.c": "310e694b025091ba269847198c5a2d496d5def54de7bfde8976bb9ad6c541ad9",
     "rhythmer/firmware/src/ui_draw.c": "55c6e7f754ff2c1ec5ce238e65fe9cf2ec92ed08daa683cd62e65662855afc5c",
     "rhythmer/firmware/src/ui_dx.c": "1d0deccf3dc7dbb4e9f0a1e8743e3a7f33bd62ffd1fb15a75790f01dd48f6d5c",
@@ -275,7 +275,7 @@
     "rhythmer/tools/video/visuals_film.mjs": "c347e657def510b6b5f82cb26e82bf9afe16461fb8d40b03dc5242dd373dfbac"
   },
   "previousBuild": {
-    "buildRevision": "20261109.18",
-    "firmwareSha256": "e91b3976880538839fb96d3230ae0f000e8fe3355f16b6e6012176ce1f3a51ac"
+    "buildRevision": "20261110.1",
+    "firmwareSha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56"
   }
 }

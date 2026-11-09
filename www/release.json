@@ -1,11 +1,11 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261110.1",
+  "buildRevision": "20261110.2",
   "localOnly": false,
-  "releaseCaution": "Public beta: reduces clicks on note onset and crackle in layered chords. Back up before installing. This exact build has been tested in software.",
+  "releaseCaution": "Public beta: new tracks start at −10 dB for more room when playing together. Saved mixer levels are retained. Back up before installing.",
   "ownerTest": null,
-  "sha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56",
+  "sha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a",
   "physicalHardwareTested": false,
   "audioPublicRedistributionCleared": false,
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery is included.",
@@ -17,8 +17,8 @@
     },
     {
       "name": "Rhythmer-0.1.2-dev1-install.zip",
-      "bytes": 3214364,
-      "sha256": "b32463e4c5b1ec55077ac4b608327222611f0c408486d92a55066eef96b1cded"
+      "bytes": 3214494,
+      "sha256": "4dbf9caa24993e7383453464383d64720be29e17bc5d4bf6b974fbdff6f52859"
     },
     {
       "name": "Rhythmer-Manual-v0.1.1-beta3.pdf",
@@ -32,18 +32,18 @@
     },
     {
       "name": "Rhythmer-start.fm1save",
-      "bytes": 1351313,
-      "sha256": "1b2f23cba8bf6d1c9bc02dc0f5d00d50332f19c3563658237e55b1b335e694b6"
+      "bytes": 1351517,
+      "sha256": "ba208020ead6dca969f59e9fb68ac59efcde913280e6c40d96a78be0a25a0f98"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2262465,
-      "sha256": "e5ea657fd80aaa3257bf821b6f621eee49cabba301f295b756380b5e5d986b40"
+      "sha256": "c8042a3f521ac66bf1e1aa3481089e891611cfda7d25a978978ea14518e4096f"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "dc93a9bccb122ffcedef80b930a7c5a90008902675a97fb3180cb53630262e56"
+      "sha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",

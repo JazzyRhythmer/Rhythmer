@@ -1543,6 +1543,7 @@ static void track_defaults(track_t *t)
     uint32_t i;
     for (i = 0; i < P_E0; i++)
         t->p[i] = TP[i].def;
+    t->p[P_LEVEL] = 92; /* -10 dB on a fresh track; project loads keep their stored level. */
     track_defaults_steps(t);
 }
 /* (0.9.9) the power-on's parts (main.c felucca_init, inside its load): each track at its defaults with its power-on
