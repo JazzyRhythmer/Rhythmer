@@ -1,0 +1,24 @@
+{
+  "source": "https://github.com/m-vave/fm1_open",
+  "commit": "4c7496daac04a95ff10d1afdcc8f9ead2dbabc41",
+  "verifiedOn": "2026-11-06",
+  "product": "FM-1_015",
+  "resourceLicense": "Apache-2.0",
+  "files": {
+    "FM-1_015.fwsc": {
+      "url": "https://raw.githubusercontent.com/m-vave/fm1_open/4c7496daac04a95ff10d1afdcc8f9ead2dbabc41/sdk/firmware/FM-1_015.fwsc",
+      "bytes": 699956,
+      "sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a"
+    },
+    "THIRD_PARTY.md": {
+      "url": "https://raw.githubusercontent.com/m-vave/fm1_open/4c7496daac04a95ff10d1afdcc8f9ead2dbabc41/THIRD_PARTY.md",
+      "bytes": 142314,
+      "sha256": "c10451a1c0b368ec926e86b9296eb0c96c790d4d4768ad07e91b09ca9ea4bfa5"
+    },
+    "LICENSE.md": {
+      "url": "https://raw.githubusercontent.com/m-vave/fm1_open/4c7496daac04a95ff10d1afdcc8f9ead2dbabc41/LICENSE.md",
+      "bytes": 38431,
+      "sha256": "fe7344af68a6e65d0cf623e3eca1ff4a4d751ba538bffbc5248134b79d02f1fd"
+    }
+  }
+}

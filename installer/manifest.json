@@ -1,0 +1,67 @@
+{
+  "version": "0.1.1-beta3",
+  "channel": "public-beta",
+  "physicalHardwareTested": false,
+  "localOnly": false,
+  "ownerTest": {
+    "date": "2026-11-08",
+    "firmwareSha256": "9962e1b78d357ce8fbe9b1b88cfccec0ecc2e87c649c8752af684102bdd4ae82",
+    "buildRevision": "20261108.6",
+    "method": "Owner-reported physical FM-1 installation and listening",
+    "result": "Owner reports this native Hortator/buffer build works very well, without the earlier buffering issue.",
+    "verifiedScope": [
+      "Installed build 20261108.6",
+      "Physical playback/listening, owner reported"
+    ],
+    "migrationAndRecoveryMatrixVerified": false
+  },
+  "firmware": {
+    "url": "../downloads/Rhythmer.fwsc",
+    "product": "FM-1_748005",
+    "sha256": "8b9d4af568135e76465ca73d20c9e544753babc1dcac60f7a0f76ebd6fa2feb1",
+    "bytes": 828061,
+    "embeddedBreaks": true
+  },
+  "loops": [
+    {
+      "name": "Amen",
+      "slot": "A",
+      "url": "../downloads/amen-160.slot",
+      "bytes": 81920,
+      "sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0"
+    },
+    {
+      "name": "Think",
+      "slot": "B",
+      "url": "../downloads/think-160.slot",
+      "bytes": 81920,
+      "sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
+    }
+  ],
+  "recovery": {
+    "url": "../downloads/official-v15/FM-1_015.fwsc",
+    "product": "FM-1_015",
+    "sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a",
+    "bytes": 699956,
+    "license": "Apache-2.0",
+    "source": "https://raw.githubusercontent.com/m-vave/fm1_open/4c7496daac04a95ff10d1afdcc8f9ead2dbabc41/sdk/firmware/FM-1_015.fwsc"
+  },
+  "recoveryArchive": {
+    "url": "../downloads/FM-1-V15-recovery.zip",
+    "bytes": 709532,
+    "sha256": "728587067d6c28193f1384ef0dcdcf71c40afbc1df54db2afc6d0beb6aa9a265"
+  },
+  "bundle": {
+    "url": "../downloads/Rhythmer-with-breaks.rhythmer",
+    "bytes": 2261425,
+    "sha256": "1fa46d9d9597e025e681847b695edcfa8947f7dd963d540c5928817b694184c8"
+  },
+  "archive": {
+    "url": "../downloads/Rhythmer-0.1.1-beta3-install.zip",
+    "bytes": 3160199,
+    "sha256": "6887fe3c9c562545ed832939995a23ffcc9251e49b3132b53068910cdf0faf3e"
+  },
+  "audioRightsURL": "../audio-rights.json",
+  "publicRedistributionCleared": false,
+  "buildRevision": "20261108.9"
+}

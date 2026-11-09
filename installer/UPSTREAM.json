@@ -1,0 +1,24 @@
+{
+  "source": "https://github.com/juanjiant-bit/JIANT",
+  "commit": "fd0ff3e3252465064c775bf648178e007ebcf61d",
+  "license": "GPL-3.0-only",
+  "note": "Unmodified upstream sources. Runtime transport copy adds Rhythmer to port names and read-only address/length progress callbacks; protocol frames, request service and payload bytes are unchanged.",
+  "files": {
+    "fm1ota.js": {
+      "bytes": 16221,
+      "sha256": "47e3155977d966722fee92717ec456e1bad38aa0a453bdf1669b090ab7d4a677"
+    },
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "fm1pkg.js": {
+      "bytes": 11052,
+      "sha256": "957c4951a97f68d9b9cb1643ac040993b99151cc026dbd3d0097b04089191f7b"
+    },
+    "fm1backup.js": {
+      "bytes": 11377,
+      "sha256": "28641c73ff5b3859ca207394a7ef94ea4e5b7a17a1ed9cb844df2fb9db9ee241"
+    }
+  }
+}
