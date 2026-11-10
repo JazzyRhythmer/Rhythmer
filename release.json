@@ -5,7 +5,7 @@
   "localOnly": false,
   "releaseCaution": "Public beta: WAVETABLE is the current name of the existing wavetable engine. Existing projects, presets and sounds are compatible. Back up before installing.",
   "ownerTest": null,
-  "sha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023",
+  "sha256": "8703f3d2ae573ccf4b924f02b0ab85bef13711ac6e41c901d338217fda3579bd",
   "physicalHardwareTested": false,
   "audioPublicRedistributionCleared": false,
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery is included.",
@@ -17,8 +17,8 @@
     },
     {
       "name": "Rhythmer-0.1.2-dev1-install.zip",
-      "bytes": 3214313,
-      "sha256": "3e16c862112b1df45ca696bb595b80565eba8d9d854a56afe03927b06444a9b2"
+      "bytes": 3214421,
+      "sha256": "b7d2980b92d1932193c0d710d844975e8bef94b17ef981f427385948c8e493be"
     },
     {
       "name": "Rhythmer-Manual-v0.1.1-beta3.pdf",
@@ -33,17 +33,17 @@
     {
       "name": "Rhythmer-start.fm1save",
       "bytes": 1351313,
-      "sha256": "8264d67052151f75d267584ac8b5023d6c1670dcc8067d250762106a646dbe44"
+      "sha256": "7f688ad0ca3f95b7defac59ef60da2843a821a10d9b1340ad787d1252723d7ed"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
       "bytes": 2262465,
-      "sha256": "ac7e3f783dd2f18339e19781fae481e635d6ee13f58d2e14f8bc87fa8d9eed21"
+      "sha256": "3eb5542821395487babdc184110645f59db864fe10b900a0ef061eb039446174"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023"
+      "sha256": "8703f3d2ae573ccf4b924f02b0ab85bef13711ac6e41c901d338217fda3579bd"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
