@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="How to find, shape and play sounds on JAZZY for the M-VAVE FM-1."><title>JAZZY / Manual</title><link rel="icon" href="../jazzy-mark.svg" type="image/svg+xml"><link rel="stylesheet" href="../firmware-links.css"><link rel="stylesheet" href="../style.css"></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="shell bar"><a class="brand" href="../" aria-label="JAZZY home"><img src="../jazzy-mark.svg" alt="" width="27" height="27"> JAZZY</a><nav aria-label="Main navigation"><a href="../#engines">Engines</a><a href="./" aria-current="page">Manual</a><a href="../installer/">Install</a></nav><div class="firmware-links" role="group" aria-label="Firmwares and support"><a href="../" aria-current="true"><img class="firmware-mark" src="../jazzy-mark.svg" alt="" width="14" height="14">JAZZY</a><a href="../../Rhythmer/#home"><img class="firmware-mark" src="../rhythmer-mark.svg" alt="" width="14" height="14">RHYTHMER</a><a class="firmware-support" href="../#support">SUPPORT ↗</a></div></div></header>
+<main id="main" class="shell page">
+<p class="label accent">FIELD MANUAL / FM–1</p>
+<h1>A world of sound awaits.</h1>
+<p class="lede">Start with one track. Play a phrase, then try it on a few engines. When a sound makes you want to keep playing, mark it as a favorite so you can find it again.</p>
+<div class="manual-layout">
+<nav class="manual-nav" aria-label="Manual contents"><a href="#web-editor">Web Editor</a><a href="#quick">01 / First sound</a><a href="#presets">02 / Preset browser</a><a href="#shape">03 / Shape and animate</a><a href="#duck">04 / Sidechain ducking</a><a href="#drums">05 / Drums and Break</a><a href="#sequence">06 / Sequence and GEN</a><a href="#save">07 / Save and switch</a><a href="#usb">08 / USB MIDI</a><a href="#lxr-credits">09 / LXR credits</a></nav>
+<div>
+<section class="article" id="quick"><h2>First sound</h2><ol><li>Use <kbd>ALGORITHM</kbd> to choose the active track.</li><li>Tap <kbd>EDIT</kbd> to enter the remembered EDIT page. Tap again to advance one page. <kbd>SELECT</kbd> goes forward or back through the same visible pages.</li><li>In <strong>EDIT → SOUND → PRESETS</strong>, turn K2 to pick an engine and K1 to audition its sounds. Play a note and try the engine controls on EDIT 1 and EDIT 2.</li></ol></section>
+<section class="article" id="presets"><h2>The preset browser</h2><ul><li><strong>K1 PRESET</strong> auditions sounds in the current list. <strong>K2 ENG</strong> switches to another engine.</li><li><strong>K3 FAV</strong> adds a star clockwise and removes it counterclockwise. <strong>K4 LIST</strong> filters by favorites or by type such as BASS, LEAD and PAD.</li><li>On EDIT’s PRESETS page, the dedicated <kbd>PRESETS</kbd> knob follows that engine and filter. On other EDIT pages and HOME it scrolls the whole catalog. In SEQ it opens the pattern phrases.</li><li><strong>SAVE → SOUND → PRESETS</strong> shows sounds across engines and keeps the browser filter.</li></ul></section>
+<section class="article" id="shape"><h2>Shape and animate</h2><p>Set attack, decay, sustain and release in ENV. Watch the skater follow the note. LFO provides two independent modulators, destinations, phase controls and a motion sequencer. In FX, set each track’s sends, then adjust the delay, reverb or chorus bus on its own page.</p><p>Repeated FX, ENV and LFO taps visit their individual pages. Set DARK or LIGHT in the display menu, or switch animation off there.</p></section>
+<section class="article" id="duck">
+<h2>Sidechain ducking and Kick Link</h2>
+<p>Press <strong>FX</strong> to reach <strong>MASTER</strong>, then turn <strong>SELECT</strong> to <strong>DUCK</strong>. Choose the trigger with <strong>SRC</strong>.</p>
+<ul><li><strong>AUTO</strong> follows recognized internal kicks or incoming Kick Link. JAZZY recognizes KW KICK and Hortator kick models. For LXR, use K2 <strong>LXR KICK</strong> to assign the kick track. OFF leaves LXR out of AUTO and outgoing Kick Link.</li>
+<li><strong>T1–T6</strong> follows the audio level of the selected track. That source track stays at its own level. Use <strong>THR</strong> to set the trigger threshold.</li>
+<li><strong>USB</strong> follows incoming USB audio above <strong>THR</strong>. Use USB Device mode, enable input in <strong>MENU → USB → USB AUDIO</strong>, and route an isolated audio feed from a USB host such as a computer.</li>
+<li><strong>MIDI</strong> triggers from a matching Note On. Set <strong>CH</strong> to ANY or 1–16, and <strong>NOTE</strong> to the trigger pitch (default 36). Any positive velocity triggers the same envelope. The matching Note On is consumed as a trigger.</li></ul>
+<p>Turn SELECT to <strong>DUCK ENV</strong>. <strong>ATK</strong> controls how quickly the gain drops, <strong>REL</strong> controls the return, and <strong>AMT</strong> controls the depth. AMT and <strong>MASTER → DUCK</strong> share one value. At zero amount, there is no ducking. Save the section to keep these settings.</p>
+<h3 id="kick-link">Connect JAZZY and RHYTHMER</h3>
+<p>For tempo and transport sync, see <a href="#usb-sync">Sync two FM‑1s over USB</a>.</p>
+<ol><li>Use a USB host adapter and a data cable to connect the two FM‑1s. Enable <strong>MENU → USB → USB HOST</strong> on one FM‑1 and leave the other in Device mode.</li>
+<li>On the unit playing the kick, set <strong>MENU → MIDI → MIDI OUT → KICK LINK</strong>.</li>
+<li>On the receiving unit, choose <strong>FX → MASTER → DUCK → SRC = AUTO</strong>, then raise <strong>DUCK ENV → AMT</strong>. A qualifying local kick has priority for two beats.</li></ol>
+<p><a class="text-link" href="../../Rhythmer/#guide/sidechain">RHYTHMER sidechain guide ↗</a></p>
+</section>
+<section class="article" id="drums"><h2>Drums and Break</h2><p>Each HORTATOR, LXR or KW KICK sound occupies one track. LXR's 595 sounds are ordered as 85 sets with seven voices each, from drum voices and snare to cymbal and closed and open hats.</p><p>BREAK ships with A / Amen and B / Think. Open <strong>EDIT → BREAK</strong> for performance, sequencing and return controls. <strong>SEQ → BREAK</strong> brings the loop and slice events into the step workflow.</p></section>
+<section class="article" id="sequence"><h2>Sequence and GEN</h2><p>Use SEQ to move through pattern, track, step, automation and engine-specific pages. Hold HOME and turn SELECT to open GEN. Choose a style and use OCT+ to generate a starting point with musical roles such as bass, chords, lead and arpeggio.</p><p>HORTATOR, KW KICK and LXR also expose <strong>SEQ → GEN</strong> for one-track Euclidean, Mutate, Turing, Cellular and Grids patterns.</p></section>
+<section class="article" id="save"><h2>Save and switch projects</h2><p>SAVE groups the library into <strong>SONG → PROJECT → SOUND</strong>. Open PROJECTS to switch projects, SECTIONS to work with A–D, and USER to save a sound.</p><p>In <strong>PROJECT → CLEAR</strong>, K1 selects the project and K2 the section. K3 selects section clear and K4 whole-project clear. OCT+ opens the review, and a second OCT+ executes the selected clear.</p></section>
+<section class="article" id="usb"><h2>USB MIDI</h2><p>JAZZY starts in USB Device mode. To use a compatible MIDI controller, stop playback and open <strong>MENU → USB → USB HOST</strong>, then confirm with OCT+. Host mode lasts for that session. Use external power for a controller that needs USB bus power.</p><h3 id="usb-sync">Sync two FM‑1s over USB</h3>
+<p>Example: RHYTHMER sets the tempo and JAZZY follows.</p>
+<ol>
+<li>Stop both FM-1s. On JAZZY, set <strong>MENU → USB → USB HOST</strong> to ON and confirm with <strong>OCT+</strong>. Leave RHYTHMER in USB Device mode.</li>
+<li>Connect the FM-1s with a USB data cable through an externally powered USB host hub or adapter on the JAZZY side. The FM-1 host port does not supply USB bus power. Wait for <strong>USB MIDI CONNECTED</strong> on JAZZY.</li>
+<li>On RHYTHMER, set <strong>GLO → GLOBAL → CLOCK</strong> to <strong>INT</strong> and <strong>MENU → MIDI → MIDI OUT</strong> to <strong>CLOCK</strong>. Set the tempo on RHYTHMER.</li>
+<li>On JAZZY, set <strong>GLO → GLOBAL → CLOCK</strong> to <strong>USB</strong> and <strong>MENU → MIDI → MIDI OUT</strong> to <strong>OFF</strong>.</li>
+<li>Press <strong>PLAY</strong> on RHYTHMER. JAZZY follows its tempo and start/stop commands. To check timing, try 120 BPM and listen to both patterns for several bars.</li>
+</ol>
+<p>USB Host is the connection role. In this example JAZZY hosts the cable while RHYTHMER leads the tempo. Enable Host again after restarting JAZZY.</p>
+<p>On current builds, CLOCK and KICK LINK are separate MIDI OUT modes. Use CLOCK on RHYTHMER for this example.</p>
+<p><a class="text-link" href="../../Rhythmer/#guide/usb-sync">RHYTHMER tempo sync guide ↗</a></p>
+<a class="text-link" href="../installer/">Installation and backup →</a></section>
+<section class="article" id="lxr-credits">
+  <h2>Elixir / LXR-02 credits and license</h2>
+  <p><strong>Engine code.</strong> JAZZY’s LXR drum engine adapts dmajka’s Elixir port of the LXR-02 firmware, © 2012–2026 Erica Synths, based on the original Sonic Potions LXR by Julian Schmidt. The engine code is licensed under GPL-3.0-only. JAZZY adapts it to play one drum sound per track with its own controls, mixer and effects. The Grids pattern generator draws on Emilie Gillet’s Mutable Instruments Grids, © 2011–2012, used here under GPLv3.</p>
+  <p><strong>Factory presets.</strong> The LXR preset bank contains 595 individual drum sounds adapted from 85 LXR-02 factory kits by Erica Synths and Hrtl. Elixir distributes the original kits with permission from Erica Synths. The kit data has separate terms from the GPL-licensed engine code. JAZZY has not obtained rights-holder authorization to redistribute its adapted presets.</p>
+  <p>JAZZY is an independent firmware for the M-VAVE FM-1. Erica Synths, LXR and LXR-02 are trademarks of Erica Synths.</p>
+  <p><a class="text-link" href="https://github.com/dmajka/elixir/blob/main/NOTICE.md">Elixir source credits ↗</a> · <a class="text-link" href="https://github.com/erica-synths/lxr-desktop-app#licence-trademarks-and-hardware">LXR-02 source and terms ↗</a> · <a class="text-link" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPL v3 ↗</a></p>
+</section>
+</div></div>
+<section class="section" id="web-editor"><h2>Web Editor</h2>
+<p>Browser Workspace saves edits locally. Use Sections A–D to switch projects or back up all four as a musical archive. Use Samples to replace either Break slot, and Save for Play + Audio to export a complete <code>.fm1save</code> for Web Play. In USB FM-1 mode, connect a device running the matching JAZZY firmware in Chrome or Edge.</p>
+<p><a class="button" href="../editor/">Open JAZZY Web Editor ↗</a></p></section>
+</main>
+<footer class="shell foot"><span>JAZZY / FIELD MANUAL</span><a href="../">Home</a><a href="../installer/">Install</a><a href="../../Rhythmer/#guide">Rhythmer manual ↗</a></footer>
+</body></html>
