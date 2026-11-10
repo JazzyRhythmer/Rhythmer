@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore the unheard. JAZZY brings 31 synth, drum and break engines and 1,220 factory sounds to the M-VAVE FM-1.">
+<title>JAZZY — Explore the unheard. | M-VAVE FM-1 Firmware</title>
+<link rel="icon" href="jazzy-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="firmware-links.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="launch-film.css?v=0a57767d7877">
+<link rel="stylesheet" href="engine-gallery.css?v=guide-cards">
+<script type="module" src="home.mjs?v=20261111.1"></script>
+<link rel="stylesheet" href="community.css?v=97a26eafcf0a">
+<script type="module" src="community.mjs?v=514d2fdba091"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="shell bar">
+<a class="brand" href="./" aria-label="JAZZY home"><img src="jazzy-mark.svg" alt="" width="27" height="27"> JAZZY</a>
+<nav aria-label="Main navigation"><a href="#engines">Engines</a><a href="#update">Update</a><a href="manual/">Manual</a><a href="emulator/">Play</a><a href="editor/">Editor</a><a href="installer/">Install</a></nav>
+<div class="firmware-links" role="group" aria-label="Firmwares and support"><a href="./" aria-current="true"><img class="firmware-mark" src="jazzy-mark.svg" alt="" width="14" height="14">JAZZY</a><a href="../Rhythmer/#home"><img class="firmware-mark" src="rhythmer-mark.svg" alt="" width="14" height="14">RHYTHMER</a><a class="firmware-support" href="#support">SUPPORT ↗</a></div>
+</div></header>
+<main id="main">
+<section class="shell hero">
+<div class="label hero-line"><span>FREE / OPEN SOURCE / M–VAVE FM–1</span><span>PUBLIC BETA / 0.1.0</span></div>
+<h1 class="masthead">JAZZY</h1>
+<aside class="maker-note" aria-label="About the maker">
+  <p><a href="#support">By Jazzy Rhythmer</a><span>Producer &amp; DJ, exploring music and small instruments.</span></p>
+  <nav class="community-links" aria-label="Creator links">
+    <a href="https://jazzyrhythmer.github.io/" target="_blank" rel="noopener noreferrer">Website ↗</a>
+<a href="https://www.youtube.com/@jazzyrhythmer" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+<a href="https://www.instagram.com/jazzyrhythmer/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+<a href="https://ko-fi.com/jazzyrhythmer" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a>
+    <a href="#notes">Studio Notes ↓</a>
+  </nav>
+</aside>
+<div class="hero-grid">
+<figure class="hero-boot">
+<div class="screen"><img src="assets/jazzy-startup.png?v=explore-the-unheard" data-motion="assets/jazzy-startup.webp?v=explore-the-unheard" alt="JAZZY OS startup, with its pixel wordmark and six animated instruments" width="240" height="240"></div>
+<figcaption><span>JAZZY OS / FIRMWARE STARTUP</span><span>LCD / 240 × 240</span></figcaption>
+</figure>
+<div class="hero-copy">
+<h2>Explore the unheard.</h2>
+<p class="hero-tagline label accent">A world of sound awaits.</p>
+<p class="intro">JAZZY brings 31 sound engines and 1,220 factory sounds to the M-VAVE FM-1. Wander from warm analog bass to glassy FM keys, shifting wavetables and the snap of an LXR kit. Play a familiar phrase on a different engine and see where it takes you.</p>
+<div class="actions"><a class="button primary" href="installer/">Install JAZZY <span>→</span></a><a class="button" href="#engines">Explore the engines <span>↓</span></a></div>
+</div>
+</div>
+<div class="numbers">
+<div><b>31</b><span>sound engines</span></div><div><b>1,220</b><span>factory sounds</span></div><div><b>595</b><span>LXR drum voices</span></div><div><b>A / B</b><span>Amen and Think</span></div>
+</div>
+</section>
+<section class="shell section launch-film" id="opening" aria-labelledby="opening-title">
+<div class="section-head"><div><p class="label accent">JAZZY / LAUNCH FILM</p><h2 id="opening-title">See JAZZY in motion.</h2></div><p class="label">01:04 / ORIGINAL SOUNDTRACK</p></div>
+<figure>
+<video controls playsinline preload="none" width="1920" height="1080" poster="assets/jazzy-launch-poster.jpg" aria-label="JAZZY launch film" aria-describedby="opening-caption">
+<source src="assets/jazzy-launch.mp4?v=wavetable-20261110.3" type="video/mp4">
+<a href="assets/jazzy-launch.mp4?v=wavetable-20261110.3">Download the JAZZY launch film</a>
+</video>
+<figcaption><p id="opening-caption">From one sound per track to all 31 engine screens, with an original soundtrack.</p><a class="text-link" href="assets/jazzy-launch.mp4?v=wavetable-20261110.3" download>Download film ↓</a></figcaption>
+</figure>
+</section>
+<section class="shell section" id="engines">
+<div class="section-head"><div><p class="label accent">01 / THE ENGINE ROOM</p><h2>See where a sound takes you.</h2></div><p>Hear FMINI-1 bass, OberVave pad chords and HYDRA’s layered harmony, or start with a straight LXR house beat. Each engine has its own character and controls, and you can jump between them from the same preset browser.</p></div>
+<div class="motion-head"><p class="label">ACTUAL FM-1 SCREEN / SELECT TO ENLARGE</p><button type="button" id="motion-toggle" class="chip" aria-pressed="false">Pause animations</button></div>
+<div class="engine-gallery engine-gallery-featured" id="featured-engines" aria-label="Featured engine animations"></div>
+<div class="listen" id="hear">
+<div><p class="label accent">SOUND DEMOS</p><h3>Hear the engine.</h3><p>Three synth phrases and a straight house beat, rendered in JAZZY. Hear OberVave’s filtered pad in a room and LXR drums dry.</p><a class="text-link" href="manual/#lxr-credits">Elixir / LXR-02 credits →</a></div>
+<div>
+<div class="auditions" role="group" aria-label="Choose a sound example"><button type="button" class="chip" data-audio="fmini" aria-pressed="true">FMINI-1</button><button type="button" class="chip" data-audio="ober" aria-pressed="false">OBERVAVE</button><button type="button" class="chip" data-audio="hydra" aria-pressed="false">HYDRA</button><button type="button" class="chip" data-audio="lxr" aria-pressed="false">LXR KIT</button></div>
+<p class="audition-caption" id="patch-caption" aria-live="polite">Tube Bass · syncopated analog bass</p>
+<audio id="patch-audio" aria-label="Selected engine demo" controls preload="none" src="assets/fmini.wav?v=2"></audio>
+</div>
+</div>
+<div class="catalog-heading" id="engine-catalog"><p class="label accent">THE COMPLETE COLLECTION</p><h3>All engines.</h3></div>
+<div class="catalog-toolbar"><div role="group" aria-label="Filter sound engines" id="engine-filters"><button type="button" class="chip" data-filter="all" aria-pressed="true">All 31</button><button type="button" class="chip" data-filter="synth" aria-pressed="false">Synths 27</button><button type="button" class="chip" data-filter="drum" aria-pressed="false">Drums 3</button><button type="button" class="chip" data-filter="sample" aria-pressed="false">Break 1</button></div><label>Find an engine <input id="engine-search" type="search" placeholder="FM, bass, LXR…"></label></div>
+<p class="label" id="engine-count" aria-live="polite"></p>
+<div class="engine-gallery engine-gallery-catalog" id="engine-grid" aria-label="All engine animations">
+  <a class="engine-card guide-card" id="engine-guide" href="manual/#presets" hidden>
+    <span class="guide-card-face" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 9v17M16 9C13 6 8 5 4 6v16c4-1 9 0 12 4 3-4 8-5 12-4V6c-4-1-9 0-12 3Z"/></svg></span>
+    <span class="engine-card-caption"><b class="engine-card-name">Learn more</b><span class="engine-zoom" aria-hidden="true">↗</span><span class="engine-card-note" id="engine-guide-topic">Browse sounds and presets</span></span>
+  </a>
+</div>
+<noscript><p>Enable JavaScript to browse and enlarge the engine animations.</p></noscript>
+<template id="engine-card">
+  <a class="engine-card">
+    <span class="screen"><img alt="" width="240" height="240" loading="lazy"></span>
+    <span class="engine-card-caption">
+      <b class="engine-card-name"></b><span class="engine-zoom" aria-hidden="true">↗</span>
+      <span class="engine-card-note"></span>
+    </span>
+  </a>
+</template>
+</section>
+<section class="shell section" id="effects">
+<div class="section-head"><div><p class="label accent">02 / SHAPE THE SOUND</p><h2>Watch what the knobs do.</h2></div><p>The motion follows the note, envelope and effect. Change the attack and watch the skater climb. Turn up feedback and watch the echoes travel.</p></div>
+<div class="feature-grid fx-grid">
+<figure><div class="screen"><img src="assets/env.png" data-motion="assets/env.gif" alt="Skater follows the envelope curve on note-on and release" width="240" height="240" loading="lazy"></div><figcaption><b>ENV</b><span>Skate the shape of a note.</span></figcaption></figure>
+<figure><div class="screen"><img src="assets/delay.png" data-motion="assets/delay.gif" alt="Delay animation shows echoes as moving bars" width="240" height="240" loading="lazy"></div><figcaption><b>DELAY</b><span>See the repeats move away.</span></figcaption></figure>
+<figure><div class="screen"><img src="assets/reverb.png" data-motion="assets/reverb.gif" alt="Reverb animation expands around the source" width="240" height="240" loading="lazy"></div><figcaption><b>REVERB</b><span>Read the shape and size of the space.</span></figcaption></figure>
+<figure><div class="screen"><img src="assets/chorus.png" data-motion="assets/chorus.gif" alt="Modulated lines sway in the chorus bus page" width="240" height="240" loading="lazy"></div><figcaption><b>PHASER / CHORUS</b><span>Follow the movement of the modulation.</span></figcaption></figure>
+<figure><div class="screen"><img src="assets/lfo.png" data-motion="assets/lfo.gif" alt="LFO shows its shape and motion over time" width="240" height="240" loading="lazy"></div><figcaption><b>LFO</b><span>See the modulation cycle as it runs.</span></figcaption></figure>
+<a class="engine-card guide-card" href="manual/#shape">
+  <span class="guide-card-face" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 9v17M16 9C13 6 8 5 4 6v16c4-1 9 0 12 4 3-4 8-5 12-4V6c-4-1-9 0-12 3Z"/></svg></span>
+  <span class="engine-card-caption"><b class="engine-card-name">Learn more</b><span class="engine-zoom" aria-hidden="true">↗</span><span class="engine-card-note">Envelopes, modulation and effects</span></span>
+</a>
+</div>
+</section>
+<section class="shell section compact" id="patterns">
+<div class="section-head"><div><p class="label">03 / PUT IT IN MOTION</p><h2>A place for the sound to go.</h2></div><p>Use the step sequencer, record automation or let GEN draft a bass, chords and melody. HORTATOR, LXR and KW KICK can make their own one-track patterns.</p></div>
+<a class="text-link" href="manual/#sequence">Sequencing and GEN in the manual →</a>
+</section>
+<section class="shell section sibling" id="companion" aria-labelledby="companion-title">
+<div><p class="label">SAME INSTRUMENT / TWO FIRMWARES</p><h2 id="companion-title">Two sides of the FM-1.</h2><p>JAZZY is the other half of RHYTHMER OS. We built them side by side for the same instrument.</p></div>
+<a href="../Rhythmer/#home"><img src="rhythmer-mark.svg" alt="" width="27" height="27"><span><b>RHYTHMER</b><small>Sound into motion. Find your own groove.</small></span><span aria-hidden="true">↗</span></a>
+<figure class="companion-film">
+  <video controls playsinline preload="none" width="1920" height="1080" poster="../Rhythmer/assets/video/companion-film.jpg" aria-label="JAZZY and RHYTHMER companion film">
+    <source src="../Rhythmer/assets/video/companion-film.mp4?v=wavetable-20261110.3" type="video/mp4">
+    <a href="../Rhythmer/assets/video/companion-film.mp4?v=wavetable-20261110.3">Download the companion film</a>.
+  </video>
+  <figcaption>JAZZY &amp; RHYTHMER / TWO SIDES OF THE FM-1</figcaption>
+</figure>
+</section>
+<section class="shell section community-panel" id="editor" aria-labelledby="editor-title">
+  <div><p class="label">JAZZY / WEB EDITOR</p><h2 id="editor-title">Shape a sound. Build a project.</h2>
+  <p>Browse factory presets, edit modulation and sequences, mix tracks, and organize four projects with A–D sections. Work in your browser or connect an FM-1 running the matching JAZZY firmware.</p></div>
+  <div class="actions"><a class="button primary" href="editor/">Open Web Editor <span>→</span></a>
+  <a class="button" href="editor/?target=usb">Connect FM-1 <span>↗</span></a></div>
+</section>
+<section class="shell section compact" id="update" aria-labelledby="update-title">
+<div class="section-head"><div><p class="label accent">LATEST UPDATE / BUILD 20261111.1</p><h2 id="update-title">Let the kick lead.</h2></div></div>
+<p>Set the sidechain from an internal kick, a chosen track, incoming USB audio or a specific MIDI note. With Kick Link, a kick on RHYTHMER can duck a mix on JAZZY, and a JAZZY kick can drive RHYTHMER the same way.</p>
+<ul><li><strong>More control over the envelope.</strong> Adjust attack, release and amount. MASTER’s DUCK and DUCK ENV’s AMT share one setting.</li>
+<li><strong>USB MIDI Host.</strong> Connect class-compliant MIDI gear, or link two FM-1s with one in Host mode and the other in Device mode.</li>
+<li><strong>31 refreshed engine animations.</strong> Each engine has its own pixel backdrop. TRIO’s bird chases an insect while the note sounds, then settles on release. ENV, LFO and FX visuals were also refreshed.</li>
+<li><strong>CPU and mix headroom.</strong> The renderer reuses compact graphics and the existing redraw limits. Earlier attack, chord and mixer fixes carry forward to reduce clicks and clipping.</li></ul>
+<p><a class="text-link" href="manual/#duck">SET UP SIDECHAIN →</a> · <a class="text-link" href="../Rhythmer/#guide/sidechain">RHYTHMER SIDECHAIN GUIDE ↗</a></p>
+</section>
+<section class="shell section community-panel" id="manual" aria-labelledby="manual-title">
+  <div><p class="label">JAZZY / FIELD MANUAL</p><h2 id="manual-title">Find your way around JAZZY.</h2>
+  <p>Start with your first sound, then explore preset browsing, sequencing, effects and sidechain at your own pace.</p></div>
+  <div class="actions"><a class="button primary" href="manual/">Open the field manual <span>→</span></a>
+  <a class="button" href="manual/#duck">Sidechain and Kick Link <span>↗</span></a></div>
+</section>
+<section class="shell section community-panel" id="support" aria-labelledby="support-title">
+  <div>
+    <p class="label">SUPPORT THE FIRMWARE</p>
+    <h2 id="support-title">Help with the next version.</h2>
+    <p>JAZZY is free and open source. Your support helps make time for development, testing and documentation.</p>
+    <a class="button primary" href="https://ko-fi.com/jazzyrhythmer" target="_blank" rel="noopener noreferrer">Support on Ko-fi ↗</a>
+  </div>
+  <div>
+    <h3>Find Jazzy Rhythmer</h3>
+    <p>Listen to new music, watch FM-1 jams and follow what’s in the studio.</p>
+    <nav class="community-links" aria-label="Music and social channels">
+      <a href="https://jazzyrhythmer.github.io/" target="_blank" rel="noopener noreferrer">Website ↗</a>
+<a href="https://www.youtube.com/@jazzyrhythmer" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+<a href="https://www.instagram.com/jazzyrhythmer/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+<a href="https://soundcloud.com/jazzyrhythmer/" target="_blank" rel="noopener noreferrer">SoundCloud ↗</a>
+<a href="https://open.spotify.com/intl-ko/artist/13ld5f2zK1RckuR4Z7qbtY" target="_blank" rel="noopener noreferrer">Spotify ↗</a>
+<a href="https://jazzyrhythmer.bandcamp.com/" target="_blank" rel="noopener noreferrer">Bandcamp ↗</a>
+    </nav>
+  </div>
+</section>
+<section class="shell section community-panel" id="notes" aria-labelledby="studio-notes-title">
+  <div>
+    <p class="label">FROM THE MAKER / STUDIO NOTES</p>
+    <h2 id="studio-notes-title">Stay on the frequency.</h2>
+    <p>Music, studio sessions, sounds and software updates from Jazzy Rhythmer, including JAZZY and RHYTHMER.</p>
+    <a class="text-link" href="https://jazzyrhythmer.github.io/" target="_blank" rel="noopener noreferrer">Explore Jazzy Rhythmer ↗</a>
+  </div>
+  <div class="studio-signup">
+    <p id="studio-notes-consent">Subscribe for emails about music, studio sessions, sounds and occasional software updates.</p>
+    <div id="studio-notes-form" aria-describedby="studio-notes-consent"><p data-signup-loading>Loading the Studio Notes signup form…</p></div>
+    <p class="studio-notes-fine">Confirm your email to join. Unsubscribe anytime. <a href="https://jazzyrhythmer.github.io/privacy.html" target="_blank" rel="noopener noreferrer">Privacy &amp; data ↗</a></p>
+    <a class="studio-notes-fallback" href="https://jazzy-rhythmer.kit.com/6dd4006c7c" target="_blank" rel="noopener noreferrer">Open the Studio Notes signup page ↗</a>
+  </div>
+</section>
+</main>
+<footer class="shell foot"><span>JAZZY / BY JAZZY RHYTHMER</span><a href="manual/">Manual</a><a href="installer/">Install</a><a href="manual/#lxr-credits">Credits</a><a href="https://github.com/JazzyRhythmer/Jazzy">Source ↗</a><a href="../Rhythmer/">Rhythmer ↗</a><a href="#notes">Studio Notes ↓</a><a href="#support">Support &amp; links ↑</a></footer>
+</body>
+</html>
