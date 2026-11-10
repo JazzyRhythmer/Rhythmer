@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-11 · Sidechain guide
+
+- Documented trigger sources, drum-lane selection, shared DUCK/AMT, and bidirectional Kick Link between RHYTHMER and JAZZY. [Read the guide](https://jazzyrhythmer.github.io/Rhythmer/#guide/sidechain).
+
 ## 0.1.2-dev1 — 2026-11-09 · build 20261109.18
 
 - FMINI-1 (43 presets) and OberVave (32 presets) replace PHASE, LOFI and WHEEL. Analog, Wavetable, FM6 and all three MONO2K machines remain. Projects using a retired engine load the affected track with Analog.

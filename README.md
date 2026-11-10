@@ -42,6 +42,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 - Break: 16 chops, 16 performance/repeat commands, source A/B and return commands in the real sequence. Hold SEQ for STRAIGHT / MUTATE / RANDOM, tail fills, beat shuffle, reverse order, shifts and A/B sequencing. Saved periodic mutation supports ORBIT/DRIFT.
 - Break follows the normal track filter, ADSR and both LFOs. Fresh Break tracks select A / Amen with an empty two-bar sequence. Hold SEQ + F3 for a straight loop; saved edits remain intact.
 - Five per-track SEQ generators (Euclid, Mutate, Turing, Cellular and Grids), plus 59 arrangement genres and targeted MIDI/Break GEN.
+- **Sidechain and Kick Link.** Trigger ducking from a kick, a track or kit lane, USB audio or a MIDI note. Send a kick to JAZZY or receive one back over USB MIDI. [Sidechain and Kick Link guide](https://jazzyrhythmer.github.io/Rhythmer/#guide/sidechain).
 - Four projects with A–D sections and explicit section/project clearing. Two LFOs per track, shared FX and ducking with local, USB-audio and timing-only MIDI triggers. Four-/six-track modes preserve inactive tracks.
 - USB MIDI Host for class-compliant USB MIDI controllers. Use Device mode for the installer and USB editor.
 - Web editor for actual sounds/patterns, musical archive import/export and user-replaceable two-bar A/B loops. Conversion to 16 kHz mono packed PCM12 happens in the browser. Musical archives do not contain audio: retain your original samples separately.
