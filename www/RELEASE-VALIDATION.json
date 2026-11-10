@@ -2,17 +2,17 @@
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
   "buildRevision": "20261110.3",
-  "firmwareSha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023",
+  "firmwareSha256": "8703f3d2ae573ccf4b924f02b0ab85bef13711ac6e41c901d338217fda3579bd",
   "physicalHardwareTested": false,
   "nativeScenarios": 1,
-  "exactBuildSummary": "WAVETABLE retains the same engine and preset IDs. Both embedded Break banks match the previous release byte for byte. The release was checked in software; no physical device write was performed.",
+  "exactBuildSummary": "USB MIDI timing and send priority refreshed in place. Break banks and loader are unchanged. Two-unit hardware testing pending.",
   "memory": {
-    "appBytes": 583352,
+    "appBytes": 583656,
     "appSlotBytes": 584336,
-    "appSlotFreeBytes": 984
+    "appSlotFreeBytes": 680
   },
   "emulator": {
-    "summary": "wavetable stack DAC PCM 156672 peak 7065 max_us 2479 late 0 missing halves 0 core1 lost 0 load (21, 0, 0) USB frames 149109\n"
+    "summary": "On the final firmware, a three-track chord stress test recorded 156672 stereo frames, zero late audio blocks, zero lost DMA halves and zero core1 misses. Hardware testing remains pending."
   },
   "loader": {
     "summary": "Both embedded factory Break banks are byte-identical to the previous release. No physical device write was performed."
@@ -146,7 +146,7 @@
     "rhythmer/firmware/src/md_trxn_kernels.h": "ff087e29cb373fd74f39ce60f928c2794950a7fc19500217ac8a8abb391cdecf",
     "rhythmer/firmware/src/md_xttrx_kernels.h": "b8cf6c4d885c62048d1eae5aa051f57182311d56c627e4b8f4a13c5560f32b18",
     "rhythmer/firmware/src/menu_items.c": "c782dbbe8e846be3e7ef7c77ea8360df5d88eb1da873f4d40389b9ea41aab59f",
-    "rhythmer/firmware/src/midi_clock.c": "19b880b92e0da609f8128fc7f3cfcc2528d952efb6d650a51e1addc27aff68fc",
+    "rhythmer/firmware/src/midi_clock.c": "ed54449147dbdd0f08b631b160752d967f596589c63c98078f8c831a0348b0c3",
     "rhythmer/firmware/src/midi_control.c": "08c9b4e1a3c92aced0b0b9e13d67e3224cb5792daaf4c41bf1b7f7566d4efb44",
     "rhythmer/firmware/src/midi_learn.c": "703889b621c09c6c495fce7eea23af0b3cbd7b064166a3b64900e46e162266c3",
     "rhythmer/firmware/src/midi_uart.c": "459cf47e648a91523713b27886448d8992ab8629288c76f6e5d317be54c4435f",
@@ -200,8 +200,8 @@
     "rhythmer/firmware/src/ui_tools.c": "74c9a4b8a1f9abd3dff6569e8f1d25653ed87054d1043e2adc9414ff4add24b3",
     "rhythmer/firmware/src/up_fm6.c": "51297886ce41caee5a1117a557fb608bc911577d09bf8a2d3014342b65eb3fe4",
     "rhythmer/firmware/src/upreset.c": "ae5be2084eeb290cefd121e0939708ebc2a7ea4cdbaa48f10a9464c900ae7a00",
-    "rhythmer/firmware/src/usb.c": "09fc3a018bc7a31577ea9186ca0b34d57dcbcbde3bd201cf0567784a4a0fed19",
-    "rhythmer/firmware/src/usb_host.c": "0c44066e99747c73c1eb0b3e5880b2ab8d9b5250b7168be47d7a1f6a843b65f2",
+    "rhythmer/firmware/src/usb.c": "54bf23c82c735cb6edb722eadd0862a5ca0b22b673b769ac0d386c4a54409e50",
+    "rhythmer/firmware/src/usb_host.c": "4a67e48d0957ba377ba7aa39f3a67f6b03c6ca5899deb1d53458ebfa705877fd",
     "rhythmer/firmware/src/usb_host_desc.h": "d85ed2a621f0d2566a44d7935af58493c08b2fd9af86016441b3ede68d9d0a06",
     "rhythmer/firmware/src/voice.c": "076d7762c69d6ec8b743c75d5286dd7bd72ec034b320842152969a601e6b246f",
     "rhythmer/firmware/src/wavetable_tables.c": "f43b00bf1eed26c206b3cb7dec00c2794a2348babe39c3c49afde00a25b7484d",
@@ -275,8 +275,8 @@
     "rhythmer/tools/video/visuals_film.mjs": "c347e657def510b6b5f82cb26e82bf9afe16461fb8d40b03dc5242dd373dfbac"
   },
   "previousBuild": {
-    "buildRevision": "20261110.2",
-    "firmwareSha256": "b1430764912967a1fdec62800c26a7ccfa092a3eea43d0f2bed178167ec0110a"
+    "buildRevision": "20261110.3",
+    "firmwareSha256": "1798874c4ae499aca19d947fba72396c2d858ec30c538ac074564c654db4f023"
   },
   "pdf": {
     "file": "Rhythmer-Manual-v0.1.2-dev1.pdf",
@@ -287,5 +287,13 @@
     "manualSourceSha256": "a3e4de3aefb52bab39952eae3a45a7b12635c59570902cbf5d5094c0933e3997",
     "links": 50,
     "scope": "Complete English print edition from current web manual chapters, with actual host-rendered UI and credits."
+  },
+  "usbClockSimulation": {
+    "scope": "USB transfer model, transport, and 80-beat sequencer phase comparison",
+    "bpmRange": [
+      120,
+      120
+    ],
+    "worstStepPhaseMs": 3
   }
 }

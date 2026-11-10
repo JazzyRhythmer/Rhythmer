@@ -74,7 +74,7 @@ static struct {
     uint8_t dg_fail, dg_nomidi;                         /* the search met a device that did not answer / was not MIDI */
     uint8_t dg_cls[3];                                  /* the last device's bDeviceClass, first interface class / subclass */
     char dg[28];                                        /* what the last search saw, in letters (uh_dg): tests, bench */
-    uint8_t in_ep, out_mps, tx_count, tx_errors, line_idle;
+    uint8_t in_ep, out_mps, tx_count, tx_rt, tx_errors, line_idle;
     uint8_t msg;                                        /* one UH_MSG_* for main.c to show */
     volatile uint8_t errors;
     uint32_t t_ms, retry_ms;
@@ -474,6 +474,7 @@ static void uh_session_end(void)
     uh.out_mps = 0;
     uh.tx_count = 0;
     mo_r = mo_w;
+    rt_r = rt_w;
     RING_PUBLISH();
     if (uh.on)
         usb_midi_lost = 1;
@@ -719,17 +720,11 @@ static void uh_tx_poll(void)
         }
         if (csr & 0x03u) return;                        /* TxPktRdy / FIFONotEmpty: no ACK yet */
         RING_PUBLISH();
-        mo_r += uh.tx_count;
+        rt_r += uh.tx_rt;
+        mo_r += uh.tx_count - uh.tx_rt;
         uh.tx_count = uh.tx_errors = 0;
     }
-    while (mo_r + n / 4u != mo_w && n + 4u <= uh.out_mps) {
-        uint32_t p = midi_out_q[(mo_r + n / 4u) % MQ];
-        ep1tx[n] = (uint8_t)p;
-        ep1tx[n + 1] = (uint8_t)(p >> 8);
-        ep1tx[n + 2] = (uint8_t)(p >> 16);
-        ep1tx[n + 3] = (uint8_t)(p >> 24);
-        n += 4u;
-    }
+    n = midi_out_fill(0, uh.out_mps, &uh.tx_rt);
     if (!n) return;
     uh.tx_count = (uint8_t)(n / 4u);
     uh.tx_ms = fm1_ms;

@@ -251,6 +251,10 @@ static volatile uint32_t so_w, so_r;
 /* MIDI rings: 4-byte USB-MIDI event packets */
 #define MQ 64u
 static uint32_t midi_in_q[MQ], midi_out_q[MQ];
+/* Melodee 3fe570d gives clock and transport their own USB queue. */
+#define RTQ 64u
+static uint8_t midi_rt_q[RTQ];
+static volatile uint32_t rt_w, rt_r;
 static uint32_t midi_in_ms[MQ];
 static uint8_t midi_in_source[MQ];                    /* 1 USB, 2 TRS */
 static volatile uint32_t fm1_ms;                    /* also declared by core.h; parser-only host tests */
@@ -278,11 +282,19 @@ static void midi_out_event(uint32_t pkt)            /* from the audio ISR */
 {
     if (
 #if RHYTHMER_USB_HOST
-        usb_midi_out_ready()
+        !usb_midi_out_ready()
 #else
-        usb.config
+        !usb.config
 #endif
-        && mo_w - mo_r < MQ) {
+        )
+        return;
+    if ((pkt & 15u) == 15u) {
+        if (rt_w - rt_r < RTQ) {
+            midi_rt_q[rt_w % RTQ] = (uint8_t)(pkt >> 8);
+            RING_PUBLISH();
+            rt_w++;
+        }
+    } else if (mo_w - mo_r < MQ) {
         midi_out_q[mo_w % MQ] = pkt;
         RING_PUBLISH();
         mo_w++;
@@ -1164,16 +1176,42 @@ static void ota_frame_done(void)
 }
 #endif
 
+/* Stage clock before notes. Host commits the read cursors only on ACK. */
+static uint32_t midi_out_fill(uint32_t n, uint32_t limit, uint8_t *realtime)
+{
+    uint32_t rt = 0, normal = 0;
+    while (n + 4u <= limit) {
+        uint32_t pkt;
+        if (rt_r + rt != rt_w) {
+            RING_PUBLISH();
+            pkt = 15u | (uint32_t)midi_rt_q[(rt_r + rt++) % RTQ] << 8;
+        } else {
+            if (mo_r + normal == mo_w)
+                break;
+            RING_PUBLISH();
+            pkt = midi_out_q[(mo_r + normal) % MQ];
+#ifdef KICK_LINK_START
+            if (n + 8u > limit && limit >= 8u && pkt == KICK_LINK_START)
+                break;
+#endif
+            normal++;
+        }
+        __builtin_memcpy(__builtin_assume_aligned(ep1tx + n, 4), &pkt, sizeof pkt);
+        n += 4u;
+    }
+    *realtime = (uint8_t)rt;
+    return n;
+}
+
 static void ep1_tx(void)
 {
     uint32_t csr, n = 0;
+    if (rt_w == rt_r && mo_w == mo_r
 #if FELUCCA_OTA
-    if (mo_w == mo_r && so_w == so_r)
-        return;
-#else
-    if (mo_w == mo_r)
-        return;
+        && so_w == so_r
 #endif
+    )
+        return;
     sie_wr(S_INDEX, 1);
     csr = sie_rd(S_TXCSR1);
     if (csr & 0x01u)
@@ -1190,25 +1228,15 @@ static void ep1_tx(void)
         n += 4u;
         so_r++;
     }
-    while (!sx_busy && so_r == so_w && mo_r != mo_w && n < 64u) {
-#else
-    while (mo_r != mo_w && n < 64u) {
+    if (!sx_busy && so_r == so_w)
 #endif
-        uint32_t pkt;
-        RING_PUBLISH();                                 /* the audio ISR (producer) can preempt us: */
-        pkt = midi_out_q[mo_r % MQ];                    /* slot read strictly between the index checks */
-#ifdef KICK_LINK_START
-        /* Keep the frame together even if editor SysEx has priority on the next transfer. */
-        if (n == 60u && pkt == KICK_LINK_START)
-            break;
-#endif
-        ep1tx[n] = (uint8_t)pkt;
-        ep1tx[n + 1] = (uint8_t)(pkt >> 8);
-        ep1tx[n + 2] = (uint8_t)(pkt >> 16);
-        ep1tx[n + 3] = (uint8_t)(pkt >> 24);
-        n += 4u;
+    {
+        uint8_t rt;
+        uint32_t start = n;
+        n = midi_out_fill(n, 64u, &rt);
         RING_PUBLISH();
-        mo_r++;
+        rt_r += rt;
+        mo_r += (n - start) / 4u - rt;
     }
     if (!n)
         return;
@@ -1879,6 +1907,7 @@ static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
         usb.config = 0;
         usb.suspended = 0;
         mo_r = mo_w;                                    /* nothing stale for the next host */
+        rt_r = rt_w;
 #ifdef KICK_LINK_START
         kick_link_cable = 0;
 #endif

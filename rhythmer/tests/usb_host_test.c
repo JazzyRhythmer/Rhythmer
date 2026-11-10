@@ -11,7 +11,7 @@
  * its own, ahead of the notes); a session that ends (unplug, fault, USB Host Off) raises usb_midi_lost, which the
  * audio interrupt takes (cr_out.c cr_mlost, 3y261): every note MIDI holds released, the FM-1's own keys kept.
  * FELUCCA_OTA=1 (run_tests.sh's second build): the device side after USB Host Off, a SysEx sent whole before the
- * notes and the clock that wait behind it.
+ * clock and notes that wait behind it.
  *   cc -std=gnu11 -O1 -fsanitize=address,undefined -o build/host/usb_host_test tests/usb_host_test.c (run_tests.sh) */
 #include <assert.h>
 #include <stdint.h>
@@ -760,20 +760,20 @@ static void test_host_output(int via_hub)
     assert(midi_track_emit(0x003c8008u)); assert(midi_track_emit(0x000040bbu));
     usb_poll(); assert(ep_cnt[1] == 8 && mo_w - mo_r == 2);
     ack_tx(); usb_poll(); assert(wire[MQ] == 0x003c8008u && wire[MQ+1] == 0x000040bbu);
-    /* Clock and transport share ChoralRoot's one ring: they leave in the order queued, keeping slots until ACK. */
+    /* Clock precedes waiting notes and keeps its own ACK cursor. */
     uint32_t sent = wire_n, pulse = 0xFu | 0xF8u << 8, start = 0xFu | 0xFAu << 8;
     assert(midi_track_emit(0x003d8008u));
     midi_sync_emit(0xF8u); midi_sync_emit(0xFAu);
     usb_poll();
-    assert(ep_cnt[1] == 12 && uh.tx_count == 3 && mo_w - mo_r == 3);
-    midi_sync_emit(0xF8u);                             /* arrives while that packet is out */
+    assert(ep_cnt[1] == 12 && uh.tx_count == 3 && mo_w - mo_r == 1 && rt_w - rt_r == 2);
+    midi_sync_emit(0xF8u);
     regs[1][17] = 0x80; usb_poll();                    /* NAK: every slot retained */
-    assert(mo_w - mo_r == 4 && uh.tx_count == 3);
+    assert(mo_w - mo_r == 1 && rt_w - rt_r == 3 && uh.tx_count == 3);
     ack_tx(); usb_poll();
-    assert(wire[sent] == 0x003d8008u && wire[sent + 1] == pulse && wire[sent + 2] == start);
-    assert(mo_w - mo_r == 1 && ep_cnt[1] == 4 && uh.tx_count == 1);
+    assert(wire[sent] == pulse && wire[sent + 1] == start && wire[sent + 2] == 0x003d8008u);
+    assert(mo_w == mo_r && rt_w - rt_r == 1 && ep_cnt[1] == 4 && uh.tx_count == 1);
     ack_tx(); usb_poll();
-    assert(wire[sent + 3] == pulse && mo_r == mo_w && !uh.tx_count);
+    assert(wire[sent + 3] == pulse && mo_r == mo_w && rt_r == rt_w && !uh.tx_count);
     /* A stall discards old queued note-ons and requests cleanup, then re-enumerates. */
     assert(midi_track_emit(0x643c9009u)); usb_poll(); regs[1][17] = 0x20; usb_poll();
     assert(uh.fault && !uh.run && !midi_track_emit(0x643d9009u)); recover_host();
@@ -794,21 +794,21 @@ static void test_host_output(int via_hub)
     assert(!uh.on && !usb_midi_out_ready());
     usb_retry(fm1_ms);usb_retry(fm1_ms + 1000); usb.config = 1;
     assert(midi_track_emit(0x643c9009u));               /* ordinary computer-facing output remains available */
-    midi_sync_emit(0xF8u);                             /* ... the clock behind the note, as queued; never in a SysEx */
+    midi_sync_emit(0xF8u);                             /* first after any active editor SysEx */
 #if FELUCCA_OTA
     /* A real-time byte inside a SysEx would reach the host's clients as part of the message: ep1_tx sends the SysEx
      * ring first and holds the MIDI ring while one is being composed (sx_busy). */
     sx_busy = 1; sx_out_q[so_w++ % SXQ] = 0x467DF004u;
     regs[1][17] = 0; usb_poll();
-    assert(ep_cnt[1] == 4 && so_r == so_w && mo_w - mo_r == 2);
+    assert(ep_cnt[1] == 4 && so_r == so_w && mo_w - mo_r == 1 && rt_w - rt_r == 1);
     regs[1][17] = 0; usb_poll();                       /* (still composing it) */
-    assert(mo_w - mo_r == 2);
+    assert(mo_w - mo_r == 1 && rt_w - rt_r == 1);
     sx_busy = 0;
 #endif
     regs[1][17] = 0; usb_poll();
-    assert(mo_r == mo_w && ep_cnt[1] == 8);
+    assert(mo_r == mo_w && rt_r == rt_w && ep_cnt[1] == 8);
     const uint8_t *out = ep_tadr[1];
-    assert(out[0] == 0x09u && out[4] == 0x0Fu && out[5] == 0xF8u);
+    assert(out[0] == 0x0Fu && out[1] == 0xF8u && out[4] == 0x09u);
     usb.config = usb.up = 0; mo_r = mo_w;
     printf("USB host OUT %s: duplex, ACK ownership, NAK/error retries, bounded faults, mode settings: OK\n",
            via_hub ? "behind a hub" : "direct");
