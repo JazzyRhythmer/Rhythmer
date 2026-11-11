@@ -42,7 +42,7 @@ static void drumgen_knob(const page_t *pg,unsigned k,int32_t s) {
 }
 /* Main-loop scratch shared across all tracks; generated MIDI is stored in the
  * existing step format. No additional per-track pattern or audio-state pool. */
-static step_t tl_src[NSTEP] __attribute__((section(".pool")));
+static step_t tl_src[NSTEP];
 #define dg_src tl_src /* SEQ tools and GEN are mutually exclusive main-loop actions. */
 static int seqgen_gate(const track_t *t,const step_t *s){
  if(s->time!=ST_NOTE||!s->n)return 0;

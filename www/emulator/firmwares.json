@@ -1,15 +1,1 @@
-{
-  "default": "rhythmer",
-  "firmwares": [
-    {
-      "id": "rhythmer",
-      "name": "Rhythmer",
-      "version": "0.1.2-dev1",
-      "author": "Jazzy Rhythmer",
-      "license": "GPL-3.0",
-      "repo": "../#releases",
-      "package": "../downloads/Rhythmer.fwsc?build=20261110.3&sha=8703f3d2ae57",
-      "about": "Rhythmer for M-VAVE FM-1 · build 20261110.3"
-    }
-  ]
-}
+{"default":"rhythmer","firmwares":[{"id":"rhythmer","name":"Rhythmer","version":"0.1.2-dev1","author":"Jazzy Rhythmer","license":"GPL-3.0","repo":"../#releases","package":"../downloads/Rhythmer.fwsc?sha=e273dfae244c","about":"Rhythmer · Multi-Break · build 20261111.3"}]}

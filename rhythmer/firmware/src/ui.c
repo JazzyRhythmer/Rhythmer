@@ -1451,7 +1451,7 @@ static void apply_preset_to(track_t *t, uint32_t pi)
 static void set_engine_of(track_t *t, uint32_t ei)
 {
     ei = six_role_engine((uint32_t)(t-trk), ei);
-    if(!six_engine_available((unsigned)(t-trk),ei)){ui_message("BREAK ALREADY ASSIGNED");return;}
+    if(!six_engine_available((unsigned)(t-trk),ei)){ui_message("ENGINE UNAVAILABLE");return;}
     unsigned changed=ei!=t->eng_req;
     const engine_t *e;
     uint32_t i;

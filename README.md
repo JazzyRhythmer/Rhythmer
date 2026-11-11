@@ -8,6 +8,10 @@
 
 Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/Jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/Rhythmer/#companion).
 
+## Multi-Break · build 20261111.3
+
+Use Break on several tracks at once, with shared A/B audio and independent playback, chops and modulation. GEN targets T1–T6 directly and shows Break controls for the selected Break track. Both factory Break banks remain included. [Update and compatibility notes](docs/releases/20261111.3.md) · [Sample preparation](https://jazzyrhythmer.github.io/Rhythmer/editor/?target=browser#samples)
+
 ## Explore the machines
 
 | Acid / NEW + MUTATE | Break / chops + repeats |

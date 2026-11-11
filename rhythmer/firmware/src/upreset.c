@@ -431,7 +431,7 @@ static int up_load(uint32_t k)
     if (!up_used(k))
         return 1;
     r = up_rec(k);
-    if(!six_engine_available(song.sel,eng_live(r->engine))){ui_message("BREAK ALREADY ASSIGNED");return 1;}
+    if(!six_engine_available(song.sel,eng_live(r->engine))){ui_message("ENGINE UNAVAILABLE");return 1;}
     up_values(r, v);
     load_begin(t, LOAD_SOUND);
     panic_req |= (uint8_t)(1u << song.sel);

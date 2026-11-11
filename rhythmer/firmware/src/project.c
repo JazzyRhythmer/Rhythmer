@@ -579,7 +579,6 @@ static int proj_unpack_c(project_t *q, const uint8_t *b);
  * is not one (it never was: no engine number past the last was ever stored) */
 static int proj_engines_ok(const project_t *q)
 {
-    unsigned breaks=0;for(unsigned k=0;k<NTRK;k++)breaks+=q->t[k].engine==ENGI_BREAK;if(breaks>1)return 0;
     uint32_t t;
     for (t = 0; t < NTRK; t++)
         if (q->t[t].engine >= NENGINES || six_role_engine(t, q->t[t].engine) != q->t[t].engine)

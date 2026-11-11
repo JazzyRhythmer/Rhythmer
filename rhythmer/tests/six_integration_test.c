@@ -15,7 +15,7 @@ int main(int argc,char **argv) {
   rp_apply();bad+=check("track count survives settings reapply",six_machine_mask==(m?3u:0u)&&menu_get(MI_TRACKS)==m);
  }
  trks_put(0);trk_note_on(&trk[4],36,127);six_break_clock(32,32,beat_samples());
- bad+=check("disabled tracks do not trigger or run",!trk[4].v[0].active&&!six_break_run&&!six_roll_count);
+ bad+=check("disabled tracks do not trigger or run",!trk[4].v[0].active&&!six_break_state(&trk[5])->run&&!six_break_state(&trk[5])->held_count);
  trks_put(1);
  /* Independent rates, phase, fades and per-slot source routing. */
  track_t *lt=&trk[1];lt->p[P_LRATE]=20;lt->p[P_L2RATE]=90;lt->p[P_L2WAVE]=2;
@@ -31,7 +31,7 @@ int main(int argc,char **argv) {
  power_on_parts();test_optional_machines();six_native_init();trks_put(3);
  for(unsigned k=0;k<6;k++)bad+=check("explicit fixture engine layout",trk[k].eng_req==(k==4?ENGI_ACID:k==5?ENGI_BREAK:TRK_DEF[k][0]));
  bad+=check("160 BPM and four projects",song.g[G_BPM]==160 && NSONG==4);
- for(unsigned t=0;t<6;t++){song.sel=t;uint32_t total;preset_all_pos(NENGINES,&total);int ok=total>0;for(unsigned i=0;i<total;i++){uint32_t k,e=preset_all_at(NENGINES,i,&k);ok&=six_preset_engine(e,NENGINES);}bad+=check("preset browser respects singleton Break ownership",ok);}
+ for(unsigned t=0;t<6;t++){song.sel=t;uint32_t total;preset_all_pos(NENGINES,&total);int ok=total>0;for(unsigned i=0;i<total;i++){uint32_t k,e=preset_all_at(NENGINES,i,&k);ok&=six_preset_engine(e,NENGINES);}bad+=check("preset browser respects per-track Break availability",ok);}
  song.sel=1;bad+=check("model list includes EMPTY and keeps stable synth order",eng_step(ENGI_WAVETABLE,-1)==ENGI_EMPTY&&eng_step(ENGI_WAVETABLE,1)==ENGI_PHASE&&eng_step(ENGI_PHASE,1)==ENGI_LOFI);
  bad+=check("stored Acid Break IDs remain stable",ENGI_BREAK==15u&&ENGI_ACID==16u&&ENGI_WAVETABLE==17u);
  project_capture(&proj_scratch);bad+=check("Garden engines pack and round trip",proj_pack(&proj_wire,&proj_scratch)&&proj_import(&proj_scratch,&proj_wire,sizeof proj_wire)&&proj_scratch.t[1].engine==ENGI_WAVETABLE&&proj_scratch.t[2].engine==ENGI_PHASE&&proj_scratch.t[3].engine==ENGI_LOFI);
@@ -52,20 +52,20 @@ int main(int argc,char **argv) {
  go_title("BRK SEQ");frame();turn(EN_K1,1);bad+=check("CHOP source selected",TSEL->p[P_LN0]==1);
  go_title("BRK PERF");frame();bad+=check("performance keys confined to BRK PERF",six_perf_enabled);
  song.playing=1;song.rec=1u<<TEST_BREAK_TRACK;TSEL->seq_idx=3;TSEL->seq_pos=0;
- key_on(26,TSEL);bad+=check("performance REC stores roll 16 command",TSEL->step[3].n==1&&TSEL->step[3].note[0]==31&&six_roll_count==1);
- key_on(23,TSEL);bad+=check("last pressed roll wins",six_roll_count==2&&six_roll_held[1]==13);key_off(23,TSEL);bad+=check("release restores and records prior held roll",six_roll_count==1&&six_roll_held[0]==15&&TSEL->step[3].note[0]==31);
- press(B_HOME);six_break_clock(32,32,beat_samples());bad+=check("HOME leaves performance without resetting controls or stuck roll",ui.home&&!six_perf_enabled&&!six_roll_count&&TSEL->p[P_E1]==90&&TSEL->p[P_E2]==90);key_off(26,TSEL);
+ key_on(26,TSEL);bad+=check("performance REC stores roll 16 command",TSEL->step[3].n==1&&TSEL->step[3].note[0]==31&&six_break_state(&trk[5])->held_count==1);
+ key_on(23,TSEL);bad+=check("last pressed roll wins",six_break_state(&trk[5])->held_count==2&&six_break_state(&trk[5])->roll_held[1]==13);key_off(23,TSEL);bad+=check("release restores and records prior held roll",six_break_state(&trk[5])->held_count==1&&six_break_state(&trk[5])->roll_held[0]==15&&TSEL->step[3].note[0]==31);
+ press(B_HOME);six_break_clock(32,32,beat_samples());bad+=check("HOME leaves performance without resetting controls or stuck roll",ui.home&&!six_perf_enabled&&!six_break_state(&trk[5])->held_count&&TSEL->p[P_E1]==90&&TSEL->p[P_E2]==90);key_off(26,TSEL);
  song.playing=0;song.rec=0;transport_req=0;
  open_family(FAM_SEQ);frame();press(B_REC);bad+=check("T6 SEQ REC arms step recording",song.rec==(1u<<TEST_BREAK_TRACK));
- ui.cursor=0;seq_entry(1u<<7);bad+=check("T6 step entry maps chop without roll",TSEL->step[0].n&&TSEL->step[0].note[0]==4&&!six_roll_count);
+ ui.cursor=0;seq_entry(1u<<7);bad+=check("T6 step entry maps chop without roll",TSEL->step[0].n&&TSEL->step[0].note[0]==4&&!six_break_state(&trk[5])->held_count);
  song.playing=1;TSEL->seq_idx=1;TSEL->seq_pos=0;key_on(26,TSEL);key_off(26,TSEL);bad+=check("T6 live recording writes slice trigger",TSEL->step[1].n==1&&TSEL->step[1].note[0]==15);song.playing=0;song.rec=0;transport_req=0;
  ui.cursor=0;note_edit(1,-1000);bad+=check("SEQ can select first chop C1",TSEL->step[0].note[0]==0);note_edit(1,1000);bad+=check("SEQ clamps command to slot B",TSEL->step[0].note[0]==34);note_edit(1,-30);
- static uint8_t sa[72000],sb[72000];six_loops[0]=sa;six_loops[1]=sb;six_loop_mask=3;six_loop_now=0;jungle_bind(sa,72000,48000);
+ static uint8_t sa[72000],sb[72000];six_loops[0]=sa;six_loops[1]=sb;six_loop_mask=3;jungle_bind(six_break_prepare(TSEL),sa,72000,48000);
  go_title("BRK PERF");frame();song.playing=1;song.rec=1u<<TEST_BREAK_TRACK;TSEL->seq_idx=5;TSEL->seq_pos=0;
  key_on(22,TSEL);key_off(22,TSEL);bad+=check("PERF B selects and records slot B",TSEL->p[P_E4]==1&&TSEL->step[5].note[0]==33);
- six_break_ticks=1;six_break_clock(0,32,beat_samples());bad+=check("manual swap waits for grid",six_loop_now==0);
- six_break_ticks=48;six_break_clock(0,32,beat_samples());bad+=check("manual swap commits at sixteenth boundary",six_loop_now==1&&jungle_bound()==sb);
- seq_note_on(TSEL,32,100);bad+=check("sequenced A swap fires without second quantization",six_loop_now==0&&jungle_bound()==sa);
+ six_break_state(TSEL)->clock_ticks=1;six_break_clock(0,32,beat_samples());bad+=check("manual swap waits for grid",six_break_state(TSEL)->loop_now==0);
+ six_break_state(TSEL)->clock_ticks=48;six_break_clock(0,32,beat_samples());bad+=check("manual swap commits at sixteenth boundary",six_break_state(TSEL)->loop_now==1&&jungle_bound(six_break_prepare(TSEL))==sb);
+ seq_note_on(TSEL,32,100);bad+=check("sequenced A swap fires without second quantization",six_break_state(TSEL)->loop_now==0&&jungle_bound(six_break_prepare(TSEL))==sa);
  key_on(25,TSEL);key_off(25,TSEL);bad+=check("toggle resolves to deterministic slot command",TSEL->p[P_E4]==1&&TSEL->step[5].note[0]==33);
  six_loops[0]=0;key_on(20,TSEL);key_off(20,TSEL);bad+=check("missing slot leaves current source intact",TSEL->p[P_E4]==1);six_loops[0]=sa;
  TSEL->seq_idx=6;TSEL->seq_pos=0;key_on(24,TSEL);key_on(22,TSEL);key_off(22,TSEL);

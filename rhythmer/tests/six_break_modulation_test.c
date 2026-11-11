@@ -6,7 +6,7 @@ static uint8_t source[72000];
 static int bad;
 #define C(s,x) do{bad+=check(s,(x));}while(0)
 static track_t *reset(void){
- ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_loops[0]=six_loops[1]=source;six_loop_mask=3;six_loop_now=0;six_native_init();trks_put(1);song.sel=5;song.playing=1;
+ ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_loops[0]=six_loops[1]=source;six_loop_mask=3;six_native_init();trks_put(1);song.sel=5;song.playing=1;
  track_t *t=TSEL;t->engine=t->eng_req=ENGI_BREAK;t->xf=t->xf_on=0;
  memset(t->v,0,sizeof t->v);t->m_env=0;t->p[P_MUTE]=0;
  t->p[P_ATK]=t->p[P_DEC]=t->p[P_REL]=0;t->p[P_SUS]=127;
@@ -16,7 +16,7 @@ static track_t *reset(void){
  t->lfo_ph=t->lfo2_ph=0;t->lfo_val=t->lfo2_val=0;t->lfo_fade=t->lfo2_fade=32767;
  for(unsigned i=0;i<4;i++)t->p[P_M1SRC+3*i]=t->p[P_M1DST+3*i]=t->p[P_M1AMT+3*i]=0;
  memset(tf_ic1,0,sizeof tf_ic1);memset(tf_ic2,0,sizeof tf_ic2);memset(tf_on,0,sizeof tf_on);memset(tf_xb,0,sizeof tf_xb);memset(tf_cmb,0,sizeof tf_cmb);memset(tf_ft,0,sizeof tf_ft);
- jungle_bind(source,sizeof source,48000);jungle_sequence_mode(1);jungle_play(1);jungle_tick_mask(0);
+ jungle_bind(six_break_prepare(TSEL),source,sizeof source,48000);jungle_sequence_mode(six_break_prepare(TSEL),1);jungle_play(six_break_prepare(TSEL),1);jungle_tick_mask(six_break_prepare(TSEL),0);
  return t;
 }
 static double render(track_t *t,unsigned blocks,uint32_t *hash){

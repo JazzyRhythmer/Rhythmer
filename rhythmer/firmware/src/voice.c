@@ -930,6 +930,7 @@ static void engine_block(track_t *t)
             v->env = v->env_out = 0;
         }
         any = t->engine != eng_idx(t->eng_req);
+        if(any&&t->engine==ENGI_BREAK)six_break_reset(t);
         if(any&&(t->engine==ENGI_BREAK||t->eng_req==ENGI_BREAK))memset(t->v[0].s,0,4*sizeof(t->v[0].s[0]));
         if(any&&(t->engine==ENGI_ACID||t->eng_req==ENGI_ACID)){
             acid_reset(t);
@@ -1054,9 +1055,10 @@ static __attribute__((noinline, minsize)) void voice_finish(int32_t *out, uint32
     }
     *edge = out[n - 1u] * 4 | 2;
 }
-/* Break is a singleton, so share its renderer between the two mixer cores. */
+/* Independent Break instances use a separate scratch buffer on each mixer core. */
 static __attribute__((noinline)) uint32_t track_render_break(track_t *t, int32_t *out, uint32_t n)
 {
+    jungle_state_t *ctx=six_break_prepare(t);
     voice_t *v=&t->v[0];vmod_t m={0};if(n>CTL)n=CTL;if(!n)return 0;
     track_lfo_tick(t);six_lfo2_tick(t);
     int32_t lfo=mulq15(t->lfo_val,t->lfo_fade),env=env_tick(t,v);
@@ -1065,10 +1067,10 @@ static __attribute__((noinline)) uint32_t track_render_break(track_t *t, int32_t
     if(t->p[P_LD_AMP])m.amp1=mulq15(m.amp1,32767-mulq15((lfo+32768)>>1,t->p[P_LD_AMP]*258));
     if(MOD.on)mod_voice(t,v,&m,0);
     v->s[BENV_CUT]=m.cutoff;v->env_out=m.amp1;
-    if(!env&&v->s[BENV_OFF]){jungle_sequence_off((unsigned)v->s[BENV_OFF]-1u);v->s[BENV_OFF]=0;}
-    jungle_pitch((m.pitch16-60*16)/16);
-    jungle_feedback((unsigned)t->p[P_E0]);jungle_variation((unsigned)t->p[P_E1]);
-    jungle_warp((unsigned)t->p[P_E2]);jungle_filter((unsigned)t->p[P_E3]);
+    if(!env&&v->s[BENV_OFF]){jungle_sequence_off(ctx,(unsigned)v->s[BENV_OFF]-1u);v->s[BENV_OFF]=0;}
+    jungle_pitch(ctx,(m.pitch16-60*16)/16);
+    jungle_feedback(ctx,(unsigned)t->p[P_E0]);jungle_variation(ctx,(unsigned)t->p[P_E1]);
+    jungle_warp(ctx,(unsigned)t->p[P_E2]);jungle_filter(ctx,(unsigned)t->p[P_E3]);
     six_break_render(t,out,n);uint32_t nr=0;
     track_post(t,ENGINES[ENGI_BREAK],out,n);
     int32_t gain=m.amp0,delta=(m.amp1-m.amp0)/(int32_t)n;

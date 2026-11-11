@@ -7,6 +7,7 @@
  * engine (General MIDI map) on any part; the SAMPLE engine's PERC set is retired (drum_from_perc).
  * Sections: sizes, parameters, voices and engines, tracks and the song, system. */
 #include <stdint.h>
+#include "../six/jungle.h"
 
 /* ------------------------------------------------------------ sizes --- */
 #define NVOICE 8                 /* JIANT per-part polyphony; shared budget in voice.c */
@@ -775,10 +776,8 @@ static uint32_t six_role_engine(uint32_t track, uint32_t e) {
 #endif
  return e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID||e==ENGI_WAVETABLE||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_ANALOG||e==ENGI_FM6||e==ENGI_WHEEL?e:ENGI_WAVETABLE;
 }
-/* BREAK is a project-wide singleton, including inactive tracks. Selection
- * availability is separate from stored-engine validity (project loading). */
 static int six_break_track(void){for(unsigned k=0;k<NTRK;k++)if(trk[k].eng_req==ENGI_BREAK)return (int)k;return -1;}
-static int six_engine_available(unsigned track,unsigned e){int owner=six_break_track();return e<NENGINES&&!eng_gone(e)&&six_role_engine(track,e)==e&&(e!=ENGI_BREAK||owner<0||(unsigned)owner==track);}
+static int six_engine_available(unsigned track,unsigned e){return e<NENGINES&&!eng_gone(e)&&six_role_engine(track,e)==e;}
 static const char *six_kind_label(unsigned e){return e==ENGI_EMPTY?"EMPTY":e==ENGI_DRUM?"DRUM":e==ENGI_ACID?"ACID":e==ENGI_BREAK?"BREAK":"SYNTH";}
 #define TSEL (&trk[song.sel])    /* the selected track */
 

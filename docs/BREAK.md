@@ -2,7 +2,7 @@
 
 ![Rhythmer Break performance](motion/break-perform.gif)
 
-Assign BREAK to one track. One Break machine is available per project. Fresh projects select A / Amen with an empty two-bar sequence; B is the corrected Think drum edit.
+Assign BREAK to any number of active tracks. Only sample banks A/B are shared; playback, selected source, sequencing, modulation and feedback are independent for each track. Fresh projects select A / Amen with an empty two-bar sequence; B is the corrected Think drum edit.
 
 Press EDIT repeatedly, or use SELECT, to reach the BREAK tab. BRK PERF offers Amenity-derived sound and performance controls; BRK SEQ exposes the playback source and sequence options. The display follows the active chop and repeat position. A/B source changes, chop triggers, repeats and up/down commands can share the real SEQ pattern and be saved with the other tracks.
 
@@ -24,7 +24,7 @@ Held-SEQ automation keys include G3 MUTATE, A3 RANDOM, B3 FILL, C4 SHUFFLE, D4 r
 
 ## Generate chops in the current genre
 
-Hold HOME and turn SELECT to GEN. Choose a genre with knob 1 and BREAK with knob 4, then press OCT+. GEN finds the assigned Break track and writes genre-aware MIDI only. It retains tempo, sounds, effects and other tracks. Hip-hop profiles leave gaps; DRUNKEN HH adds deliberate push/pull; jungle uses stronger activity and bounded answer rolls. GLO + G4 undoes the operation.
+Hold HOME and turn SELECT to GEN. Choose a genre with knob 1 and the required T1–T6 with knob 4, then press OCT+. If that track uses Break, GEN shows Tn BREAK and its dedicated controls, and writes genre-aware chop MIDI only. It retains tempo, sounds, effects and other tracks. Hip-hop profiles leave gaps; DRUNKEN HH adds deliberate push/pull; jungle uses stronger activity and bounded answer rolls. GLO + G4 undoes the operation.
 
 ## Your own two-bar samples
 
