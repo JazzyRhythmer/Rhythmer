@@ -8,12 +8,12 @@ export const kind = m => m === 'DRUM' ? 'drum' : m === 'ACID' ? 'acid' : m === '
 const integer = (n,min,max) => Number.isInteger(n) && n>=min && n<=max;
 export function blankSection(){return Array.from({length:6},(_,t)=>Array.from({length:16},(_,s)=>({on:t===0?s%4===0:t===5?s===0:t===4?[0,3,6,8,10,14].includes(s):[0,6,10].includes(s),note:48+[0,3,7,10][s%4],velocity:100,accent:false,slide:false,command:'C1',source:'A'})));}
 export function makeProject(){return {format:'rhythmer-web',version:1,name:'UNTITLED',tempo:160,mode:6,root:0,scale:'MIN',tracks:['DRUM','WAVETABLE','FMINI-1','OBERVAVE','ACID','BREAK'].map(model=>({model,preset:0,level:100,mute:false,params:[64,32,64,48,96,32,0,32]})),sections:Array.from({length:4},blankSection)};}
-export function availableModels(p,index){return MODELS.slice();}
-export function setModel(p,index,model){if(!integer(index,0,5)||!availableModels(p,index).includes(model))throw Error('Invalid track or engine.');p.tracks[index].model=model;p.tracks[index].preset=0;}
+export function availableModels(p,index){return MODELS.filter(m=>m!=='BREAK'||!p.tracks.some((t,i)=>i!==index&&t.model==='BREAK'));}
+export function setModel(p,index,model){if(!integer(index,0,5)||!availableModels(p,index).includes(model))throw Error('BREAK can be assigned to one track only.');p.tracks[index].model=model;p.tracks[index].preset=0;}
 export function validateProject(p){
  if(!p||p.format!=='rhythmer-web'||p.version!==1)throw Error('Import a Rhythmer web draft v1 JSON file.');
  if(typeof p.name!=='string'||p.name.length>48||!integer(p.tempo,40,240)||![4,6].includes(p.mode)||!integer(p.root,0,11)||!Object.hasOwn(SCALES,p.scale))throw Error('Invalid project settings.');
- if(!Array.isArray(p.tracks)||p.tracks.length!==6)throw Error('A project needs six tracks.');
+ if(!Array.isArray(p.tracks)||p.tracks.length!==6||p.tracks.filter(t=>t?.model==='BREAK').length>1)throw Error('A project needs six tracks and no more than one BREAK.');
  for(const t of p.tracks)if(!t||!MODELS.includes(modelLabel(t.model))&&!RETIRED.includes(t.model)||!integer(t.preset,0,127)||!integer(t.level,0,127)||typeof t.mute!=='boolean'||!Array.isArray(t.params)||t.params.length!==8||!t.params.every(n=>integer(n,0,127)))throw Error('Invalid track data.');
  if(!Array.isArray(p.sections)||p.sections.length!==4)throw Error('A project needs sections A–D.');
  for(const sec of p.sections){if(!Array.isArray(sec)||sec.length!==6)throw Error('Invalid section track count.');for(const steps of sec){if(!Array.isArray(steps)||steps.length!==16)throw Error('A web draft needs 16 steps per pattern.');for(const s of steps)if(!s||typeof s.on!=='boolean'||!integer(s.note,0,127)||!integer(s.velocity,1,127)||typeof s.accent!=='boolean'||typeof s.slide!=='boolean'||!['A','B'].includes(s.source)||!(/^(C|R)([1-9]|1[0-6])$|^RET$/.test(s.command)))throw Error('Invalid step data.');}}
