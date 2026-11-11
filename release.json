@@ -1,11 +1,11 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261110.3",
+  "buildRevision": "20261111.3",
   "localOnly": false,
-  "releaseCaution": "Public beta: WAVETABLE is the current name of the existing wavetable engine. Existing projects, presets and sounds are compatible. Back up before installing.",
+  "releaseCaution": "Multi-Break: independent Break engines on any active track. GEN targets T1\u2013T6; choose the existing engine first. Back up before installing.",
   "ownerTest": null,
-  "sha256": "8703f3d2ae573ccf4b924f02b0ab85bef13711ac6e41c901d338217fda3579bd",
+  "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e",
   "physicalHardwareTested": false,
   "audioPublicRedistributionCleared": false,
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery is included.",
@@ -17,8 +17,8 @@
     },
     {
       "name": "Rhythmer-0.1.2-dev1-install.zip",
-      "bytes": 3214421,
-      "sha256": "b7d2980b92d1932193c0d710d844975e8bef94b17ef981f427385948c8e493be"
+      "bytes": 3214995,
+      "sha256": "b33d94055f37f531fe17440ee126333b1da61c3e8463b25e50536405e0e07ec5"
     },
     {
       "name": "Rhythmer-Manual-v0.1.1-beta3.pdf",
@@ -32,18 +32,18 @@
     },
     {
       "name": "Rhythmer-start.fm1save",
-      "bytes": 1351313,
-      "sha256": "7f688ad0ca3f95b7defac59ef60da2843a821a10d9b1340ad787d1252723d7ed"
+      "bytes": 1351314,
+      "sha256": "4ff11de0d976dbf391a50edf42203f442ed1f9e94dac8d20d9d6f3ca52a0c61f"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
-      "bytes": 2262465,
-      "sha256": "3eb5542821395487babdc184110645f59db864fe10b900a0ef061eb039446174"
+      "bytes": 2261433,
+      "sha256": "4c0b9d42547a6aac66a784c509aba58652c5db79b30a5ff06812aa9ac36792e4"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "8703f3d2ae573ccf4b924f02b0ab85bef13711ac6e41c901d338217fda3579bd"
+      "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -99,6 +99,12 @@
       "name": "think-160.slot",
       "bytes": 81920,
       "sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
+    },
+    {
+      "name": "Rhythmer-0.1.2-dev1-20261111.3-source.tar.gz",
+      "bytes": 3545855,
+      "sha256": "6345d8d724db0911369646ccd12abbb1bff999f43ecd43d970b8a230e3245dd1"
     }
-  ]
+  ],
+  "correspondingSource": "downloads/Rhythmer-0.1.2-dev1-20261111.3-source.tar.gz"
 }
