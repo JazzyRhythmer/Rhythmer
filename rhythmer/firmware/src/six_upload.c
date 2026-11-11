@@ -19,10 +19,7 @@ static int six_upload_handle(uint32_t cmd,const uint8_t *a,uint32_t n){
   fm1_mc_park();
 #endif
   six_loop_mask&=(uint8_t)~(1u<<slot);six_loops[slot]=0;
-  for(unsigned i=0;i<NTRK;i++)if(trk[i].engine==ENGI_BREAK){
-   jungle_state_t *ctx=six_break_state(&trk[i]);
-   if(ctx->loop_now==slot)jungle_bind(ctx,0,0,0);
-  }
+  if(six_loop_now==slot)jungle_bind(0,0,0);
   irq_restore(f);
   rc=0;for(uint32_t off=0;off<0x14000u;off+=4096u){fm1_wdt_feed();if(st_erase(base+off)){rc=4;break;}}
   if(!rc)six_up_slot=(uint8_t)slot;

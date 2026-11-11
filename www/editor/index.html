@@ -4859,7 +4859,7 @@ download=function(name,obj){
 };
 // Audio is intentionally separate from the musical archive protocol.
 const samplePanel=document.getElementById('p-samples');
-import('./break-samples.mjs?v=sample-upload-20261111.4').then(({initBreakSamples})=>initBreakSamples({
+import('./break-samples.mjs?v=sample-upload-20261112.1').then(({initBreakSamples})=>initBreakSamples({
  container:samplePanel,mode:WORKSPACE?'browser':'usb',getWorkspace:()=>workspace,getDevice:()=>dev,
  request:(d,r,o)=>sessionRequest(d,r,o),
  operation:async fn=>{if(!dev)throw Error('Connect Rhythmer first');const release=beginBusy();try{return await fn();}finally{release();}},

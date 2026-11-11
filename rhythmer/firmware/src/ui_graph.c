@@ -1844,14 +1844,14 @@ static void six_wave_cache(unsigned slot){
 }
 static void six_graph_break(void){
  if(!six_loop_mask){cv_text_in(8,36,224,&AF_S,"NO BREAK LOADED",T_TEXT,T_BG);return;}
- const track_t *t=TSEL;unsigned slot=six_break_state(t?t:TSEL)->loop_now&1,chop=t->p[P_LN0]!=0;
+ const track_t *t=TSEL;unsigned slot=six_loop_now&1,chop=t->p[P_LN0]!=0;
  six_wave_cache(slot);
  for(unsigned k=0;k<2;k++){uint16_t bg=k==slot?T_TEXT:T_BG,fg=k==slot?T_BG:T_TEXT;int x=8+k*76;
   cv_rect(x,0,70,14,bg);cv_text_in(x,1,70,&AF_X,k?"B THINK":"A AMEN",fg,bg);}
  cv_text_r(232,2,&AF_X,chop?"CHOP":"LOOP",T_TEXT,T_BG);
- struct jungle_step st[32];jungle_pattern(six_break_state(t?t:TSEL),st);int current=jungle_current_step(six_break_state(t?t:TSEL));
+ struct jungle_step st[32];jungle_pattern(st);int current=jungle_current_step();
  if(chop){current=t->seq_idx%32;for(unsigned i=0;i<32;i++){const step_t *s=&seq_steps(t)[i];st[i].active=i<(unsigned)t->p[P_SLEN]&&s->time==ST_NOTE&&s->n;st[i].slice=s->note[0];st[i].stretch=s->time==ST_TIE;}}
- int roll=jungle_roll_active(six_break_state(t?t:TSEL));unsigned ticks=six_break_state(t)->clock_ticks,period=roll<0?192:roll==3?144:roll<4?192:roll<8?96:roll<12?48:24;
+ int roll=jungle_roll_active();unsigned ticks=six_break_ticks,period=roll<0?192:roll==3?144:roll<4?192:roll<8?96:roll<12?48:24;
  unsigned phase=song.playing?(ticks%period)*224/period:0;
  unsigned slice=16;
  if(current>=0){
@@ -1875,7 +1875,7 @@ static void six_graph_break(void){
  }
  static const char *const names[16]={"1/4 REPEAT","BUILD","STRETCH","ECHO","1/8 REPEAT","1/8 DOWN","1/8 UP","1/8 SHRINK","1/16 REPEAT","1/16 DOWN","1/16 UP","1/16 SHRINK","1/32 REPEAT","1/32 DOWN","1/32 UP","1/32 SHRINK"};
  cv_text_in(8,68,150,&AF_X,roll<0?"STRAIGHT / CHOP":names[(unsigned)roll&15],T_TEXT,T_BG);
- cv_text_r(232,68,&AF_X,t->p[P_E5]?"FREEZE":six_break_state(t?t:TSEL)->held_count?"HOLD":"",T_TEXT,T_BG);
+ cv_text_r(232,68,&AF_X,t->p[P_E5]?"FREEZE":six_roll_count?"HOLD":"",T_TEXT,T_BG);
  for(unsigned i=0;i<32;i++){int x=8+(i%16)*14,y=85+(i/16)*15;char n[3];unsigned v=st[i].slice;
   if(chop&&v>=32){n[0]=v==32?'A':v==33?'B':'<';n[1]=0;}else if(chop&&v>=16){n[0]='R';n[1]=0;}else fmt_int(n,(v&15)+1);
   if(st[i].active)cv_text_in(x,y,12,&AF_X,n,T_TEXT,T_BG);else cv_rect(x+4,y+6,2,2,T_DIM);
@@ -1914,7 +1914,7 @@ static void draw_graph(void)
       if(pg->graph!=GR_BROWSE&&!(ui_prefs&PREF_ANIM_OFF))sig^=fm1_ms/160u;}
     for(unsigned k=0;k<P_COUNT;k++)sig=sig*33u+(uint16_t)TSEL->p[k];
     if(ui.confirm==CF_DICE_ALL)sig^=gen_draw_sig();
-    if(trk_eng(TSEL)==ENGI_BREAK)sig^=six_break_state(t?t:TSEL)->loop_now*7919u+six_loop_mask*313u+(unsigned)(jungle_roll_active(six_break_state(t?t:TSEL))+1)*977u;
+    if(trk_eng(TSEL)==ENGI_BREAK)sig^=six_loop_now*7919u+six_loop_mask*313u+(unsigned)(jungle_roll_active()+1)*977u;
     if(six_song_fx_at&&fm1_ms-six_song_fx_at<400&&!(ui_prefs&PREF_ANIM_OFF))sig^=fm1_ms/64u;
     if(ui.home){sig^=home_level()*7919u+home_set()*40503u;for(unsigned k=0;k<NTRK;k++)sig^=steps_sig(&trk[k])+trk[k].seq_idx*977u+(unsigned)six_visual_level(&trk[k])*131u;}
     else sig^=steps_sig(TSEL);

@@ -7,7 +7,6 @@
  * engine (General MIDI map) on any part; the SAMPLE engine's PERC set is retired (drum_from_perc).
  * Sections: sizes, parameters, voices and engines, tracks and the song, system. */
 #include <stdint.h>
-#include "../six/jungle.h"
 
 /* ------------------------------------------------------------ sizes --- */
 #define NVOICE 8                 /* JIANT per-part polyphony; shared budget in voice.c */
@@ -391,19 +390,6 @@ typedef struct {
 enum { PT_NONE, PT_BASS, PT_LEAD, PT_PAD, PT_KEYS, PT_PLUCK, PT_BELL, PT_VOX, PT_DRUM, PT_FX, PT_N };
 #define TAG(t) (PT_##t << 1)
 #define PR_MONO(pr) ((pr)->mono & 1u)
-
-/* Identical sound decoding for factory loads and legacy project conversion.
- * Preset sends store value+1; zero requests the historical common default.
- * Main-loop work only: do not add this helper to the audio rendering path. */
-static __attribute__((noinline)) void preset_sound_values(int16_t *p, const preset_t *pr)
-{
-    static const uint8_t fx_default[4]={0,24,28,36};
-    for(unsigned i=0;i<8u;i++)p[P_E0+i]=pr->e[i];
-    p[P_ATK]=pr->env[0];p[P_DEC]=pr->env[1];
-    p[P_SUS]=pr->env[2];p[P_REL]=pr->env[3];
-    p[P_ED_FLT]=pr->fenv;p[P_VOICE]=PR_MONO(pr)?V_LEGATO:V_POLY;
-    for(unsigned i=0;i<4u;i++)p[P_DIST+i]=pr->fx[i]?pr->fx[i]-1:fx_default[i];
-}
 #define PR_TAG(pr) ((uint32_t)(pr)->mono >> 1)
 
 struct track;
@@ -789,8 +775,10 @@ static uint32_t six_role_engine(uint32_t track, uint32_t e) {
 #endif
  return e==ENGI_M2STAT||e==ENGI_M2SAW||e==ENGI_M2SID||e==ENGI_WAVETABLE||e==ENGI_PHASE||e==ENGI_LOFI||e==ENGI_ANALOG||e==ENGI_FM6||e==ENGI_WHEEL?e:ENGI_WAVETABLE;
 }
+/* BREAK is a project-wide singleton, including inactive tracks. Selection
+ * availability is separate from stored-engine validity (project loading). */
 static int six_break_track(void){for(unsigned k=0;k<NTRK;k++)if(trk[k].eng_req==ENGI_BREAK)return (int)k;return -1;}
-static int six_engine_available(unsigned track,unsigned e){return e<NENGINES&&!eng_gone(e)&&six_role_engine(track,e)==e;}
+static int six_engine_available(unsigned track,unsigned e){int owner=six_break_track();return e<NENGINES&&!eng_gone(e)&&six_role_engine(track,e)==e&&(e!=ENGI_BREAK||owner<0||(unsigned)owner==track);}
 static const char *six_kind_label(unsigned e){return e==ENGI_EMPTY?"EMPTY":e==ENGI_DRUM?"DRUM":e==ENGI_ACID?"ACID":e==ENGI_BREAK?"BREAK":"SYNTH";}
 #define TSEL (&trk[song.sel])    /* the selected track */
 

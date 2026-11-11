@@ -153,7 +153,7 @@ static struct {
 #define UI_TARGET 160u           /* the fill the step steers to: ~3.6 ms (a render's 128 and a packet's 45 in hand) */
 #define UI_MAXF 46u              /* frames in the largest packet a host sends at 44.1 kHz (45, one spare) */
 #define UI_STEP_MAX 650          /* the step's range: +-1 % of 65536 (a host clock far off: the ring re-primes) */
-static uint32_t ui_ring[UI_N];   /* (2 KiB) */
+static uint32_t ui_ring[UI_N] __attribute__((section(".pool")));   /* (2 KiB) */
 static volatile uint32_t ui_w, ui_r;
 static uint32_t ep4rx[UI_MAXF + 2u] __attribute__((aligned(4)));
 static volatile uint8_t usb_duplex;                      /* the device presents the audio output too (usb_duplex_switch) */
@@ -187,7 +187,7 @@ static struct {
 /* (0.8.9) all 160 phases in RAM (the pool, built from the 80 in the flash the first time the ring primes at 48 kHz):
  * one forward loop, no flash reads (the table no longer pushes the render's code out of the cache), and core 1 can
  * run it outside the audio ISR, with the flash off */
-static int32_t rs_tab[UAC_FIR_L / 2u][UAC_FIR_N] __attribute__((section(".pool")));   /* 7.5 KiB: mirrored FIR phases share coefficients. */
+static int32_t rs_tab[UAC_FIR_L][UAC_FIR_N] __attribute__((section(".pool")));   /* (15 KiB) */
 static uint32_t rs_in[HALF_FRAMES] __attribute__((section(".pool")));            /* a half (CORES 2) or a block, 16-bit L | R */
 static struct {
     uint8_t c1;                  /* this stream resamples on core 1, a half at a time (chosen when it primes) */
@@ -1307,6 +1307,7 @@ static void uac_rs_init(void)                           /* the resampler from si
         int32_t x = UAC_FIR0[0][i], a = UAC_FIR0[1][i], b = UAC_FIR0[2][i];
         for (p = 0; p < UAC_FIR_L / 2u; p++) {
             rs_tab[p][i] = x;
+            rs_tab[UAC_FIR_L - 1u - p][UAC_FIR_N - 1u - i] = x;   /* (phase 159 - p: phase p backwards) */
             x += a;
             a += b;
             if (p < UAC_FIR_L / 2u - 3u)
@@ -1392,22 +1393,20 @@ static UAC_C1_TEXT uint32_t uac_rs_run(const uint32_t *in, uint32_t n, uint32_t 
         h++;
         s = (h - UAC_FIR_N) & (RS_H - 1u);              /* the window: oldest .. this frame */
         do {
-            unsigned reverse=ph>=UAC_FIR_L/2u;
-            int32_t stride=reverse?-1:1;
-            const int16_t *x=&rs.l[s+(reverse?UAC_FIR_N-1u:0u)];
-            const int32_t *c=rs_tab[reverse?UAC_FIR_L-1u-ph:ph];
+            const int16_t *x = &rs.l[s];                /* R: x[2 * RS_H] */
+            const int32_t *c = rs_tab[ph];
             int64_t al = 0, ar = 0;
             int32_t yl, yr;
-            for (j = UAC_FIR_N / 4u; j; j--, x += 4*stride, c += 4) {
+            for (j = UAC_FIR_N / 4u; j; j--, x += 4, c += 4) {
                 int32_t c0 = c[0], c1 = c[1], c2 = c[2], c3 = c[3];
                 al += (int64_t)c0 * x[0];
                 ar += (int64_t)c0 * x[2u * RS_H];
-                al += (int64_t)c1 * x[stride];
-                ar += (int64_t)c1 * x[2u * RS_H + stride];
-                al += (int64_t)c2 * x[2*stride];
-                ar += (int64_t)c2 * x[2u * RS_H + 2*stride];
-                al += (int64_t)c3 * x[3*stride];
-                ar += (int64_t)c3 * x[2u * RS_H + 3*stride];
+                al += (int64_t)c1 * x[1];
+                ar += (int64_t)c1 * x[2u * RS_H + 1u];
+                al += (int64_t)c2 * x[2];
+                ar += (int64_t)c2 * x[2u * RS_H + 2u];
+                al += (int64_t)c3 * x[3];
+                ar += (int64_t)c3 * x[2u * RS_H + 3u];
             }
             yl = (int32_t)((al + (1 << (UAC_FIR_Q - 1))) >> UAC_FIR_Q);
             yr = (int32_t)((ar + (1 << (UAC_FIR_Q - 1))) >> UAC_FIR_Q);

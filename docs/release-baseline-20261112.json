@@ -1,0 +1,12 @@
+{
+  "Jazzy": {
+    "programBytes": 584300,
+    "onlyDifference": "__DATE__ display; all other bytes identical",
+    "offset": 553936
+  },
+  "Rhythmer": {
+    "programBytes": 583656,
+    "onlyDifference": "__DATE__ display; all other bytes identical",
+    "offset": 548212
+  }
+}

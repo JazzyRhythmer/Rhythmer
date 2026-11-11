@@ -8,13 +8,9 @@
 
 Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/Jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/Rhythmer/#companion).
 
-## Factory FX defaults · build 20261111.4
+## Playback base restored · 20261112.1
 
-Break factory sounds load with all four sends at zero. Acid uses DIST 30%, PHASER 0%, DLY 0%, REV 10%. Saved user mixes remain unchanged. Shared preset decoding preserves every engine and preset. [Release and validation notes](docs/releases/20261111.4.md).
-
-## Multi-Break · build 20261111.3
-
-Use Break on several tracks at once, with shared A/B audio and independent playback, chops and modulation. GEN targets T1–T6 directly and shows Break controls for the selected Break track. Both factory Break banks remain included. [Update and compatibility notes](docs/releases/20261111.3.md) · [Sample preparation](https://jazzyrhythmer.github.io/Rhythmer/editor/?target=browser#samples)
+The preserved single-Break playback base is restored. Missing factory sends default to zero; explicit preset FX and saved mixes remain. Acid and Break load dry. [Release notes and provenance](docs/releases/20261112.1.md). Both Amen and Think remain included. Back up before installation.
 
 ## Explore the machines
 

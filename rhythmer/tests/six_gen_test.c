@@ -44,7 +44,7 @@ int main(void){
  gx.eng=-1;
  /* UI reads boundary pitches and all break command classes without altering music. */
  static uint8_t sample[72000];static uint16_t pixels[240*150];
- six_loops[0]=six_loops[1]=sample;six_loop_mask=3;
+ six_loops[0]=six_loops[1]=sample;six_loop_mask=3;six_loop_now=0;
  trks_put(3);song.sel=TEST_ACID_TRACK;trk[4].p[P_SLEN]=64;
  for(unsigned i=0;i<64;i++){step_clear(&trk[4].step[i]);trk[4].step[i].time=ST_NOTE;trk[4].step[i].n=1;trk[4].step[i].note[0]=i&1?127:0;}
  unsigned before=steps_sig(&trk[4]);ui_prefs|=PREF_ANIM_OFF;six_gen_fx_at=5000;six_gen_fx_kind=2;fm1_ms=5100;

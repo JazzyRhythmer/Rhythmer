@@ -18,19 +18,18 @@ typedef union { md_voice_t md; fm6_note_t fm6;
  p5_voice_t prophet;
 #endif
  } md_fm6_runtime_t;
-typedef union {md_fm6_runtime_t voice[4];jungle_state_t break_state;} md_track_runtime_t;
-static md_track_runtime_t md_shared[NPART];
+static md_fm6_runtime_t md_shared[NPART][4];
 static md_voice_t md_pool[NPART][3] __attribute__((section(".pool")));
 static md_voice_t md_aux[NPART] __attribute__((section(".lowbuf")));
 static uint8_t md_shared_engine[NPART];
 static void md_memory(unsigned track,unsigned engine){
  if(md_shared_engine[track]!=engine){
-  memset(&md_shared[track],0,sizeof md_shared[track]);
+  memset(md_shared[track],0,sizeof md_shared[track]);
   if(engine==ENGI_DRUM){memset(md_pool[track],0,sizeof md_pool[track]);memset(&md_aux[track],0,sizeof md_aux[track]);}
   md_shared_engine[track]=(uint8_t)engine;
  }
 }
-static md_voice_t *md_at(unsigned track,unsigned slot){return slot<4?&md_shared[track].voice[slot].md:slot<7?&md_pool[track][slot-4]:&md_aux[track];}
+static md_voice_t *md_at(unsigned track,unsigned slot){return slot<4?&md_shared[track][slot].md:slot<7?&md_pool[track][slot-4]:&md_aux[track];}
 static void drum_md_reset(void){memset(md_pool,0,sizeof md_pool);memset(md_aux,0,sizeof md_aux);memset(md_shared,0,sizeof md_shared);memset(md_shared_engine,0,sizeof md_shared_engine);}
 static uint32_t pow2_q16(int32_t d16) {
  uint32_t u=(uint32_t)(d16+192*16),oct=u/192u;

@@ -57,7 +57,7 @@ static int six_visual_level(const track_t *t){
  unsigned ti=(unsigned)(t-trk);if(!six_track_enabled(ti)||t->p[P_MUTE])return 0;
  int en=clamp(t->m_env/258,0,127);
  for(unsigned v=0;v<NVOICE;v++)if(t->v[v].active){int e=clamp(t->v[v].env>>17,0,127);if(e>en)en=e;}
- if(t->engine==ENGI_BREAK&&jungle_playing(six_break_state(t?t:TSEL)))en=64+((jungle_current_step(six_break_state(t?t:TSEL))&1)?0:63);
+ if(t->engine==ENGI_BREAK&&jungle_playing())en=64+((jungle_current_step()&1)?0:63);
  if(t->engine==ENGI_DRUM){const drum_lane_t *k=drum_kit_of(t);for(unsigned j=0;k&&j<8;j++){int e=clamp(k[j].x.ea>>23,0,127);if(k[j].x.live&&e>en)en=e;}}
  int punch=six_note_punch(t);if(punch>en)en=punch;
  return en;
@@ -176,13 +176,13 @@ static void six_machine_glyph(const track_t *t,unsigned engine,int en,unsigned p
 #endif
  if(engine==ENGI_BREAK){
   static const uint8_t preview[16]={112,48,70,22,100,36,60,28,124,52,76,24,94,44,66,32};
-  unsigned slot=six_break_state(t?t:TSEL)->loop_now&1u;
+  unsigned slot=six_loop_now&1u;
   int sampled=t&&(six_loop_mask&(1u<<slot));
   if(sampled)six_wave_cache(slot);
   for(unsigned j=0;j<16;j++){
    int a=2+(sampled?six_wave_peak[slot][j]*3:preview[j])*(h-4)/127,xx=x+(int)j*w/16;
    cv_rect(xx,cy-a/2,w/16>2?w/16-1:1,a,ink);
-   if(en&&(t?jungle_playing(six_break_state(t?t:TSEL))&&j==(unsigned)(jungle_current_step(six_break_state(t?t:TSEL))/2):j==(ph>>28)))cv_frame(xx,y,w/16+1,h,ink);
+   if(en&&(t?jungle_playing()&&j==(unsigned)(jungle_current_step()/2):j==(ph>>28)))cv_frame(xx,y,w/16+1,h,ink);
   }return;
  }
  if(engine==ENGI_WAVETABLE){

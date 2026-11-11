@@ -1,11 +1,11 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261111.4",
-  "firmwareSha256": "f2275843d80bb0776e10b5fc2023aaa2a87c29e5738836b7c257c11b80ac1966",
+  "buildRevision": "20261112.1",
+  "firmwareSha256": "a614d29b2ad55248d4d8d51d562893416a03d1508070bd14acbcae037cbea6bb",
   "physicalHardwareTested": false,
   "nativeScenarios": 1,
-  "exactBuildSummary": "# Factory FX defaults · build 20261111.4\n\nBreak A/B factory sounds now load with DIST / PHASER / DLY / REV all at 0%. Acid factory sounds load with DIST 30%, PHASER 0%, DLY 0%, REV 10%. These defaults apply to factory preset loads, INIT SOUND, new projects and startup defaults. Saved project and user sound effect settings are preserved.\n\nFactory sound decoding is shared between normal preset loading and legacy project conversion. JAZZY retains all 31 engines and 1,221 presets; it now has 176 bytes of application image headroom. The shared loader is main-loop work and adds no per-sample DSP processing. No audio buffers, stack guards, synthesis models or preset data were removed.\n\nBoth bundled Break banks (Amen A / Think B) are unchanged. Multi-Break independent playback, shared A/B samples and GEN targeting T1–T6 remain supported. Back up your music and original custom loops before installing: installation replaces both sample banks with the included factory loops.\n\nSoftware validation: every factory preset decoded identically to the previous loading algorithm (JAZZY 1,221; RHYTHMER 178). Both OSes pass 62 default/load/project-preservation checks and constrained firmware builds. Emulator validation is separate from physical FM-1 installation and endurance testing.\n",
+  "exactBuildSummary": "# Restored playback base · 20261112.1\n\nThis release restores the single-Break playback implementation from the preserved JAZZY 20261111.2 and RHYTHMER 20261110.3 sources. Their unmodified rebuilds differ from the original application binaries only in the displayed compile date; all other program bytes match. Track-state allocation, audio buffers, scheduling and the earlier generator behavior are restored rather than reimplemented.\n\nOnly these firmware fixes are applied: HYDRA enables its high-note oversampling when a legato/glide phrase crosses the pitch threshold; LXR uses the track ADSR together with its native drum decay, with filter and FX processing retained; missing factory FX sends default to zero, while explicit preset FX and saved project/user-sound settings remain. Acid and Break load with all four sends at zero. There is no Acid-specific send branch.\n\nBreak is limited to one track. GEN uses the earlier track targets and dedicated BREAK target again. Keep projects from newer versions backed up; projects containing several Break tracks must be reduced to one Break before use with this version.\n\nBoth bundled Break banks are unchanged: A / Amen and B / Think. Installation replaces A/B, so keep your original custom audio and converted .slot files. RHYTHMER and JAZZY direct updates remain supported; V15 is not required between the two companion firmwares. Save the automatic musical backup before installation.\n\nSoftware checks cover both constrained firmware builds, all available factory presets, dry defaults and saved mix preservation, all 14 HYDRA presets crossing the high-note threshold, and release termination across all 595 LXR presets. Physical FM-1 installation and endurance validation are separate. The reported broad playback regression has not been declared fixed by software tests alone; this rollback restores the earlier playback base for device verification.\n",
   "memory": {
     "appBytes": 583656,
     "appSlotBytes": 584336,
@@ -295,73 +295,5 @@
       120
     ],
     "worstStepPhaseMs": 3
-  },
-  "multiBreak": {
-    "jazzy-2": {
-      "max_us": 5855,
-      "late": 0,
-      "ui_frames": 368,
-      "peak": 1200,
-      "audio_lost": 0,
-      "core1_lost": 0,
-      "core1_mask": 21,
-      "track_mode": 3,
-      "sha256": "0fea5d35b9a2bdfb54c1113afcd52aac703732215e8a58f70fc0df0efcdde764"
-    },
-    "jazzy-4": {
-      "max_us": 6506,
-      "late": 0,
-      "ui_frames": 355,
-      "peak": 1909,
-      "audio_lost": 0,
-      "core1_lost": 0,
-      "core1_mask": 41,
-      "track_mode": 3,
-      "sha256": "0fea5d35b9a2bdfb54c1113afcd52aac703732215e8a58f70fc0df0efcdde764"
-    },
-    "jazzy-6": {
-      "max_us": 7376,
-      "late": 0,
-      "ui_frames": 343,
-      "peak": 2101,
-      "audio_lost": 0,
-      "core1_lost": 0,
-      "core1_mask": 7,
-      "track_mode": 3,
-      "sha256": "0fea5d35b9a2bdfb54c1113afcd52aac703732215e8a58f70fc0df0efcdde764"
-    },
-    "rhythmer-2": {
-      "max_us": 5489,
-      "late": 0,
-      "ui_frames": 67,
-      "peak": 1200,
-      "audio_lost": 0,
-      "core1_lost": 0,
-      "core1_mask": 29,
-      "track_mode": 3,
-      "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e"
-    },
-    "rhythmer-4": {
-      "max_us": 6197,
-      "late": 0,
-      "ui_frames": 66,
-      "peak": 1909,
-      "audio_lost": 0,
-      "core1_lost": 0,
-      "core1_mask": 41,
-      "track_mode": 3,
-      "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e"
-    },
-    "rhythmer-6": {
-      "max_us": 6876,
-      "late": 0,
-      "ui_frames": 61,
-      "peak": 2101,
-      "audio_lost": 0,
-      "core1_lost": 0,
-      "core1_mask": 50,
-      "track_mode": 3,
-      "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e"
-    }
   }
 }

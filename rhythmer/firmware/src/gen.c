@@ -40,11 +40,7 @@ static struct {
 } gp = {GEN_EXPLORE, 1, 50, 0, {GA_AUTO, GA_AUTO, GA_AUTO, GA_AUTO, GA_AUTO}, 50, GA_AUTO, 30, 0, 0, 0, 0, ""};
 
 /* the generator's own random numbers: a stream a part, from the seed */
-static int gen_target_index(void){return gp.target&&gp.target<=NTRK?(int)gp.target-1:-1;}
-static __attribute__((noinline)) int gen_target_break(void){int k=gen_target_index();return k>=0&&trk_eng(&trk[k])==ENGI_BREAK;}
-static const uint16_t GEN_BREAK_PARAM[4]={P_MPAT,P_LN1,P_MMODE,P_MAMT};
-static const char *const GEN_BREAK_LABEL[2][4]={{"EVERY","ACTION","MODE","AMOUNT"},{"DENSITY","REPEATS","SWING","HUMAN"}};
-
+static int gen_target_index(void){return gp.target==7?six_break_track():gp.target?(int)gp.target-1:-1;}
 static unsigned gen_menu_pos(void){if(gp.genre==GEN_EXPLORE)return 0;if(!gp.genre)return 1;for(unsigned i=0;i<NGENRE;i++)if(GEN_ORDER[i]+1u==gp.genre)return i+2;return 0;}
 static uint32_t gq = 1;
 static uint32_t gr(void) { gq ^= gq << 13; gq ^= gq >> 17; gq ^= gq << 5; return gq; }
@@ -2750,7 +2746,7 @@ static void gen_go(void)
     char b[8];
     int stay=gen_on();uint8_t page=gp.page;
     if(!gp.target&&six_gen_next(0)>=NTRK){ui_message("NO GEN TRACKS");return;}
-    int ti=gen_target_index();if(gp.target&&(ti<0||trk_eng(&trk[ti])==ENGI_EMPTY)){ui_message("SELECT SOUND");return;}
+    int ti=gen_target_index();if(gp.target&&ti<0){ui_message("NO BREAK TRACK");return;}
     undo_mark();
     if(gp.target)gen_track(&trk[(unsigned)ti]);else gen_make();
     if(stay){ui.home=1;ui.confirm=CF_DICE_ALL;gp.page=page;ui.force=1;}
@@ -2761,7 +2757,7 @@ static void gen_go(void)
     b[3] = (char)('0' + gp.seed / 10u % 10u); b[4] = (char)('0' + gp.seed % 10u); b[5] = 0;
     str_cpy(gp.last + k, b, sizeof gp.last - k);
     ui_say("GEN: ", gp.last);
-    str_cpy(ui.msg2, gp.target ? "OTHER TRACKS KEPT" : (trk_live==6?"ALL: 6 TRACKS / SPECIAL KEPT":"ALL: 4 TRACKS / OTHERS KEPT"), sizeof ui.msg2);
+    str_cpy(ui.msg2, gp.target ? "MIDI ONLY / OTHER TRACKS KEPT" : (trk_live==6?"ALL: 6 TRACKS / SPECIAL KEPT":"ALL: 4 TRACKS / OTHERS KEPT"), sizeof ui.msg2);
     ui.force = 1;
 }
 static uint32_t gen_sig(void)                           /* the settings that make the piece */
@@ -2886,7 +2882,7 @@ static const char *gen_track(track_t *t)
     }
     for(unsigned i=len;i<NSTEP;i++)gclear(&draft.step[i]);
     fm1_irq_off();memcpy(t->step,draft.step,sizeof t->step);latch_drop_req|=(uint8_t)(1u<<k);fm1_irq_on();
-    pat_sig[k]=steps_sig(t);return e==ENGI_BREAK?"BREAK CHOPS":RN[r];
+    pat_sig[k]=steps_sig(t);return RN[r];
 }
 static const char *dice_seq(track_t *t){uint16_t seed=gp.seed;gp.seed=(uint16_t)(rng()%10000u);const char *msg=gen_track(t);gp.seed=seed;return msg;}
 
@@ -2912,18 +2908,6 @@ static void gen_knob(uint32_t k, int32_t s)
 {
     uint32_t p = gp.page;
     gp.hot = (uint8_t)k;
-    if(gen_target_break()&&p){
-        if(p==1u){
-            track_t *t=&trk[gen_target_index()];unsigned id=GEN_BREAK_PARAM[k];
-            int max=k==0?6:k==1?2:k==2?1:127;
-            t->p[id]=(int16_t)clamp(t->p[id]+s,0,max);
-        }else{
-            uint8_t *v=k==0?&gp.energy:k==1?&gp.complex:k==2?&gp.swing:&gp.human;
-            int x=*v==GA_AUTO?105:*v;
-            x=clamp(x+s*5,0,k==2?105:100);*v=(uint8_t)(x>100?GA_AUTO:x);
-        }
-        ui.force=1;return;
-    }
     if (p == 0u) {
         if (k == 0u) {                                  /* (0.8.6) EXPLORE first, then RANDOM, then the genres */
             uint32_t pos = gen_menu_pos();
@@ -2932,7 +2916,7 @@ static void gen_knob(uint32_t k, int32_t s)
         }
         else if (k == 1u) gp.seed = (uint16_t)((gp.seed + 10000u + (uint32_t)clamp(accel(EN_K2, s, 9999), -9999, 9999)) % 10000u);
         else if (k == 2u) gp.energy = (uint8_t)clamp((int32_t)gp.energy + s * 5, 0, 100);
-        else {int x=clamp((gp.target?(int)gp.target+2:(int)gp.form)+(s>0?1:-1),0,8);gp.target=(uint8_t)(x>2?x-2:0);if(x<3)gp.form=(uint8_t)x;}
+        else {int x=clamp((gp.target?(int)gp.target+2:(int)gp.form)+(s>0?1:-1),0,9);gp.target=(uint8_t)(x>2?x-2:0);if(x<3)gp.form=(uint8_t)x;}
     } else if (p == 1u) {
         gen_amt_turn(&gp.amt[k], s);
     } else {
@@ -2955,19 +2939,10 @@ static void gen_value(uint32_t p, uint32_t k, char *b)
 {
     uint32_t v;
     b[0] = 0;
-    if(gen_target_break()&&p){
-        if(p==1u){
-            const track_t *t=&trk[gen_target_index()];
-            unsigned n=(unsigned)t->p[GEN_BREAK_PARAM[k]];
-            if(k==0){str_cpy(b,N_MUTBARS[n%7u],16);return;}
-            if(k==1){str_cpy(b,SIX_BREAK_ACTIONS[n%3u],16);return;}
-            if(k==2){str_cpy(b,N_MUTMODE[n%2u],16);return;}
-            v=n;
-        }else v=k==0?gp.energy:k==1?gp.complex:k==2?gp.swing:gp.human;
-    }else if (p == 0u) {
+    if (p == 0u) {
         if (k == 0u) { str_cpy(b, gp.genre == GEN_EXPLORE ? "EXPLORE" : gp.genre ? GENRE[(gp.genre - 1u) % NGENRE].name : "RANDOM", 16); return; }
         if (k == 1u) { b[0] = (char)('0' + gp.seed / 1000u % 10u); b[1] = (char)('0' + gp.seed / 100u % 10u); b[2] = (char)('0' + gp.seed / 10u % 10u); b[3] = (char)('0' + gp.seed % 10u); b[4] = 0; return; }
-        if (k == 3u) { if(gp.target){str_cpy(b,gen_target_break()?"T1 BREAK":"T1 MIDI",16);b[1]=(char)('0'+gp.target);}else str_cpy(b, GEN_FORM[gp.form % 3u], 16); return; }
+        if (k == 3u) { if(gp.target==7){str_cpy(b,"BREAK",16);}else if(gp.target){str_cpy(b,"T1 MIDI",16);b[1]=(char)('0'+gp.target);}else str_cpy(b, GEN_FORM[gp.form % 3u], 16); return; }
         v = gp.energy;
     } else if (p == 1u) v = gp.amt[k];
     else if (k == 0u) v = gp.amt[GP_LEAD];
@@ -2993,22 +2968,20 @@ static void gen_cards(void)
         a = p == 1u ? gp.amt[k] : p == 2u && k == 0u ? gp.amt[GP_LEAD] : p == 2u && k == 2u ? gp.swing : 0u;
         r = p == 0u ? (k == 0u ? (int32_t)gen_menu_pos() * 1000 / (int32_t)(GEN_NPOS - 1u) :   /* (0.8.7:
                                                          * KNOB 1's order, EXPLORE at the left) */ k == 1u ? gp.seed / 10 : k == 2u ? gp.energy * 10 :
-                       (gp.target?gp.target+2u:gp.form)*1000/8) :
+                       (gp.target?gp.target+2u:gp.form)*1000/9) :
             (p == 1u || (p == 2u && (k == 0u || k == 2u))) ? (a == GA_AUTO ? 1000 : (int32_t)a * 10) :
             (int32_t)(k == 1u ? gp.complex : gp.human) * 10;
-        draw_column(k, gen_target_break()&&p?GEN_BREAK_LABEL[p-1u][k]:GEN_LBL[p][k], v, "", VAL(k), gen_target_break()&&p?-1:r, ICON_NONE);
+        draw_column(k, GEN_LBL[p][k], v, "", VAL(k), r, ICON_NONE);
     }
 }
 static uint32_t gen_draw_sig(void)
 {
-    uint32_t h=gen_sig()*31u+gp.page*7u+str_hash(gp.hot*977u,gp.last)+ux.gen;
-    int k=gen_target_index();if(k>=0){h=h*31u+trk_eng(&trk[k]);for(unsigned i=0;i<4;i++)h=h*31u+(unsigned)trk[k].p[GEN_BREAK_PARAM[i]];}
-    return h;
+    return gen_sig() * 31u + gp.page * 7u + str_hash(gp.hot * 977u, gp.last) + ux.gen;
 }
 static uint32_t gen_hash(uint32_t x) { x *= 2654435761u; x ^= x >> 15; x *= 2246822519u; x ^= x >> 13; return x % 1000u; }
 static void gen_panel(void)
 {
-    if(gp.target){int ti=gen_target_index();track_t *t=ti>=0?&trk[ti]:0;char b[16];gen_value(0,3,b);cv_text_in(6,6,228,&AF_X,b,T_TEXT,T_BG);cv_text_in(6,28,228,&AF_X,gen_target_break()?"BREAK SEQUENCE":"SOUND / TEMPO KEPT",T_TEXT,T_BG);for(unsigned i=0;i<32;i++){const step_t *p=t?&t->step[i]:0;unsigned on=p&&p->time==ST_NOTE&&(p->n||p->hit);cv_rect(8+(i%16)*14,58+(i/16)*18,on?8:2,on?6:2,on?T_TEXT:T_DIM);}char genre[16];gen_value(0,0,genre);cv_text_in(6,103,228,&AF_X,genre,T_TEXT,T_BG);cv_text_in(6,125,228,&AF_X,"OCT+ GENERATE / OCT- BACK",T_TEXT,T_BG);return;}
+    if(gp.target){int ti=gen_target_index();track_t *t=ti>=0?&trk[ti]:0;char b[16];gen_value(0,3,b);if(gp.target==7){str_cpy(b,ti>=0?"BREAK T1 MIDI":"NO BREAK TRACK",16);if(ti>=0)b[7]=(char)('1'+ti);}cv_text_in(6,6,228,&AF_X,b,T_TEXT,T_BG);cv_text_in(6,28,228,&AF_X,"TEMPO / KEY / SOUND KEPT",T_TEXT,T_BG);for(unsigned i=0;i<32;i++){const step_t *p=t?&t->step[i]:0;unsigned on=p&&p->time==ST_NOTE&&(p->n||p->hit);cv_rect(8+(i%16)*14,58+(i/16)*18,on?8:2,on?6:2,on?T_TEXT:T_DIM);}char genre[16];gen_value(0,0,genre);cv_text_in(6,103,228,&AF_X,genre,T_TEXT,T_BG);cv_text_in(6,125,228,&AF_X,"OCT+ MIDI / OCT- BACK",T_TEXT,T_BG);return;}
     static const char *const role[4]={"01 DRUM","02 SYNTH","03 SYNTH","04 SYNTH"};
     for(unsigned k=0;k<4;k++){
       int y=6+k*23;cv_text_in(6,y,70,&AF_X,role[k],T_TEXT,T_BG);

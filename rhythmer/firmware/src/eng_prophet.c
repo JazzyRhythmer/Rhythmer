@@ -9,8 +9,8 @@ _Static_assert(sizeof(p5_voice_t)<=sizeof(md_voice_t),"Prophet fits existing mut
 static p5_voice_t *prophet_state(track_t *t,voice_t *v){
  unsigned ti=(unsigned)(t-trk);if(md_shared_engine[ti]!=ENGI_PROPHET){memset(prophet_owner[ti],0,sizeof prophet_owner[ti]);md_memory(ti,ENGI_PROPHET);}
  unsigned free=4;
- for(unsigned i=0;i<4;i++){if(prophet_owner[ti][i]==v)return &md_shared[ti].voice[i].prophet;if(!prophet_owner[ti][i]||!prophet_owner[ti][i]->active)free=i;}
- if(free==4)free=0;prophet_owner[ti][free]=v;return &md_shared[ti].voice[free].prophet;
+ for(unsigned i=0;i<4;i++){if(prophet_owner[ti][i]==v)return &md_shared[ti][i].prophet;if(!prophet_owner[ti][i]||!prophet_owner[ti][i]->active)free=i;}
+ if(free==4)free=0;prophet_owner[ti][free]=v;return &md_shared[ti][free].prophet;
 }
 static void prophet_on(track_t *t,voice_t *v){p5_voice_t *s=prophet_state(t,v);memset(s,0,sizeof *s);s->noise=0x13579bdu+(unsigned)(t-trk)*177u+(unsigned)(v-t->v)*77u;}
 static void jp_render(track_t *t,voice_t *v,int32_t *out,uint32_t n,const vmod_t *m){

@@ -1,0 +1,33 @@
+--- a/rhythmer/firmware/src/project.c
++++ b/rhythmer/firmware/src/project.c
+@@ -1497,7 +1497,7 @@
+  * (until 1.0.2 the SAMPLE engine's PERC set, retired since) */
+ static void proj_legacy_drums(track_t *t)
+ {
+-    static const uint8_t FX_DEF[4] = {0, 24, 28, 36};
++    static const uint8_t FX_DEF[4] = {0, 0, 0, 0};
+     const preset_t *pr = &ENGINES[ENGI_DRUM]->presets[0];
+     uint32_t i;
+     t->eng_req = ENGI_DRUM;
+--- a/rhythmer/firmware/src/fm4_convert.c
++++ b/rhythmer/firmware/src/fm4_convert.c
+@@ -363,7 +363,7 @@
+  * FLT, VOICE, the sends; the OP ENV values their defaults); the track's own values (param_kept) are the caller's */
+ static void fm4_preset_values(int16_t *p, uint32_t k)
+ {
+-    static const uint8_t FX_DEF[4] = {0, 24, 28, 36};
++    static const uint8_t FX_DEF[4] = {0, 0, 0, 0};
+     const preset_t *pr = &DIGITAL_PRESETS[k % FM4_NPRESETS];
+     uint32_t i;
+     for (i = 0; i < 8u; i++)
+--- a/rhythmer/firmware/src/ui.c
++++ b/rhythmer/firmware/src/ui.c
+@@ -1437,7 +1437,7 @@
+         t->p[P_VLYR] = (int16_t)(e->presets[pi].xp >> 2);
+     }
+     {   /* the sends */
+-        static const uint8_t FX_DEF[4] = {0, 24, 28, 36};
++        static const uint8_t FX_DEF[4] = {0, 0, 0, 0};
+         const preset_t *pr = &e->presets[pi];
+         for (i = 0; i < 4u; i++)
+             t->p[P_DIST + i] = (int16_t)(pr->fx[i] ? pr->fx[i] - 1 : FX_DEF[i]);

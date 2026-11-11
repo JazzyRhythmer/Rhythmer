@@ -8,7 +8,7 @@ int main(int argc,char **argv){
  int bad=0;
  for(unsigned style=0;style<2;style++){
   ui_power_on();fm6_init();power_on_parts();test_optional_machines();six_native_init();trks_put(1);song.master_q12=4096;mc_host=atoi(argv[1]);mc_host_v12=1;mc_off=0;gov_cap=16;sys_load=LOAD_FULL;
-  six_loops[0]=sample[0];six_loops[1]=sample[1];six_loop_mask=3;jungle_bind(six_break_prepare(&trk[5]),sample[0],72000,48000);
+  six_loops[0]=sample[0];six_loops[1]=sample[1];six_loop_mask=3;six_loop_now=0;jungle_bind(sample[0],72000,48000);
   for(unsigned k=0;k<6;k++){
    track_t *t=&trk[k];unsigned e=k==5?ENGI_BREAK:style?ENGI_ACID:(unsigned[]){ENGI_DRUM,ENGI_WAVETABLE,ENGI_PHASE,ENGI_LOFI,ENGI_ACID}[k];
    set_engine_of(t,e);t->engine=e;apply_preset_to(t,e==ENGI_ACID?k%4:e==ENGI_DRUM?14:0);t->xf=t->xf_on=0;t->p[P_MUTE]=0;t->p[P_SLEN]=32;t->p[P_SGATE]=100;
@@ -25,7 +25,7 @@ int main(int argc,char **argv){
      else for(unsigned j=0;j<(!style&&k==2?3u:1u);j++)trk_note_on(&trk[k],36+k*5+j*4,120);
     }
     six_break_note(&trk[5],(b/160)%16,127);
-    if(b%320==0)six_break_select(&trk[5],(b/320)&1u,1);
+    if(b%320==0)six_break_select((b/320)&1u,1);
    }
    int32_t y[64];mix_block(y,32);split+=mc_mask_last&&mc_mask_last!=63;
    for(unsigned j=0;j<64;j++)energy|=y[j]!=0;fwrite(y,sizeof y,1,out);

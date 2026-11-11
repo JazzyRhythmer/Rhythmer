@@ -3,8 +3,8 @@
 HOME + turn SELECT opens GEN. On GEN page 1, knob 1 chooses the genre; knob 4 is now TARGET:
 
 - ALL LOOP / ALL PARTS / ALL SONG: the existing complete arrangement generator for tracks 1–4.
-- T1 through T6: replace only that track's sequence using the currently selected GEN genre; a Break target reads Tn BREAK.
-- The separate BREAK target is removed. Select the track directly. If it already uses Break, GEN shows its Break controls; an EMPTY target asks SELECT SOUND.
+- T1 MIDI through T6 MIDI: replace only that track's sequence using the currently selected GEN genre.
+- BREAK: find the singleton Break machine in any track position, then generate that track's chop sequence. If no Break is assigned, show NO BREAK TRACK and keep music intact.
 
 OCT+ generates. Pressing it again with the same settings chooses another seed. SELECT still moves through the three GEN pages. GLO + G4 undoes a generation. In a partial target mode, reopening GEN retains the selected genre and target. New Project resets the scope to ALL.
 
@@ -29,10 +29,8 @@ The sixteen source chops are evenly spaced eighth notes across two 4/4 bars. Kic
 
 ## Validation
 
-The native target test applies all 59 genres to all six track slots (354 cases), checks other-track/global/automation preservation, current-genre response, SCL, chord reference, 1–64 step lengths, track-specific Break routing and empty-target behaviour, Dilla push/pull and high-tempo half-time. Whole-arrangement GEN regression remains separate. The exact firmware is also tested in the community emulator, including a playing control run and a run that operates HOME + SELECT, the genre/target knobs and OCT+; RAM comparisons verify the actual Break MIDI change and unchanged musical globals/other tracks.
+The native target test applies all 59 genres to all six track slots (354 cases), checks other-track/global/automation preservation, current-genre response, SCL, chord reference, 1–64 step lengths, owner relocation/missing-owner behaviour, Dilla push/pull and high-tempo half-time. Whole-arrangement GEN regression remains separate. The exact firmware is also tested in the community emulator, including a playing control run and a run that operates HOME + SELECT, the genre/target knobs and OCT+; RAM comparisons verify the actual Break MIDI change and unchanged musical globals/other tracks.
 
 Physical FM-1 listening, update transfer/recovery and long dense-session load tests are still separate checks. Research and artist references are in GEN-STYLE-DESIGN.md; these are original generative profiles, not copied artist MIDI or recordings.
 
 During update-media capture, a remembered DRUM VOICE page was found to override the graph area of GEN/HOME. The source now prioritizes GEN/HOME before the EDIT sound list. `six_gen_navigation_test.c` verifies all three views with ASan/UBSan and is included in the normal test script. This navigation fix is newer than the preserved beta3 binary/package above: it needs a new build and exact-binary validation before installation or release.
-
-See [independent Break tracks](MULTI-BREAK.md) for shared sample banks, per-track state and GEN controls.

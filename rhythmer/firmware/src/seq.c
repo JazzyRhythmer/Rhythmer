@@ -1061,16 +1061,15 @@ static void key_on(uint32_t k, track_t *t)
     if(!six_track_enabled(trk_index(t)))return;
     if(drum_track(t)){unsigned ti=trk_index(t);if(ti<NTRK){dx_input_note[ti]=kb_note[k];dx_input_serial[ti]++;}}
     if(t->engine==ENGI_BREAK){
-        jungle_state_t *ctx=six_break_prepare(t);
-        kb_on[k]=kb_sn[k]=0;int cmd=six_break_command(t,k);if(cmd==-1)return;
+        kb_on[k]=kb_sn[k]=0;int cmd=six_break_command(k);if(cmd==-1)return;
         if(cmd==-2)cmd=(int)six_break_slice(k);
-        if(cmd>=32&&!six_break_select(t,(unsigned)cmd-32,0))return;
-        ctx->key_cmd[k]=(uint8_t)(cmd+1);
+        if(cmd>=32&&!six_break_select((unsigned)cmd-32,0))return;
+        six_key_cmd[k]=(uint8_t)(cmd+1);
         if(cmd<32){t->v[0].s[BENV_KEYS]=(int32_t)((uint32_t)t->v[0].s[BENV_KEYS]|(1u<<k));six_break_env_on(t,(unsigned)cmd,100);}
-        if(six_perf_enabled)six_break_key(t,k,1);else jungle_one_shot(ctx,(unsigned)cmd);
+        if(six_perf_enabled)six_break_key(k,1);else jungle_one_shot((unsigned)cmd);
         if(rec_on(t)){
-         if(cmd>=32&&ctx->held_count){
-          rec_note(t,ctx->roll_held[ctx->held_count-1]+16u,100);
+         if(cmd>=32&&six_roll_count){
+          rec_note(t,six_roll_held[six_roll_count-1]+16u,100);
           unsigned idx=t->rh_start%(unsigned)clamp(t->p[P_SLEN],1,64);step_t *s=&t->step[seq_src(t,idx)];
           if(s->n<4)s->note[s->n++]=(uint8_t)cmd;
          }else rec_note(t,(unsigned)cmd,100);
@@ -1121,12 +1120,11 @@ static void keys_strum(uint32_t n)
 static void key_off(uint32_t k, track_t *t)
 {
     if(t->engine==ENGI_BREAK){
-        jungle_state_t *ctx=six_break_prepare(t);
-        unsigned was=ctx->held_count?ctx->roll_held[ctx->held_count-1]+16u:0;
-        six_break_key(t,k,0);if(ctx->key_cmd[k])rec_release(t,ctx->key_cmd[k]-1u);ctx->key_cmd[k]=0;
+        unsigned was=six_roll_count?six_roll_held[six_roll_count-1]+16u:0;
+        six_break_key(k,0);if(six_key_cmd[k])rec_release(t,six_key_cmd[k]-1u);six_key_cmd[k]=0;
         t->v[0].s[BENV_KEYS]=(int32_t)((uint32_t)t->v[0].s[BENV_KEYS]&~(1u<<k));six_break_env_release(t);
-        if(six_perf_enabled&&ctx->held_count&&was!=ctx->roll_held[ctx->held_count-1]+16u&&rec_on(t))
-            rec_note(t,ctx->roll_held[ctx->held_count-1]+16u,100);
+        if(six_perf_enabled&&six_roll_count&&was!=six_roll_held[six_roll_count-1]+16u&&rec_on(t))
+            rec_note(t,six_roll_held[six_roll_count-1]+16u,100);
         return;
     }
     uint32_t n = kb_on[k], i, mc = trk_midi_ch(trk_index(t));
