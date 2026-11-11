@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=f4a3fd0a6f94';
+import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=companion-20261112';
 import {mountProgress} from './progress.mjs?v=f4a3fd0a6f94';
 const $=s=>document.querySelector(s),mode=new URLSearchParams(location.search).get('mode')==='stock'?'stock':'rhythmer';
 let manifest,target,recovery,source,up,access,working=false,writing=false,backupReady=false,bundleReady=false,releaseLock,heartbeat,channel;
@@ -14,7 +14,7 @@ function checkpoint(){try{return JSON.parse(sessionStorage.getItem(checkpointKey
 function allowed(preparing=false){try{return bundleReady&&authorize({mode,source,recovery,target,backupSaved:preparing||(backupReady&&$('#backup-saved').checked),ack:preparing||$('#ack').checked,checkpoint:checkpoint()});}catch{return false;}}
 function refresh(){
  $('#start').disabled=working||!bundleReady;$('#connect').disabled=working||!!source;$('#disconnect').disabled=working||!source;
- $('#backup').disabled=working||!source||!['custom','rhythmer'].includes(source.kind);
+ $('#backup').disabled=working||!source||!['custom','rhythmer','jazzy'].includes(source.kind);
  $('#backup-saved').disabled=working||!backupReady;$('#stock-file').disabled=working;
  $('#review').disabled=working||!allowed(true);
  $('#ack').disabled=working;
@@ -88,7 +88,7 @@ async function review(){
  const isResume=source.kind==='loader';$('#confirm-title').textContent=isResume?'Resume this update?':mode==='stock'?'Return this FM-1 to V15?':'Install Rhythmer?';
  $('#confirm-detail').textContent=`Source: ${source.id.text} (${source.input.name}). Target: ${target.product}. SHA-256: ${target.sha256}. ${mode==='stock'?'The unmodified official V15 image will be written. Custom projects are not imported into stock.':'This integrated package includes Amen (A) and the corrected two-bar Think drum edit (B). It replaces factory audio in A/B during the firmware transfer.'} ${isResume?'Explicit update-loader resume.':''}`;
  $('#confirm-risk').checked=false;$('#confirm-backup').checked=false;$('#confirm-notice').checked=false;$('#confirm-audio-rights').checked=false;$('#confirm-audio-row').hidden=mode==='stock';$('#confirm-v15').checked=false;$('#confirm-v15-row').hidden=mode==='stock';$('#confirm-write').disabled=true;
- const archive=$('#confirm-download');archive.hidden=!backupURL||!['custom','rhythmer'].includes(source.kind);if(!archive.hidden){archive.href=backupURL;archive.download=$('#backup-download').download;}
+ const archive=$('#confirm-download');archive.hidden=!backupURL||!['custom','rhythmer','jazzy'].includes(source.kind);if(!archive.hidden){archive.href=backupURL;archive.download=$('#backup-download').download;}
  $('#confirm-backup-label').textContent=archive.hidden?'This stock firmware or loader has no compatible archive export. I have kept earlier backups and understand existing music/data may be lost.':'I downloaded the backup above and kept it outside this browser. I have separately retained original Break audio.';
  transferView.enter('review','Download the backup where available, read the notices, then confirm. No device write has started.');
  const d=$('#confirm');d.returnValue='';d.showModal();await new Promise(resolve=>d.addEventListener('close',resolve,{once:true}));if(d.returnValue!=='write'||!modalReady()){transferView.cancel();log('Installation review cancelled before device writes.');return;}
@@ -121,7 +121,7 @@ async function startFlow(){
   transferView.enter('device','Identifying the connected FM-1.');if(!source)await connectDevice();
   transferView.configure({mode,resume:source?.kind==='loader'});
   authorize({mode,source,recovery,target,backupSaved:true,ack:true,checkpoint:checkpoint()});
-  if(['custom','rhythmer'].includes(source.kind))await captureMusic();else{transferView.enter('backup','Stock firmware / loader cannot export a musical archive here.');transferView.model.skip('backup');}
+  if(['custom','rhythmer','jazzy'].includes(source.kind))await captureMusic();else{transferView.enter('backup','Stock firmware / loader cannot export a musical archive here.');transferView.model.skip('backup');}
  });
  if(prepared)await review();
 }
