@@ -1,11 +1,11 @@
 {
   "version": "0.1.2-dev1",
   "product": "FM-1_748023",
-  "buildRevision": "20261111.3",
+  "buildRevision": "20261111.4",
   "localOnly": false,
-  "releaseCaution": "Multi-Break: independent Break engines on any active track. GEN targets T1\u2013T6; choose the existing engine first. Back up before installing.",
+  "releaseCaution": "Multi-Break: independent Break engines on any active track. GEN targets T1–T6; choose the existing engine first. Back up before installing.",
   "ownerTest": null,
-  "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e",
+  "sha256": "f2275843d80bb0776e10b5fc2023aaa2a87c29e5738836b7c257c11b80ac1966",
   "physicalHardwareTested": false,
   "audioPublicRedistributionCleared": false,
   "installation": "One integrated firmware image includes Amen/Think; no separate sample upload. Official V15 recovery is included.",
@@ -17,8 +17,8 @@
     },
     {
       "name": "Rhythmer-0.1.2-dev1-install.zip",
-      "bytes": 3214995,
-      "sha256": "b33d94055f37f531fe17440ee126333b1da61c3e8463b25e50536405e0e07ec5"
+      "bytes": 3215690,
+      "sha256": "c29efff145cc947582eb70c3d292c909dab6605e30b6d3f38e202386cd54b77f"
     },
     {
       "name": "Rhythmer-Manual-v0.1.1-beta3.pdf",
@@ -32,18 +32,18 @@
     },
     {
       "name": "Rhythmer-start.fm1save",
-      "bytes": 1351314,
-      "sha256": "4ff11de0d976dbf391a50edf42203f442ed1f9e94dac8d20d9d6f3ca52a0c61f"
+      "bytes": 1352562,
+      "sha256": "cb4e4ab87f02fa5050a9977fab90cf9121955017afee8249346bc6ac54a5d90b"
     },
     {
       "name": "Rhythmer-with-breaks.rhythmer",
-      "bytes": 2261433,
-      "sha256": "4c0b9d42547a6aac66a784c509aba58652c5db79b30a5ff06812aa9ac36792e4"
+      "bytes": 2262482,
+      "sha256": "7be43dba18dd468b99af1fe7da45f2080ecf9acf5ba51e9bb454f81bf0399829"
     },
     {
       "name": "Rhythmer.fwsc",
       "bytes": 828061,
-      "sha256": "e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e"
+      "sha256": "f2275843d80bb0776e10b5fc2023aaa2a87c29e5738836b7c257c11b80ac1966"
     },
     {
       "name": "THIRD-PARTY-AUDIO.txt",
@@ -104,7 +104,13 @@
       "name": "Rhythmer-0.1.2-dev1-20261111.3-source.tar.gz",
       "bytes": 3545855,
       "sha256": "6345d8d724db0911369646ccd12abbb1bff999f43ecd43d970b8a230e3245dd1"
+    },
+    {
+      "name": "Rhythmer-0.1.2-dev1-20261111.4-source.tar.gz",
+      "bytes": 3555459,
+      "sha256": "36e1e10606b364476beedd412d4e8260747b4ff2fe1090476d26fbda1272cb92"
     }
   ],
-  "correspondingSource": "downloads/Rhythmer-0.1.2-dev1-20261111.3-source.tar.gz"
+  "correspondingSource": "downloads/Rhythmer-0.1.2-dev1-20261111.4-source.tar.gz",
+  "validation": "# Factory FX defaults · build 20261111.4\n\nBreak A/B factory sounds now load with DIST / PHASER / DLY / REV all at 0%. Acid factory sounds load with DIST 30%, PHASER 0%, DLY 0%, REV 10%. These defaults apply to factory preset loads, INIT SOUND, new projects and startup defaults. Saved project and user sound effect settings are preserved.\n\nFactory sound decoding is shared between normal preset loading and legacy project conversion. JAZZY retains all 31 engines and 1,221 presets; it now has 176 bytes of application image headroom. The shared loader is main-loop work and adds no per-sample DSP processing. No audio buffers, stack guards, synthesis models or preset data were removed.\n\nBoth bundled Break banks (Amen A / Think B) are unchanged. Multi-Break independent playback, shared A/B samples and GEN targeting T1–T6 remain supported. Back up your music and original custom loops before installing: installation replaces both sample banks with the included factory loops.\n\nSoftware validation: every factory preset decoded identically to the previous loading algorithm (JAZZY 1,221; RHYTHMER 178). Both OSes pass 62 default/load/project-preservation checks and constrained firmware builds. Emulator validation is separate from physical FM-1 installation and endurance testing.\n"
 }

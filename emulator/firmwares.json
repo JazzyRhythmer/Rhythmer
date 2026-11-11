@@ -1,1 +1,15 @@
-{"default":"rhythmer","firmwares":[{"id":"rhythmer","name":"Rhythmer","version":"0.1.2-dev1","author":"Jazzy Rhythmer","license":"GPL-3.0","repo":"../#releases","package":"../downloads/Rhythmer.fwsc?sha=e273dfae244c","about":"Rhythmer · Multi-Break · build 20261111.3"}]}
+{
+  "default": "rhythmer",
+  "firmwares": [
+    {
+      "id": "rhythmer",
+      "name": "Rhythmer",
+      "version": "0.1.2-dev1",
+      "author": "Jazzy Rhythmer",
+      "license": "GPL-3.0",
+      "repo": "../#releases",
+      "package": "../downloads/Rhythmer.fwsc?sha=f2275843d80b",
+      "about": "Rhythmer · factory FX defaults · build 20261111.4"
+    }
+  ]
+}
