@@ -1496,7 +1496,6 @@ static int proj_unpack(project_t *q, const uint8_t *b, uint32_t st)
  * (until 1.0.2 the SAMPLE engine's PERC set, retired since) */
 static void proj_legacy_drums(track_t *t)
 {
-    static const uint8_t FX_DEF[4] = {0, 24, 28, 36};
     const preset_t *pr = &ENGINES[ENGI_DRUM]->presets[0];
     uint32_t i;
     t->eng_req = ENGI_DRUM;
@@ -1504,16 +1503,8 @@ static void proj_legacy_drums(track_t *t)
     for (i = 0; i < P_E0; i++)
         if (!param_kept(i))
             t->p[i] = TP[i].def;
-    for (i = 0; i < 8u; i++)
-        t->p[P_E0 + i] = pr->e[i];
-    t->p[P_ATK] = pr->env[0];
-    t->p[P_DEC] = pr->env[1];
-    t->p[P_SUS] = pr->env[2];
-    t->p[P_REL] = pr->env[3];
-    t->p[P_ED_FLT] = pr->fenv;
-    t->p[P_VOICE] = PR_MONO(pr) ? V_LEGATO : V_POLY;
-    for (i = 0; i < 4u; i++)
-        t->p[P_DIST + i] = (int16_t)(pr->fx[i] ? pr->fx[i] - 1 : FX_DEF[i]);
+    preset_sound_values(t->p, pr);
+
 }
 
 static project_t proj_scratch __attribute__((section(".pool")));   /* (0.8.5: the pool again, LOWBUF full with the steps'

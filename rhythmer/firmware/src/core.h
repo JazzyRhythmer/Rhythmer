@@ -391,6 +391,19 @@ typedef struct {
 enum { PT_NONE, PT_BASS, PT_LEAD, PT_PAD, PT_KEYS, PT_PLUCK, PT_BELL, PT_VOX, PT_DRUM, PT_FX, PT_N };
 #define TAG(t) (PT_##t << 1)
 #define PR_MONO(pr) ((pr)->mono & 1u)
+
+/* Identical sound decoding for factory loads and legacy project conversion.
+ * Preset sends store value+1; zero requests the historical common default.
+ * Main-loop work only: do not add this helper to the audio rendering path. */
+static __attribute__((noinline)) void preset_sound_values(int16_t *p, const preset_t *pr)
+{
+    static const uint8_t fx_default[4]={0,24,28,36};
+    for(unsigned i=0;i<8u;i++)p[P_E0+i]=pr->e[i];
+    p[P_ATK]=pr->env[0];p[P_DEC]=pr->env[1];
+    p[P_SUS]=pr->env[2];p[P_REL]=pr->env[3];
+    p[P_ED_FLT]=pr->fenv;p[P_VOICE]=PR_MONO(pr)?V_LEGATO:V_POLY;
+    for(unsigned i=0;i<4u;i++)p[P_DIST+i]=pr->fx[i]?pr->fx[i]-1:fx_default[i];
+}
 #define PR_TAG(pr) ((uint32_t)(pr)->mono >> 1)
 
 struct track;

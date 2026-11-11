@@ -1424,24 +1424,12 @@ static void apply_preset_to(track_t *t, uint32_t pi)
     for (i = 0; i < P_E0; i++)                        /* the rest of the sound to its defaults: a preset */
         if (!param_kept(i) && !((trk_eng(t)==ENGI_ACID||trk_eng(t)==ENGI_BREAK) && i>=P_LN0 && i<=P_LN7)) /* sounds the same after any edit */
             t->p[i] = TP[i].def;
-    for (i = 0; i < 8u; i++)
-        t->p[P_E0 + i] = (int16_t)e->presets[pi].e[i];
-    t->p[P_ATK] = e->presets[pi].env[0];
-    t->p[P_DEC] = e->presets[pi].env[1];
-    t->p[P_SUS] = e->presets[pi].env[2];
-    t->p[P_REL] = e->presets[pi].env[3];
-    t->p[P_ED_FLT] = e->presets[pi].fenv;
-    t->p[P_VOICE] = PR_MONO(&e->presets[pi]) ? V_LEGATO : V_POLY;   /* mono presets keep the legato feel */
+    preset_sound_values(t->p, &e->presets[pi]);
     if (e == &ENG_FORMANT) {                          /* (0.8.5) VOICE's words: LANG, LYRIC (0: its vowels) */
         t->p[P_VLANG] = (int16_t)(e->presets[pi].xp & 3u);
         t->p[P_VLYR] = (int16_t)(e->presets[pi].xp >> 2);
     }
-    {   /* the sends */
-        static const uint8_t FX_DEF[4] = {0, 24, 28, 36};
-        const preset_t *pr = &e->presets[pi];
-        for (i = 0; i < 4u; i++)
-            t->p[P_DIST + i] = (int16_t)(pr->fx[i] ? pr->fx[i] - 1 : FX_DEF[i]);
-    }
+
     fm6_track_loaded(t);                              /* FM6: the preset's patch (its SLOT) */
     load_end(t);
 }
@@ -1506,7 +1494,12 @@ static void apply_preset(uint32_t pi)                 /* the selected track's so
 static void set_engine(uint32_t ei) { set_engine_of(TSEL, ei); }
 /* (0.6.46) INIT SOUND, NEW PROJECT, (0.6.49) the power-on: the engine's own defaults (its EDIT values as the engine
  * declares them, not its first preset's colour; the envelope, VOICE and the filter envelope as a new track has them),
- * dry (no DIST CHOR DLY REV send: the effects are the player's to add), on FM6 the init voice */
+ * dry except ACID's 30% DIST / 10% REV; on FM6 the init voice */
+static __attribute__((noinline)) void initial_sends(track_t *t)
+{
+    for(unsigned i=0;i<4u;i++)t->p[P_DIST+i]=0;
+    if(trk_eng(t)==ENGI_ACID){t->p[P_DIST]=38;t->p[P_REV]=13;}
+}
 static void init_sound_of(track_t *t, uint32_t ei)
 {
     static const uint8_t ENVP[6] = {P_ATK, P_DEC, P_SUS, P_REL, P_ED_FLT, P_VOICE};
@@ -1519,8 +1512,7 @@ static void init_sound_of(track_t *t, uint32_t ei)
         t->p[P_E0 + i] = e->edit[i].def;
     for (i = 0; i < 6u; i++)
         t->p[ENVP[i]] = TP[ENVP[i]].def;
-    for (i = 0; i < 4u; i++)
-        t->p[P_DIST + i] = 0;
+    initial_sends(t);
     if(trk_eng(t)==ENGI_ACID)for(i=0;i<8;i++)t->p[P_LN0+i]=SIX_GEN[i].def;
     if(trk_eng(t)==ENGI_BREAK){t->p[P_LN0]=1;t->p[P_VOICE]=V_MONO;}
     fm6_init_voice(t);
@@ -1528,14 +1520,12 @@ static void init_sound_of(track_t *t, uint32_t ei)
 }
 /* (0.9.9) the power-on, INIT SYSTEM and NEW PROJECT: part i (engines.c TRK_DEF) its engine with its preset's sound
  * (the EDIT values, the envelope, MONO / POLY, VOICE's words, FM6's patch), over the engine's defaults as INIT SOUND
- * leaves them, and dry: no DIST CHOR DLY REV send (the effects are the player's to add). Was INIT SOUND's alone */
+ * leaves them, dry except ACID's 30% DIST / 10% REV. Was INIT SOUND's alone */
 static void power_sound_of(track_t *t, uint32_t i)
 {
-    uint32_t k;
     init_sound_of(t, TRK_DEF[i % NPART][0]);
     apply_preset_to(t, TRK_DEF[i % NPART][1]);
-    for (k = 0; k < 4u; k++)
-        t->p[P_DIST + k] = 0;
+    initial_sends(t);
 }
 
 static void track_defaults(track_t *t)

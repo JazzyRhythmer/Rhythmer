@@ -37,10 +37,10 @@ static void acid_render(track_t *t,voice_t *v,int32_t *out,uint32_t n,const vmod
 static const preset_t ACID_PRESETS[]={
  /* Hortator's four ACID colours with Rhythmer's factory cutoff settings.
   * Tune and gate follow track pitch and SEQ; the last two controls are SLIDE and DRIVE. */
- {"HT SQUELCH",{80,64,64,50,64,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT DEEPBASS",{80,30,30,30,40,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT SCREAMER",{50,115,100,80,100,0,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0},
- {"HT SQUAREAC",{80,80,70,60,64,1,21,0},{0,64,127,0},0,1|TAG(BASS),{0},1,0}
+ {"HT SQUELCH",{80,64,64,50,64,0,21,0},{0,64,127,0},0,1|TAG(BASS),{39,1,1,14},1,0},
+ {"HT DEEPBASS",{80,30,30,30,40,0,21,0},{0,64,127,0},0,1|TAG(BASS),{39,1,1,14},1,0},
+ {"HT SCREAMER",{50,115,100,80,100,0,21,0},{0,64,127,0},0,1|TAG(BASS),{39,1,1,14},1,0},
+ {"HT SQUAREAC",{80,80,70,60,64,1,21,0},{0,64,127,0},0,1|TAG(BASS),{39,1,1,14},1,0}
 };
 #define ACID_PD(n,hi,d) {n,F_INT,0,hi,d,0,0}
 static const char *const ACID_WAVES[]={"SAW","SQR"};

@@ -1,1 +1,56 @@
-{"version":"0.1.2-dev1","channel":"public-beta","physicalHardwareTested":false,"localOnly":false,"ownerTest":null,"firmware":{"url":"../downloads/Rhythmer.fwsc?sha=e273dfae244c","product":"FM-1_748023","sha256":"e273dfae244c5c89e745a7e85a3901fd8830906f774593deed5e8a6bb3dfd17e","bytes":828061,"embeddedBreaks":true},"loops":[{"name":"Amen","slot":"A","url":"../downloads/amen-160.slot","bytes":81920,"sha256":"b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0"},{"name":"Think","slot":"B","url":"../downloads/think-160.slot","bytes":81920,"sha256":"e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"}],"recovery":{"url":"../downloads/official-v15/FM-1_015.fwsc","product":"FM-1_015","sha256":"db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a","bytes":699956,"license":"Apache-2.0","source":"https://raw.githubusercontent.com/m-vave/fm1_open/4c7496daac04a95ff10d1afdcc8f9ead2dbabc41/sdk/firmware/FM-1_015.fwsc"},"recoveryArchive":{"url":"../downloads/FM-1-V15-recovery.zip","bytes":709532,"sha256":"95243336f1cecf886aab97556c1e6fb809ac334e88fe76b05252df703631e327"},"bundle":{"url":"../downloads/Rhythmer-with-breaks.rhythmer?sha=e273dfae244c","bytes":2261433,"sha256":"4c0b9d42547a6aac66a784c509aba58652c5db79b30a5ff06812aa9ac36792e4"},"archive":{"url":"../downloads/Rhythmer-0.1.2-dev1-install.zip?sha=e273dfae244c","bytes":3214995,"sha256":"b33d94055f37f531fe17440ee126333b1da61c3e8463b25e50536405e0e07ec5"},"audioRightsURL":"../audio-rights.json","publicRedistributionCleared":false,"buildRevision":"20261111.3"}
+{
+  "version": "0.1.2-dev1",
+  "channel": "public-beta",
+  "physicalHardwareTested": false,
+  "localOnly": false,
+  "ownerTest": null,
+  "firmware": {
+    "url": "../downloads/Rhythmer.fwsc?sha=f2275843d80b",
+    "product": "FM-1_748023",
+    "sha256": "f2275843d80bb0776e10b5fc2023aaa2a87c29e5738836b7c257c11b80ac1966",
+    "bytes": 828061,
+    "embeddedBreaks": true
+  },
+  "loops": [
+    {
+      "name": "Amen",
+      "slot": "A",
+      "url": "../downloads/amen-160.slot",
+      "bytes": 81920,
+      "sha256": "b642cdc43eb3a2586fbeb721f8300ffc6beff57144bd9977915ff6d0df37dcc0"
+    },
+    {
+      "name": "Think",
+      "slot": "B",
+      "url": "../downloads/think-160.slot",
+      "bytes": 81920,
+      "sha256": "e28d614f5a125c4ec480e0d1140f951cec7e8252e932cf402ede1aa4288a29e3"
+    }
+  ],
+  "recovery": {
+    "url": "../downloads/official-v15/FM-1_015.fwsc",
+    "product": "FM-1_015",
+    "sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a",
+    "bytes": 699956,
+    "license": "Apache-2.0",
+    "source": "https://raw.githubusercontent.com/m-vave/fm1_open/4c7496daac04a95ff10d1afdcc8f9ead2dbabc41/sdk/firmware/FM-1_015.fwsc"
+  },
+  "recoveryArchive": {
+    "url": "../downloads/FM-1-V15-recovery.zip",
+    "bytes": 709532,
+    "sha256": "95243336f1cecf886aab97556c1e6fb809ac334e88fe76b05252df703631e327"
+  },
+  "bundle": {
+    "url": "../downloads/Rhythmer-with-breaks.rhythmer?sha=f2275843d80b",
+    "bytes": 2262482,
+    "sha256": "7be43dba18dd468b99af1fe7da45f2080ecf9acf5ba51e9bb454f81bf0399829"
+  },
+  "archive": {
+    "url": "../downloads/Rhythmer-0.1.2-dev1-install.zip?sha=f2275843d80b",
+    "bytes": 3215690,
+    "sha256": "c29efff145cc947582eb70c3d292c909dab6605e30b6d3f38e202386cd54b77f"
+  },
+  "audioRightsURL": "../audio-rights.json",
+  "publicRedistributionCleared": false,
+  "buildRevision": "20261111.4"
+}

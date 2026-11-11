@@ -183,8 +183,8 @@ static uint32_t six_break_render(track_t *t,int32_t *out,uint32_t n)
 }
 
 static const preset_t SIX_BREAK_PRESETS[]={
- {"BREAK A",{0,0,0,64,0,0,0,0},{0,0,127,0},0,1|TAG(DRUM),{0},0,0},
- {"BREAK B",{0,0,0,64,1,0,0,0},{0,0,127,0},0,1|TAG(DRUM),{0},0,0}
+ {"BREAK A",{0,0,0,64,0,0,0,0},{0,0,127,0},0,1|TAG(DRUM),{1,1,1,1},0,0},
+ {"BREAK B",{0,0,0,64,1,0,0,0},{0,0,127,0},0,1|TAG(DRUM),{1,1,1,1},0,0}
 };
 #define SIX_PD(n,hi,d) {n,F_INT,0,hi,d,0,0}
 static const engine_t ENG_BREAK={.name="BREAK",.page_title={"AMENITY","BREAK LOOP"},
