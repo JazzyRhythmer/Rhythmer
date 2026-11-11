@@ -2,7 +2,7 @@
 import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=f4a3fd0a6f94';
 import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=f4a3fd0a6f94';
 import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=f4a3fd0a6f94';
-import {parseInfo} from './midi.mjs?v=f4a3fd0a6f94';
+import {parseInfo} from './midi.mjs?v=companion-20261112';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
 const RHYTHMER_DEV_PRODUCTS=['FM-1_748007','FM-1_748008','FM-1_748010','FM-1_748011','FM-1_748012','FM-1_748013','FM-1_748014','FM-1_748015','FM-1_748016','FM-1_748017','FM-1_748018','FM-1_748019','FM-1_748020','FM-1_748021','FM-1_748022','FM-1_748023'];
@@ -22,9 +22,11 @@ export function strictInfo(body,product){
 export function sourceKind(id,info){
  if(id.model==='ota-FM-1')return 'loader';
  if(id.model!=='FM-1')return 'unsupported';
- const layout=strictInfo(info||[],id.text);
- if(RHYTHMER_PRODUCTS.includes(id.text)&&layout&&
-    (engineCount(id.text)===25?layout.engines===25:layout.engines===21||layout.engines===22))return 'rhythmer';
+ const parsed=parseInfo([240,125,70,76,1,...(info||[]),247]);
+ const z=(info||[]).indexOf(0);
+ const abi=z>0&&info[z+2]===127&&[71,76,77,78].includes(info[z+3])&&info[z+4]===64&&info[z+5]===119;
+ if(id.text==='FM-1_900'&&parsed?.isJazzy&&abi)return 'jazzy';
+ if((RHYTHMER_PRODUCTS.includes(id.text)||/^FM-1_748[0-9]{3}$/.test(id.text))&&parsed?.isRhythmer&&abi)return 'rhythmer';
  if(id.version>=1&&id.version<=16)return id.version===15?'v15':'stock';
  return 'custom';
 }
@@ -37,7 +39,7 @@ export function authorize({mode,source,recovery,target,backupSaved,ack,checkpoin
  if(source.kind==='loader'){
   ensure(!repair,'Sample repair needs a running Rhythmer.');
   ensure(mode==='stock'||checkpoint?.sha256===target.sha256&&checkpoint?.product===target.product,'Unknown update session: use official V15 recovery first.');
- }else if(mode==='rhythmer')ensure(source.kind==='v15'||source.kind==='rhythmer','Return to official V15 before installing Rhythmer from this firmware.');
+ }else if(mode==='rhythmer')ensure(['v15','rhythmer','jazzy'].includes(source.kind),'Return to official V15 before installing Rhythmer from this firmware.');
  if(repair)ensure(source.kind==='rhythmer','Sample repair needs the matching Rhythmer build.');
  return true;
 }
@@ -93,7 +95,7 @@ export async function inspect(up){
  return {kind:sourceKind(d.id,info),id:d.id,info,input:d.link.input,output:d.link.output};
 }
 export async function backup(source,progress){
- ensure(source.kind==='rhythmer'||source.kind==='custom','No musical archive protocol on this firmware.');
+ ensure(['rhythmer','jazzy','custom'].includes(source.kind),'No musical archive protocol on this firmware.');
  const c=new BackupConnection(source.input,source.output);
  try{return await captureBackup((r,o)=>c.request(r,o),String.fromCharCode(...source.info.slice(0,source.info.indexOf(0))),progress,{complete:true});}finally{c.close();}
 }

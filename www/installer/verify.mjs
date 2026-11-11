@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Only identity/INFO and the bank status query. No transfer/restore commands.
-import {DeviceUpdater,inspect,verifyEmbeddedBanks,strictInfo} from './core.mjs?v=f4a3fd0a6f94';
+import {DeviceUpdater,inspect,verifyEmbeddedBanks,strictInfo} from './core.mjs?v=companion-20261112';
 const $=s=>document.querySelector(s);
 $('#verify').addEventListener('click',async()=>{
  $('#verify').disabled=true;$('#result').textContent='';

@@ -7,14 +7,15 @@ export function parseInfo(data){
  const name=String.fromCharCode(...a.slice(5,end));
  const engines=a[end+1];let cursor=end+6;
  if(!engines||engines>64)return null;
- for(let i=0;i<engines;i++){const z=a.indexOf(0,cursor);if(z<cursor||z-cursor>8)return null;cursor=z+1;}
+ for(let i=0;i<engines;i++){const z=a.indexOf(0,cursor);if(z<cursor||z-cursor>9)return null;cursor=z+1;}
  const tracks=a[cursor];
  if(!Number.isInteger(tracks)||tracks<1||tracks>16)return null;
  // This public release supplies FELUCCA_VERSION; the browser data engine
  // retains its development ABI label. Do not accept arbitrary JIANT versions.
  const knownName=['Rhythmer dev','Rhythmer v0.1.1-beta3','JIANT Rhythmer dev','JIANT v0.1.1-beta3'].includes(name);
- const knownLayout=name==='Rhythmer v0.1.2-dev1'?engines===25:knownName&&[21,22].includes(engines);
- return {name,engines,tracks,isRhythmer:knownLayout&&tracks===6};
+ const isRhythmer=(/^Rhythmer (?:dev|v[0-9][A-Za-z0-9.\-]*)$/.test(name)&&[21,22,25].includes(engines)||knownName&&[21,22].includes(engines))&&tracks===6;
+ const isJazzy=/^JAZZY(?: |$)/.test(name)&&engines===43&&tracks===6;
+ return {name,engines,tracks,isRhythmer,isJazzy};
 }
 export async function getMidi(){if(!navigator.requestMIDIAccess)throw Error('Web MIDI is unavailable in this browser. Use Chrome or Edge on a computer.');return navigator.requestMIDIAccess({sysex:true});}
 export async function queryInfo(access,inputID,outputID){
