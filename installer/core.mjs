@@ -1,8 +1,9 @@
+import {recoveryPolicy} from './install-safety.mjs?v=install-safety-20261112.2';
 // SPDX-License-Identifier: GPL-3.0-only
-import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=f4a3fd0a6f94';
-import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=f4a3fd0a6f94';
-import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=f4a3fd0a6f94';
-import {parseInfo} from './midi.mjs?v=companion-20261112';
+import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=install-safety-20261112.2';
+import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=install-safety-20261112.2';
+import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=install-safety-20261112.2';
+import {parseInfo} from './midi.mjs?v=install-safety-20261112.2';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
 const RHYTHMER_DEV_PRODUCTS=['FM-1_748007','FM-1_748008','FM-1_748010','FM-1_748011','FM-1_748012','FM-1_748013','FM-1_748014','FM-1_748015','FM-1_748016','FM-1_748017','FM-1_748018','FM-1_748019','FM-1_748020','FM-1_748021','FM-1_748022','FM-1_748023'];
@@ -27,19 +28,20 @@ export function sourceKind(id,info){
  const abi=z>0&&info[z+2]===127&&[71,76,77,78].includes(info[z+3])&&info[z+4]===64&&info[z+5]===119;
  if(id.text==='FM-1_900'&&parsed?.isJazzy&&abi)return 'jazzy';
  if((RHYTHMER_PRODUCTS.includes(id.text)||/^FM-1_748[0-9]{3}$/.test(id.text))&&parsed?.isRhythmer&&abi)return 'rhythmer';
- if(id.version>=1&&id.version<=16)return id.version===15?'v15':'stock';
+ if(id.version>=1&&id.version<=16)return id.version===15?'v15':id.version===16?'v16':'stock';
  return 'custom';
 }
 export function authorize({mode,source,recovery,target,backupSaved,ack,checkpoint,repair=false}){
- ensure(recovery?.product==='FM-1_015','Prepare the verified official V15 recovery file first.');
- ensure(mode==='stock'?target?.product==='FM-1_015':RHYTHMER_PRODUCTS.includes(target?.product),'No verified target package.');
+ recoveryPolicy(source,recovery,mode);
+ if(mode==='stock')ensure(target?.product===recovery.product&&target?.sha256===recovery.sha256,'Official target differs from the reviewed recovery file.');
+ ensure(mode==='stock'?['FM-1_015','FM-1_016'].includes(target?.product):RHYTHMER_PRODUCTS.includes(target?.product),'No verified target package.');
  ensure(source&&source.kind!=='unsupported','Inspect one compatible FM-1 first.');
  ensure(ack,'Read and acknowledge the installation notice.');
  ensure(backupSaved,'Download your backup and acknowledge it, or acknowledge that stock/loader data cannot be backed up.');
  if(source.kind==='loader'){
   ensure(!repair,'Sample repair needs a running Rhythmer.');
   ensure(mode==='stock'||checkpoint?.sha256===target.sha256&&checkpoint?.product===target.product,'Unknown update session: use official V15 recovery first.');
- }else if(mode==='rhythmer')ensure(['v15','rhythmer','jazzy'].includes(source.kind),'Return to official V15 before installing Rhythmer from this firmware.');
+ }else if(mode==='rhythmer')ensure(['v15','v16','rhythmer','jazzy'].includes(source.kind),'Use the source firmware’s documented return to official V15 or V16 before installing Rhythmer.');
  if(repair)ensure(source.kind==='rhythmer','Sample repair needs the matching Rhythmer build.');
  return true;
 }
