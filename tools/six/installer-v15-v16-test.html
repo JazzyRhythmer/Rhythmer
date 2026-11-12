@@ -1,0 +1,24 @@
+<!doctype html><html><body><pre id="result">RUNNING</pre><script type="module">
+try{
+ let count=0;const check=(ok,msg)=>{if(!ok)throw Error(msg);count++;};const reject=(fn,msg)=>{let ok=false;try{fn();}catch{ok=true;}check(ok,msg);};
+ const core=await import('./installer/core.mjs');const jazzy=await import('../Jazzy/installer/package.mjs');const safety=await import('./installer/install-safety.mjs');
+ const f15=new Uint8Array(await(await fetch('./qa-v15.fwsc')).arrayBuffer()),f16=new Uint8Array(await(await fetch('./qa-v16.fwsc')).arrayBuffer());
+ const s15=await safety.validateOfficial(f15),s16=await safety.validateOfficial(f16);check(s15.product==='FM-1_015','Official V15 accepted');check(s16.product==='FM-1_016','Official V16 accepted');
+ const bad=f16.slice();bad[2000]^=1;let refused=false;try{await safety.validateOfficial(bad);}catch{refused=true;}check(refused,'Modified V16 refused');
+ for(const [id,rec] of [['FM-1_015',s15],['FM-1_016',s16]]){
+ const num=Number(id.split('_')[1]);const src={id:{text:id,model:'FM-1',version:num},kind:core.sourceKind({text:id,model:'FM-1',version:num},[])};
+ check(core.authorize({mode:'rhythmer',source:src,recovery:rec,target:{product:'FM-1_748023'},backupSaved:true,ack:true}),'RHYTHMER accepts '+id);
+ check(jazzy.isSupportedSource(id,'','jazzy'),'JAZZY accepts '+id);
+ check(core.authorize({mode:'stock',source:src,recovery:rec,target:rec,backupSaved:true,ack:true}),'Matching stock allowed');
+ reject(()=>core.authorize({mode:'rhythmer',source:src,recovery:rec,target:{product:'FM-1_748023'},backupSaved:false,ack:true}),'Backup required');
+ }
+ reject(()=>safety.recoveryPolicy({id:'FM-1_016'},s15,'jazzy'),'V16 to V15 mismatch blocked');reject(()=>safety.recoveryPolicy({id:'FM-1_015'},s16,'stock'),'V15 to V16 mismatch blocked');
+ reject(()=>core.authorize({mode:'rhythmer',source:{kind:'custom'},recovery:s15,target:{product:'FM-1_748023'},backupSaved:true,ack:true}),'Other custom blocked');
+ reject(()=>core.authorize({mode:'rhythmer',source:{kind:'loader'},recovery:s15,target:{product:'FM-1_748023'},backupSaved:true,ack:true}),'Unknown resume blocked');
+ check(!jazzy.isSupportedSource('FM-1_017','','jazzy'),'Unknown official blocked');
+ const report=safety.failureDetails({code:'stopped',phase:'stage',served:10,message:'test'},{mode:'stock',target:s16,writing:true});check(report.advice.includes('V15'),'Head refusal advice');check(report.served===10,'Request count retained');
+ check(safety.deviceSummary({id:'FM-1_016'}).flash.jedec===null,'Never invent flash ID');
+ const t=await import('./installer/transport.mjs');check(t.fail('stopped','test','', 'stage',12).served===12,'Transport error counter');
+ document.getElementById('result').textContent='PASS '+count+' assertions';
+}catch(e){document.getElementById('result').textContent='FAIL '+e.stack;}
+</script></body></html>

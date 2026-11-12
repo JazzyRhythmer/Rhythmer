@@ -20,5 +20,20 @@
       "bytes": 11377,
       "sha256": "28641c73ff5b3859ca207394a7ef94ea4e5b7a17a1ed9cb844df2fb9db9ee241"
     }
+  },
+  "installerMaintenance": {
+    "revision": "20261112.2",
+    "jiantPublicVersion": "V10.7.17",
+    "jiantInstaller": "https://juanjiant-bit.github.io/JIANT/webapp/installer/",
+    "jiantSourceRevisionAudited": "b29824f01d5da851a7826332ba77020c3f033977",
+    "skiffSourceRevisionAudited": "fe387231f7b7cb98823f19d8d4f99fee4fcd3792",
+    "changes": [
+      "Enable original V15/V16 file verification through existing upstream allowV16 validator",
+      "Admit V16 as source; require its matching recovery file",
+      "Preserve boot-area matching; no flash-driver changes",
+      "Attach phase and request counters to transport errors",
+      "Add environment/source/recovery/error diagnostics and explicit newer-chip limitations"
+    ],
+    "firmwareModified": false
   }
 }

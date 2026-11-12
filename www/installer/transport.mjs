@@ -44,7 +44,7 @@ export function pairOutput(input, outs) {
 // errors carry a code the pages translate: notfound, busy (a port another program holds), noanswer (a port that
 // does not answer the identity query), model, noupdate (the firmware never asked for the update), stopped, noloader,
 // lost, noreturn, mismatch (detail: the identity the device reports), badreq
-export function fail(code, msg, detail = "") { const e = new Error(msg); e.code = code; e.detail = detail; return e; }
+export function fail(code, msg, detail = "", phase = null, served = null) { const e = new Error(msg); Object.assign(e,{code,detail,phase,served}); return e; }
 
 export function pack7(data) {
   const out = []; let acc = 0, nb = 0;
@@ -268,18 +268,18 @@ export class Updater {
       if (s1.finished || s1.lost || s1.served) break;
     }
     dev.link.close();
-    if (!s1.finished && !s1.lost && !s1.served) throw fail("noupdate", `${dev.id.text} did not start the update: nothing was written`, dev.id.text);
-    if (!s1.finished) throw fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} after ${s1.served} requests: nothing was written`);
+    if (!s1.finished && !s1.lost && !s1.served) throw fail("noupdate", `${dev.id.text} did not start reading the package. Save the diagnostic report.`, dev.id.text, "stage", 0);
+    if (!s1.finished) throw fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} during update staging after ${s1.served} requests. Firmware installation was not confirmed; loader staging may have started.`, "", "stage", s1.served);
     step("loader");
     await sleep(this.t.loaderSettle);
     const ota = await this.waitFor((id) => id.model === "ota-" + model, this.t.loader);
-    if (!ota) throw fail("noloader", "the update loader did not appear. Replug the USB cable and press Install again: the device stays in update mode until it is finished.");
+    if (!ota) throw fail("noloader", "The update loader did not reconnect within the allowed time. Keep power stable, inspect USB/MIDI ports and save the diagnostic report before retrying.");
     const s2 = await this.write(ota, image, step);
-    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Replug and press Install again to resume.`);
+    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Inspect the device before resuming the same package.`, "", "write", s2.served);
     step("reboot");
     await sleep(this.t.loaderSettle);
     const back = await this.waitFor((id) => !IS_OTA(id), this.t.back);
-    if (!back) throw fail("noreturn", "the device did not come back: power-cycle it");
+    if (!back) throw fail("noreturn", "The firmware did not reconnect in time. Keep power stable and inspect the device before any retry.");
     back.link.close();
     if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
     this.installedPorts = {input: back.link.input, output: back.link.output};
@@ -304,7 +304,7 @@ export class Updater {
     if (!ota) return false;
     const step = onStep || (() => {});
     const result = await this.write(ota, image, step);
-    if (!result.finished) return false;
+    if (!result.finished) throw fail(result.lost ? "lost" : "stopped", "The resumed transfer did not complete. Inspect the device before retrying.", "", "write", result.served);
     if (product) {
       step("reboot");
       await sleep(this.t.loaderSettle);

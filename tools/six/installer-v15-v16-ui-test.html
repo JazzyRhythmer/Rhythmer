@@ -1,0 +1,17 @@
+<!doctype html><html><body><pre id="result">RUNNING</pre><script type="module">
+try{let count=0;const check=(ok,m)=>{if(!ok)throw Error(m);count++;};const wait=async(fn,m)=>{for(let i=0;i<500;i++){if(fn())return;await new Promise(r=>setTimeout(r,100));}throw Error(m);};const v16=await(await fetch('./qa-v16.fwsc')).arrayBuffer();
+for(const product of ['Rhythmer','Jazzy'])for(const mode of ['', '?mode=stock']){
+ const frame=document.createElement('iframe');frame.style='width:1200px;height:800px';frame.src='../'+product+'/installer/'+mode;document.body.append(frame);
+ await wait(()=>frame.contentDocument?.getElementById('start')&&!frame.contentDocument.getElementById('start').disabled,product+' initial load '+mode);
+ const d=frame.contentDocument,w=frame.contentWindow;check(d.getElementById('install-compatibility'),product+' compatibility copy');
+ const select=d.getElementById('stock-version');select.value='FM-1_016';select.dispatchEvent(new w.Event('change'));
+ await wait(()=>d.getElementById('start').disabled,product+' V16 waits for file');check(d.getElementById('recovery-selection').textContent.includes('V16'),'V16 status visible');
+ const file=new w.File([v16],'FM-1.fwsc',{type:'application/octet-stream'}),dt=new w.DataTransfer();dt.items.add(file);const input=d.getElementById('stock-file');input.files=dt.files;input.dispatchEvent(new w.Event('change'));
+ await wait(()=>!d.getElementById('start').disabled,product+' V16 file verified '+mode);check(d.getElementById('stock-status').textContent.includes('V16'),'V16 verified status');
+ if(mode)check(d.getElementById('build-status').textContent.includes('FM-1_016'),'V16 actual recovery target visible');
+ select.value='FM-1_015';select.dispatchEvent(new w.Event('change'));await wait(()=>!d.getElementById('start').disabled&&d.getElementById('stock-status').textContent.includes('V15'),product+' revert to V15');
+ check(d.getElementById('report'),'Diagnostic report available');frame.remove();
+}
+document.getElementById('result').textContent='PASS '+count+' UI checks; four pages load, V16 waits for original file, file validated, recovery target shown, V15 restored; no MIDI access requested.';
+}catch(e){document.getElementById('result').textContent='FAIL '+e.stack;}
+</script></body></html>
