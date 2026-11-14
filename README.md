@@ -72,3 +72,5 @@ Independent community firmware, supplied without warranty to the extent permitte
 ## Watch Rhythmer
 
 [![Watch the Rhythmer opening film](docs/github/film.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
+
+You can also try Rhythmer in the browser, no flashing needed, in the free community [FM-1 Emulator](https://fm1-emulator.atst.tools/).
