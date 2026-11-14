@@ -14,3 +14,8 @@ header.jr-site-header,header.jr-site-header.top,header.jr-site-header.topbar{bac
 
 /* One shared active underline; disable the older FM-1 pseudo-element. */
 .jr-site-header .jr-section-nav a::after,.jr-site-header .jr-section-nav a::before{content:none!important;display:none!important}
+
+/* Share the page canvas as well as the header, including legacy black body overrides. */
+:root{--bg:#0c0d0d}
+html,body{background-color:#0c0d0d!important}
+body>main{background-color:transparent!important}
