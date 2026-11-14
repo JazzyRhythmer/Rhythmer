@@ -11,3 +11,6 @@ html{scroll-padding-top:100px}.jr-manual-utility{max-width:1240px;width:calc(100
 
 /* Opaque shared header: override legacy translucent FM-1 top bars. */
 header.jr-site-header,header.jr-site-header.top,header.jr-site-header.topbar{background:#0c0d0d!important;background-image:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;opacity:1!important}
+
+/* One shared active underline; disable the older FM-1 pseudo-element. */
+.jr-site-header .jr-section-nav a::after,.jr-site-header .jr-section-nav a::before{content:none!important;display:none!important}
