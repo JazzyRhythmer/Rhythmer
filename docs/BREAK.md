@@ -28,8 +28,8 @@ Hold HOME and turn SELECT to GEN. Choose a genre with knob 1 and BREAK with knob
 
 ## Your own two-bar samples
 
-Open [SAMPLES in the web editor](https://jazzyrhythmer.github.io/Rhythmer/editor/?target=browser#samples). Keep the original, choose A or B, enter the **original file's source BPM**, and align an eight-beat / two-bar region to its first downbeat. Review conversion, listen, and confirm the destination before transfer. Conversion produces a 160 BPM, 16 kHz mono PCM12 bank within the device's slot budget.
+Open [SAMPLES in the web editor](https://jazzyrhythmer.github.io/rhythmer/editor/?target=browser#samples). Keep the original, choose A or B, enter the **original file's source BPM**, and align an eight-beat / two-bar region to its first downbeat. Review conversion, listen, and confirm the destination before transfer. Conversion produces a 160 BPM, 16 kHz mono PCM12 bank within the device's slot budget.
 
 This converter changes playback rate; use your DAW to export at 160 BPM first if pitch preservation matters. The slots are shared across projects. Musical archives do not contain sample audio: keep original files or converted .slot banks. A firmware installation restores the package's factory loops.
 
-[Detailed manual: Break start, SEQ, performance, automation and sample upload](https://jazzyrhythmer.github.io/Rhythmer/#guide).
+[Detailed manual: Break start, SEQ, performance, automation and sample upload](https://jazzyrhythmer.github.io/rhythmer/#guide).

@@ -2,7 +2,7 @@
 
 Built on JIANT’s sequencing and system foundation, with X0X-derived Acid generation, Amenity-derived break manipulation and a new monochrome interface.
 
-[Website / browser demo](https://jazzyrhythmer.github.io/Rhythmer/) · [Install / official V15 return](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [36-second opening film](https://jazzyrhythmer.github.io/Rhythmer/#opening)
+[Website / browser demo](https://jazzyrhythmer.github.io/rhythmer/) · [Install / official V15 return](https://jazzyrhythmer.github.io/rhythmer/installer/) · [36-second opening film](https://jazzyrhythmer.github.io/rhythmer/#opening)
 
 **This optimized binary has not yet been physically revalidated.** A previous build produced audible artifacts and exceeded the audio deadline on a real FM-1. The changes below passed host and emulator checks; resolution of that hardware report is not yet confirmed. This is a public prerelease, released at the owner’s request.
 

@@ -6,7 +6,7 @@
   ],
   "image": "docs/launch/card.png",
   "color": "#EDEDDD",
-  "play": "https://jazzyrhythmer.github.io/Rhythmer/#play",
-  "editor": "https://jazzyrhythmer.github.io/Rhythmer/editor/",
-  "cheat": "https://jazzyrhythmer.github.io/Rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf"
+  "play": "https://jazzyrhythmer.github.io/rhythmer/#play",
+  "editor": "https://jazzyrhythmer.github.io/rhythmer/editor/",
+  "cheat": "https://jazzyrhythmer.github.io/rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf"
 }

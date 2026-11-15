@@ -1,12 +1,12 @@
 # RHYTHMER
 
-[![Rhythmer — Sound into motion. Startup and Break screens from the FM-1 firmware.](docs/github/hero.png)](https://jazzyrhythmer.github.io/Rhythmer/)
+[![Rhythmer — Sound into motion. Startup and Break screens from the FM-1 firmware.](docs/github/hero.png)](https://jazzyrhythmer.github.io/rhythmer/)
 
 **Sound into motion.** Build a groove one track at a time. Swap a drum voice, generate a fresh part, or slice a break and play the changes into the sequence. Rhythmer is an open-source groovebox for the M‑VAVE FM‑1, with up to six assignable tracks.
 
-[**Play in your browser**](https://jazzyrhythmer.github.io/Rhythmer/#play) · [**Install Rhythmer**](https://jazzyrhythmer.github.io/Rhythmer/installer/) · [**Web editor**](https://jazzyrhythmer.github.io/Rhythmer/editor/) · [Manual](https://jazzyrhythmer.github.io/Rhythmer/#guide) · [PDF](https://jazzyrhythmer.github.io/Rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf) · [Releases](https://github.com/JazzyRhythmer/Rhythmer/releases)
+[**Play in your browser**](https://jazzyrhythmer.github.io/rhythmer/#play) · [**Install Rhythmer**](https://jazzyrhythmer.github.io/rhythmer/installer/) · [**Web editor**](https://jazzyrhythmer.github.io/rhythmer/editor/) · [Manual](https://jazzyrhythmer.github.io/rhythmer/#guide) · [PDF](https://jazzyrhythmer.github.io/rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf) · [Releases](https://github.com/JazzyRhythmer/rhythmer/releases)
 
-Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/Jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/Rhythmer/#companion).
+Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/rhythmer/#companion).
 
 ## Playback base restored · 20261112.1
 
@@ -21,7 +21,7 @@ The preserved single-Break playback base is restored. Missing factory sends defa
 
 ## The machines in motion
 
-Host-rendered firmware UI driven by note, envelope and preset input; silent previews, not physical-device footage. FM6 cycles patches to show its operator networks. [Try the actual firmware with sound](https://jazzyrhythmer.github.io/Rhythmer/#play).
+Host-rendered firmware UI driven by note, envelope and preset input; silent previews, not physical-device footage. FM6 cycles patches to show its operator networks. [Try the actual firmware with sound](https://jazzyrhythmer.github.io/rhythmer/#play).
 
 | | | |
 | --- | --- | --- |
@@ -46,7 +46,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 - Break: 16 chops, 16 performance/repeat commands, source A/B and return commands in the real sequence. Hold SEQ for STRAIGHT / MUTATE / RANDOM, tail fills, beat shuffle, reverse order, shifts and A/B sequencing. Saved periodic mutation supports ORBIT/DRIFT.
 - Break follows the normal track filter, ADSR and both LFOs. Fresh Break tracks select A / Amen with an empty two-bar sequence. Hold SEQ + F3 for a straight loop; saved edits remain intact.
 - Five per-track SEQ generators (Euclid, Mutate, Turing, Cellular and Grids), plus 59 arrangement genres and targeted MIDI/Break GEN.
-- **Sidechain and Kick Link.** Trigger ducking from a kick, a track or kit lane, USB audio or a MIDI note. Send a kick to JAZZY or receive one back over USB MIDI. [Sidechain and Kick Link guide](https://jazzyrhythmer.github.io/Rhythmer/#guide/sidechain).
+- **Sidechain and Kick Link.** Trigger ducking from a kick, a track or kit lane, USB audio or a MIDI note. Send a kick to JAZZY or receive one back over USB MIDI. [Sidechain and Kick Link guide](https://jazzyrhythmer.github.io/rhythmer/#guide/sidechain).
 - Four projects with A–D sections and explicit section/project clearing. Two LFOs per track, shared FX and ducking with local, USB-audio and timing-only MIDI triggers. Four-/six-track modes preserve inactive tracks.
 - USB MIDI Host for class-compliant USB MIDI controllers. Use Device mode for the installer and USB editor.
 - Web editor for actual sounds/patterns, musical archive import/export and user-replaceable two-bar A/B loops. Conversion to 16 kHz mono packed PCM12 happens in the browser. Musical archives do not contain audio: retain your original samples separately.
@@ -55,7 +55,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 The current public beta is **v0.1.2-dev1 · build 20261109.18 · FM-1_748023**. The installer and browser emulator run the same package. New browser sessions start in four-track mode with empty sequences and both factory Break banks ready. Existing emulator saves remain associated with their firmware hashes.
 
-**Back up before updating.** PHASE, LOFI and WHEEL were retired to make room for the two new synths. Projects containing those engines open with Analog on the affected tracks; retain a backup and use the [previous release](https://github.com/JazzyRhythmer/Rhythmer/releases/tag/v0.1.1-beta3) if you need those sounds. Use official V15 when switching between firmware families. Installing restores the bundled Amen and Think banks; save your custom audio separately.
+**Back up before updating.** PHASE, LOFI and WHEEL were retired to make room for the two new synths. Projects containing those engines open with Analog on the affected tracks; retain a backup and use the [previous release](https://github.com/JazzyRhythmer/rhythmer/releases/tag/v0.1.1-beta3) if you need those sounds. Use official V15 when switching between firmware families. Installing restores the bundled Amen and Think banks; save your custom audio separately.
 
 See [exact build validation](RELEASE-VALIDATION.json) for emulator, editor and installer test scope. Dense arrangements can still exceed the device's audio budget. Mute tracks, reduce simultaneous notes or simplify FX if needed.
 
@@ -71,12 +71,12 @@ Independent community firmware, supplied without warranty to the extent permitte
 
 ## Watch Rhythmer
 
-[![Watch the Rhythmer opening film](docs/github/film.jpg)](https://jazzyrhythmer.github.io/Rhythmer/#opening)
+[![Watch the Rhythmer opening film](docs/github/film.jpg)](https://jazzyrhythmer.github.io/rhythmer/#opening)
 
 <!-- JAZZY-RHYTHMER-PORTFOLIO:START -->
 ## More from Jazzy Rhythmer
 
-**For MPC Sample:** [RHYTHMER OS](https://jazzyrhythmer.github.io/mpc-sample/) · **For FM-1:** [JAZZY](https://jazzyrhythmer.github.io/Jazzy/) / [RHYTHMER](https://jazzyrhythmer.github.io/Rhythmer/)
+**For MPC Sample:** [RHYTHMER OS](https://jazzyrhythmer.github.io/mpc-sample/) · **For FM-1:** [JAZZY](https://jazzyrhythmer.github.io/jazzy/) / [RHYTHMER](https://jazzyrhythmer.github.io/rhythmer/)
 
 **JR Audio Software** — in development, expected in 2027: [JR ACID](https://jazzyrhythmer.github.io/software.html#jr-acid) · [JR FX](https://jazzyrhythmer.github.io/software.html#jr-fx) · [JR SMPL](https://jazzyrhythmer.github.io/software.html#jr-smpl) · [JR RYTM](https://jazzyrhythmer.github.io/software.html#jr-rytm) · [JR DRAW](https://jazzyrhythmer.github.io/software.html#jr-draw) · [JR PLAY](https://jazzyrhythmer.github.io/software.html#jr-play) · [JR TREK](https://jazzyrhythmer.github.io/software.html#jr-trek).
 

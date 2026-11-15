@@ -2,7 +2,7 @@
 
 ## 2026-11-11 · Sidechain guide
 
-- Documented trigger sources, drum-lane selection, shared DUCK/AMT, and bidirectional Kick Link between RHYTHMER and JAZZY. [Read the guide](https://jazzyrhythmer.github.io/Rhythmer/#guide/sidechain).
+- Documented trigger sources, drum-lane selection, shared DUCK/AMT, and bidirectional Kick Link between RHYTHMER and JAZZY. [Read the guide](https://jazzyrhythmer.github.io/rhythmer/#guide/sidechain).
 
 ## 0.1.2-dev1 — 2026-11-09 · build 20261109.18
 
