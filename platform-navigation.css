@@ -19,3 +19,6 @@ header.jr-site-header,header.jr-site-header.top,header.jr-site-header.topbar{bac
 :root{--bg:#0c0d0d}
 html,body{background-color:#0c0d0d!important}
 body>main{background-color:transparent!important}
+
+/* A quiet support invitation for the free firmware. */
+.jr-support-copy{max-width:680px}.jr-support-copy h2{font:500 clamp(28px,3vw,38px)/1.15 Arial,Helvetica,sans-serif;letter-spacing:-.035em;color:#eee;margin:0 0 22px}.jr-support-copy>p{font:15px/1.85 Arial,Helvetica,sans-serif;color:#aaa;max-width:630px;margin:0 0 18px}.jr-support-actions{margin:24px 0}.jr-support-copy a.jr-support-tip{display:inline-flex;align-items:center;background:#eee;color:#111;border:1px solid #eee;padding:15px 21px;font:12px/1.3 monospace;text-decoration:none}.jr-support-copy a.jr-support-tip:hover{background:#fff;color:#000}.jr-support-copy .jr-support-ongoing{font-size:13px;line-height:1.8}.jr-support-ongoing a{color:#ddd;text-underline-offset:4px}.jr-support-section{border-top:1px solid #343636;padding-top:48px;padding-bottom:48px;scroll-margin-top:80px}.jr-support-copy a:focus-visible{outline:2px solid white;outline-offset:5px}@media(max-width:600px){.jr-support-section{padding-top:35px;padding-bottom:35px}}
