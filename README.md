@@ -8,9 +8,6 @@
 
 Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/rhythmer/#companion).
 
-## Playback base restored · 20261112.1
-
-The preserved single-Break playback base is restored. Missing factory sends default to zero; explicit preset FX and saved mixes remain. Acid and Break load dry. [Release notes and provenance](docs/releases/20261112.1.md). Both Amen and Think remain included. Back up before installation.
 
 ## Explore the machines
 
