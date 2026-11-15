@@ -16,6 +16,8 @@ const IS_OTA = (id) => /^ota-/i.test(id.model);
  * USB hub, and Windows installing a driver the first time the update loader (another USB identity) appears, took
  * longer than the 30 s the loader had */
 export const UPDATE_TIMES = {
+  portOpen: 5000, openSettle: 300, reply: 10,
+  stageMax: 600000, writeMax: 1800000, progress1: 30000, progress2: 120000,
   hs: 1000, hsTries: 2,        // the identity query: an answer within hs, tries times per port
   findTries: 3, backoff: 400,  // a device not found: scan again after backoff, 2 x backoff...
   settle1: 2000, idle1: 12000, upgradeTries: 3,   // step 1: the running firmware's first request; UPGRADE again if none
@@ -26,15 +28,16 @@ export const UPDATE_TIMES = {
 };
 /* the ports worth asking for an identity: the FM-1 (official: its own name or the USB composite's), JIANT, Felucca and
  * its forks, the update loaders. Other gear is not probed, except a port that appears while we wait for the loader */
-export const PORT_RE = /rhythmer|fm-?1|felucca|jiant|skiff|ota|composite|sinco|usb-midi|m-?vave|cuvave/i;
+export const PORT_RE = /jazzy|rhythmer|fm[ -]?1|felucca|jiant|skiff|ota|composite|sinco|usb-midi|m-?vave|cuvave/i;
 /* Windows names one device's ports "FM-1", "2- FM-1", "MIDIIN2 (FM-1)" / "MIDIOUT2 (FM-1)", "FM-1 1": the device's name */
 export const portBase = (name) => String(name || "").trim().replace(/^\d+\s*-\s*/, "")
   .replace(/^MIDI(?:IN|OUT)\d*\s*\((.*)\)$/i, "$1").replace(/\s+\d+$/, "").trim().toLowerCase();
 /* the output of an input: the same name, else the same device name, else the only live output of an FM-1-like name */
 export function pairOutput(input, outs) {
   const live = outs.filter((o) => o.state !== "disconnected");
-  const same = live.find((o) => o.name === input.name);
-  if (same) return same;
+  const same = live.filter((o) => o.name === input.name);
+  if (same.length === 1) return same[0];
+  if (same.length > 1) return null;
   const base = portBase(input.name), byBase = live.filter((o) => portBase(o.name) === base);
   if (byBase.length === 1) return byBase[0];
   const named = live.filter((o) => PORT_RE.test(o.name || ""));
@@ -45,6 +48,11 @@ export function pairOutput(input, outs) {
 // does not answer the identity query), model, noupdate (the firmware never asked for the update), stopped, noloader,
 // lost, noreturn, mismatch (detail: the identity the device reports), badreq
 export function fail(code, msg, detail = "", phase = null, served = null) { const e = new Error(msg); Object.assign(e,{code,detail,phase,served}); return e; }
+
+// A driver may leave open() pending forever. No write is allowed until it resolves.
+export async function bounded(promise,ms,code='porttimeout') {
+ let timer;try{return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(fail(code,'MIDI operation timed out. Close other MIDI applications, reconnect and inspect the FM-1.')),ms);})]);}finally{clearTimeout(timer);}
+}
 
 export function pack7(data) {
   const out = []; let acc = 0, nb = 0;
@@ -87,6 +95,7 @@ function parseRequest(pkt) {
 }
 
 function parseIdentity(pkt) {
+  if(pkt[0]!==0xF0||pkt.at(-1)!==0xF7)return null;
   const d = unpack7(pkt.slice(1, -1));
   if (d.length !== 34 || d[0] !== 0 || d[1] !== 0x59 || d[2] !== 0x11) return null;
   const txt = String.fromCharCode(...d.slice(6, 33)).replace(/\0+$/, "");
@@ -99,10 +108,10 @@ function parseIdentity(pkt) {
 // one MIDI in/out pair with a SysEx queue
 class Link {
   constructor(input, output) {
-    this.input = input; this.output = output; this.q = []; this.waiter = null;
+    this.input = input; this.output = output; this.q = []; this.waiter = null;this.overflow=false;
     input.onmidimessage = (ev) => {
       if (ev.data[0] !== 0xF0) return;
-      this.q.push(Array.from(ev.data));
+      if(this.q.length>=128){this.overflow=true;}else this.q.push(Array.from(ev.data));
       if (this.waiter) { const w = this.waiter; this.waiter = null; w(); }
     };
   }
@@ -113,6 +122,7 @@ class Link {
   }
   drain() { this.q.length = 0; }
   async read(ms) {
+    if(this.overflow)throw fail("overflow","Too many pending MIDI messages. Stop playback and close other MIDI applications before inspecting the device again.");
     if (!this.q.length) {
       let tm;
       await Promise.race([new Promise((r) => { this.waiter = r; }), new Promise((r) => { tm = setTimeout(r, ms); })]);
@@ -150,7 +160,7 @@ export class Updater {
     this.refresh = opts.refresh || null;
     this.lastScan = { ports: [], outputs: [] };
     this.baseline = null;                          // the port names of the first scan (unnamed new ones are probed later)
-    this.sawNamed = false;
+    this.sawNamed = false;this.opened=new Set();this.inTransition=false;this.lastRequest=null;
   }
 
   /* one pass over the inputs: named ports ("named"), or other ports ("other": the ones absent from the first scan
@@ -169,10 +179,15 @@ export class Updater {
       const output = pairOutput(input, outs);
       if (!output) { rec.result = "no output port"; continue; }
       /* Windows: a port another program holds (the M-VAVE app, a DAW, MIDI-OX) cannot be opened: open() rejects */
-      try { await input.open(); await output.open(); }
-      catch (e) { rec.result = `busy (${(e && e.name) || "open failed"})`; rec.busy = true; this.log(`port ${input.name}: ${rec.result}`); continue; }
+      try { for(const port of [input,output]){
+        this.opened.add(port);let timedOut=false;
+        const opening=port.open();opening.then(()=>{if(timedOut)port.close?.().catch(()=>{});},()=>{});
+        try{await bounded(opening,Math.max(1,Math.min(this.t.portOpen,(this.deadline||Infinity)-Date.now())));}catch(e){timedOut=true;throw e;}
+      }}
+      catch (e) { rec.result = `${e.code==='porttimeout'?'port open timeout':'busy'} (${(e && e.name) || "open failed"})`; rec.busy = true; this.log(`port ${input.name}: ${rec.result}`); continue; }
       const link = new Link(input, output);
-      const id = await handshake(link, this.t.hsTries, this.t.hs);
+      await sleep(Math.min(this.t.openSettle,Math.max(0,(this.deadline||Infinity)-Date.now())));
+      const id = await handshake(link, this.t.hsTries, Math.max(1,Math.min(this.t.hs,((this.deadline||Infinity)-Date.now())/3)));
       rec.result = id ? id.text : "no answer"; rec.answered = !!id;
       if (id && (!filter || filter(id))) return { link, id, name: input.name };
       link.close();
@@ -207,44 +222,44 @@ export class Updater {
   }
 
   async waitFor(filter, ms) {
-    const end = Date.now() + ms;
-    for (let n = 1; Date.now() < end; n++) {
-      const dev = await this.find(filter);
-      if (dev) return dev;
-      if (this.refresh && n % this.t.refreshEvery === 0) {
-        try { const a = await this.refresh(); if (a) { this.access = a; this.log("MIDI access refreshed"); } } catch (_) {}
+    const end=Date.now()+ms,prev=this.inTransition;this.inTransition=true;this.deadline=end;
+    try {for(let n=1;Date.now()<end;n++){
+      let dev;try{dev=await this.find(filter);}catch(e){if(e.code!=='ambiguous')throw e;this.log('Waiting for old MIDI endpoints to disappear before choosing the new port.');}
+      if(dev)return dev;
+      if(this.refresh && (n===1||n%this.t.refreshEvery===0)){
+        try{const a=await bounded(this.refresh(),Math.max(1,Math.min(this.t.portOpen,end-Date.now())),'refresh');if(a){this.access=a;this.log('MIDI access refreshed');}}catch(_){}
       }
-      await sleep(this.t.poll);
-    }
-    return null;
+      await sleep(Math.min(this.t.poll,Math.max(0,end-Date.now())));
+    }return null;}finally{this.inTransition=prev;this.deadline=null;}
   }
+  close(){for(const p of this.opened){p.onmidimessage=null;try{p.close?.().catch(()=>{});}catch(_){}}this.opened.clear();}
 
   // serve read requests until the device asks for one of the finish addresses; stops early
   // when the port disappears (lost: true) instead of waiting out idleMs
-  async serve(link, image, finishAddr, idleMs, onProgress) {
-    let served = 0, last = Date.now();
-    for (;;) {
-      const pkt = await link.read(Math.min(1000, idleMs));
-      if (!pkt) {
-        if (link.lost) return { served, finished: false, lost: true };
-        if (Date.now() - last > idleMs) return { served, finished: false };
-        continue;
+  async serve(link,image,finishAddr,idleMs,onProgress,phase='stage'){
+    let served=0,last=Date.now(),progress=last;const started=last,seen=new Set();
+    const max=phase==='write'?this.t.writeMax:this.t.stageMax,stall=phase==='write'?this.t.progress2:this.t.progress1;
+    const result=(reason,lost=false)=>({served,finished:false,lost,reason,lastRequest:this.lastRequest});
+    for(;;){
+      const now=Date.now();
+      if(now-started>=max)return result('phase-timeout');
+      if(now-last>=idleMs)return result('request-timeout');
+      if(seen.size&&now-progress>=stall)return result('repeated-requests-without-progress');
+      if(link.lost)return result('disconnected',true);
+      const pkt=await link.read(Math.min(1000,idleMs,max-(now-started),seen.size?stall-(now-progress):Infinity));
+      if(!pkt)continue;
+      const r=parseRequest(pkt);if(!r)continue;
+      last=Date.now();this.lastRequest={phase,address:r.addr,bytes:r.len,flags:r.fl,served};
+      if(r.addr===0xE0000000||r.addr===0xF0000000){
+        if(!link.send(response(r.addr,[...new TextEncoder().encode('success'),0])))return result('finish-ack-send-failed',true);
+        if(r.addr===finishAddr)return {served,finished:true,lastRequest:this.lastRequest};continue;
       }
-      const r = parseRequest(pkt);
-      if (!r) continue;
-      last = Date.now();
-      if (r.addr === 0xE0000000 || r.addr === 0xF0000000) {
-        link.send(response(r.addr, [...new TextEncoder().encode("success"), 0]));
-        if (r.addr === finishAddr) return { served, finished: true };
-        continue;
-      }
-      if (r.len > MAXDATA || r.addr + r.len > image.length) throw fail("badreq", `bad request ${r.addr.toString(16)}+${r.len}`);
-      await sleep(10);
-      if (!link.send(response(r.addr, Array.from(image.subarray(r.addr, r.addr + r.len)), r.fl))) {
-        return { served, finished: false, lost: true };
-      }
-      served++;
-      if (onProgress) onProgress(served, r.addr, r.len, image.length);
+      if(!r.len||r.len>MAXDATA||r.addr>image.length-r.len)throw fail('badreq',`bad request ${r.addr.toString(16)}+${r.len}`,'',phase,served);
+      const key=r.addr+':'+r.len;
+      if(!seen.has(key)){seen.add(key);progress=Date.now();}
+      await sleep(this.t.reply);
+      if(!link.send(response(r.addr,Array.from(image.subarray(r.addr,r.addr+r.len)),r.fl)))return result('response-send-failed',true);
+      served++;if(onProgress)onProgress(served,r.addr,r.len,image.length);
     }
   }
 
@@ -269,13 +284,14 @@ export class Updater {
     }
     dev.link.close();
     if (!s1.finished && !s1.lost && !s1.served) throw fail("noupdate", `${dev.id.text} did not start reading the package. Save the diagnostic report.`, dev.id.text, "stage", 0);
-    if (!s1.finished) throw fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} during update staging after ${s1.served} requests. Firmware installation was not confirmed; loader staging may have started.`, "", "stage", s1.served);
+    if (!s1.finished && !(s1.lost && s1.served)) throw fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} during update staging after ${s1.served} requests. Firmware installation was not confirmed; loader staging may have started.`, s1.reason||"", "stage", s1.served);
+    if(!s1.finished)this.log("Staging port disconnected after valid reads; checking for the actual update loader before continuing.");
     step("loader");
     await sleep(this.t.loaderSettle);
     const ota = await this.waitFor((id) => id.model === "ota-" + model, this.t.loader);
     if (!ota) throw fail("noloader", "The update loader did not reconnect within the allowed time. Keep power stable, inspect USB/MIDI ports and save the diagnostic report before retrying.");
     const s2 = await this.write(ota, image, step);
-    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Inspect the device before resuming the same package.`, "", "write", s2.served);
+    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Inspect the device before resuming the same package.`, s2.reason||"", "write", s2.served);
     step("reboot");
     await sleep(this.t.loaderSettle);
     const back = await this.waitFor((id) => !IS_OTA(id), this.t.back);
@@ -292,7 +308,7 @@ export class Updater {
     this.log(`loader: ${ota.id.text} on ${ota.name}`);
     ota.link.send(UPGRADE);
     await sleep(this.t.settle2);
-    const s2 = await this.serve(ota.link, image, 0xF0000000, this.t.idle2, (n,address,bytes,imageBytes) => step("write",n,{address,bytes,imageBytes}));
+    const s2 = await this.serve(ota.link, image, 0xF0000000, this.t.idle2, (n,address,bytes,imageBytes) => step("write",n,{address,bytes,imageBytes}),"write");
     ota.link.close();
     return s2;
   }
