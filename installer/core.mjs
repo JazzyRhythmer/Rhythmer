@@ -1,9 +1,9 @@
-import {recoveryPolicy} from './install-safety.mjs?v=install-safety-20261112.2';
+import {recoveryPolicy} from './install-safety.mjs?v=installer-20261116.1';
 // SPDX-License-Identifier: GPL-3.0-only
-import {Updater,PORT_RE,pairOutput} from './transport.mjs?v=install-safety-20261112.2';
-import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=install-safety-20261112.2';
-import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=install-safety-20261112.2';
-import {parseInfo} from './midi.mjs?v=install-safety-20261112.2';
+import {Updater,PORT_RE,pairOutput,fail} from './transport.mjs?v=installer-20261116.1';
+import {Package,logicalImage,sha256hex,validateStockPackage} from './fm1pkg.js?v=installer-20261116.1';
+import {BackupConnection,captureBackup,bkPack,bkCrc} from './fm1backup.js?v=installer-20261116.1';
+import {parseInfo} from './midi.mjs?v=installer-20261116.1';
 export {validateStockPackage,sha256hex};
 const ensure=(yes,why)=>{if(!yes)throw Error(why);};
 const RHYTHMER_DEV_PRODUCTS=['FM-1_748007','FM-1_748008','FM-1_748010','FM-1_748011','FM-1_748012','FM-1_748013','FM-1_748014','FM-1_748015','FM-1_748016','FM-1_748017','FM-1_748018','FM-1_748019','FM-1_748020','FM-1_748021','FM-1_748022','FM-1_748023'];
@@ -83,7 +83,7 @@ export class DeviceUpdater extends Updater{
  async find(filter,opts){
   // Conservatively refuse multiple endpoints rather than risk updating the wrong unit.
   const ins=[...this.access.inputs.values()].filter(candidate),outs=[...this.access.outputs.values()].filter(candidate);
-  ensure(ins.length<=1&&outs.length<=1,'Connect only one FM-1; close duplicate MIDI endpoints before continuing.');
+  if(ins.length>1||outs.length>1)throw fail('ambiguous','Connect only one FM-1; close duplicate MIDI endpoints before continuing.',JSON.stringify({inputs:ins.map(p=>p.name),outputs:outs.map(p=>p.name)}));
   const found=await super.find(filter,{...opts,others:false});
   if(found&&this.expectedFirst){const s=this.expectedFirst;this.expectedFirst=null;try{ensure(found.id.text===s.id.text&&found.link.input.id===s.input.id&&found.link.output.id===s.output.id,'Device changed at upgrade entry. Inspect and back up again.');}catch(e){found.link.close();throw e;}}
   return found;
@@ -110,7 +110,7 @@ export async function verifyRhythmer(up,target){
 }
 export async function verifyEmbeddedBanks(source){
  const c=new BackupConnection(source.input,source.output);
- try{const r=await c.request([80,[]],{timeout:8000});
+ try{const r=await c.request([80,[]],{timeout:8000,retries:2});
   ensure(r.length===6&&String.fromCharCode(...r.slice(0,5))==='SIX3\0','Installed factory-bank validation failed: invalid device response. Stop and inspect before retrying the full package.');
   const mask=r[5];ensure(mask===3,`Installed factory-bank validation failed: A / Amen ${mask&1?'ready':'not readable'}, B / Think ${mask&2?'ready':'not readable'} (mask ${mask}). Stop and inspect before retrying the full package.`);return mask;
  }finally{c.close();}

@@ -1,7 +1,8 @@
-import {INSTALLER_REVISION,validateOfficial,recoveryPolicy,stockName,deviceSummary,environment,failureDetails} from './install-safety.mjs?v=install-safety-20261112.2';
+import {fetchChecked} from './network.mjs?v=installer-20261116.1';
+import {INSTALLER_REVISION,validateOfficial,recoveryPolicy,stockName,deviceSummary,environment,failureDetails} from './install-safety.mjs?v=installer-20261116.1';
 // SPDX-License-Identifier: GPL-3.0-only
-import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=install-safety-20261112.2';
-import {mountProgress} from './progress.mjs?v=install-safety-20261112.2';
+import {DeviceUpdater,inspect,backup,authorize,validateStockPackage,validateInstallBundle,transfer,verifyRhythmer,verifyEmbeddedBanks,confirmSource} from './core.mjs?v=installer-20261116.1';
+import {mountProgress} from './progress.mjs?v=installer-20261116.1';
 const $=s=>document.querySelector(s),mode=new URLSearchParams(location.search).get('mode')==='stock'?'stock':'rhythmer';
 let manifest,target,recovery,source,up,access,officialOverride=null,lastError=null,working=false,writing=false,backupReady=false,bundleReady=false,releaseLock,heartbeat,channel;
 document.body.dataset.mode=mode;
@@ -20,11 +21,11 @@ function refresh(){
  $('#review').disabled=working||!allowed(true);
  $('#ack').disabled=working;
 }
-async function busy(fn){if(working)return false;working=true;refresh();try{await fn();return true;}catch(e){if(['running','waiting'].includes(transferView.model.status))transferView.fail(e.message);lastError=failureDetails(e,{mode,target,stage:lastTransferStage,writing});state('Stopped: '+e.message+' '+lastError.advice+(writing?' Firmware or audio may already be written. Inspect before recovery.':' No firmware or sample write was started by this operation.'));return false;}finally{working=false;writing=false;refresh();}}
-async function loadBytes(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('Local asset unavailable: '+url);return new Uint8Array(await r.arrayBuffer());}
+async function busy(fn){if(working)return false;working=true;refresh();try{await fn();return true;}catch(e){if(['running','waiting'].includes(transferView.model.status))transferView.fail(e.message);e.lastRequest=up?.lastRequest??null;e.portScan=up?.lastScan??null;lastError=failureDetails(e,{mode,target,stage:lastTransferStage,writing});state('Stopped: '+e.message+' '+lastError.advice+(writing?' Firmware or audio may already be written. Inspect before recovery.':' No firmware or sample write was started by this operation.'));return false;}finally{working=false;writing=false;refresh();}}
+async function loadBytes(url){const r=await fetchChecked(url,{cache:'no-store'});if(!r.ok)throw Error('Local asset unavailable: '+url);return new Uint8Array(await r.arrayBuffer());}
 async function preload(){
  bundleReady=false;refresh();
- const r=await fetch('manifest.json',{cache:'no-store'});if(!r.ok)throw Error('Installer manifest unavailable.');manifest=await r.json();
+ const r=await fetchChecked('manifest.json',{cache:'no-store'});if(!r.ok)throw Error('Installer manifest unavailable.');manifest=await r.json();
  if(typeof manifest.localOnly!=='boolean'||!['local-development','public-beta'].includes(manifest.channel||'local-development')||manifest.physicalHardwareTested!==false)throw Error('Unsupported installer channel.');
  if(mode==='rhythmer'&&manifest.releaseHold){$('#build-status').textContent='ON HOLD / '+manifest.releaseHold;throw Error(manifest.releaseHold);}
  const b=await validateInstallBundle(await loadBytes(manifest.bundle.url),manifest);
@@ -44,7 +45,7 @@ function reserve(){
 function signal(busy){channel?.postMessage({type:'installer',busy});}
 function closeConnection(){
  if(heartbeat)clearInterval(heartbeat);heartbeat=null;signal(false);channel?.close();channel=null;
- for(const p of [...(access?.inputs.values()||[]),...(access?.outputs.values()||[])]){p.onmidimessage=null;p.close?.().catch(()=>{});}
+ up?.close();
  releaseLock?.();releaseLock=null;source=null;access=null;up=null;backupReady=false;$('#backup-saved').checked=false;$('#backup-download').hidden=true;
 }
 async function connectDevice(){
@@ -138,3 +139,5 @@ if(mode==='stock'){
 }
 $('#report').addEventListener('click',updateReport);
 transferView.render(true);updateReport();preload().catch(e=>{bundleReady=false;target=null;$('#build-status').textContent=e.message;state('Installation bundle unavailable: '+e.message);refresh();});refresh();
+
+document.addEventListener('visibilitychange',()=>{if(writing&&document.hidden)log('Installer tab hidden: background throttling can delay USB MIDI replies. Keep this page visible, the computer awake and USB/power connected.');});
