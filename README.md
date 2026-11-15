@@ -4,9 +4,9 @@
 
 **Sound into motion.** Build a groove one track at a time. Swap a drum voice, generate a fresh part, or slice a break and play the changes into the sequence. Rhythmer is an open-source groovebox for the M‑VAVE FM‑1, with up to six assignable tracks.
 
-[**Play in your browser**](https://jazzyrhythmer.github.io/rhythmer/#play) · [**Install Rhythmer**](https://jazzyrhythmer.github.io/rhythmer/installer/) · [**Web editor**](https://jazzyrhythmer.github.io/rhythmer/editor/) · [Manual](https://jazzyrhythmer.github.io/rhythmer/#guide) · [PDF](https://jazzyrhythmer.github.io/rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf) · [Releases](https://github.com/JazzyRhythmer/rhythmer/releases)
+[**Play in your browser**](https://jazzyrhythmer.github.io/rhythmer/#play) · [**Install Rhythmer**](https://jazzyrhythmer.github.io/rhythmer/installer/) · [**Web editor**](https://jazzyrhythmer.github.io/rhythmer/editor/) · [Manual](https://jazzyrhythmer.github.io/rhythmer/#guide) · [PDF](https://jazzyrhythmer.github.io/rhythmer/downloads/Rhythmer-Manual-v0.1.2-dev1.pdf) · [Releases](https://github.com/jazzyrhythmer/rhythmer/releases)
 
-Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/JazzyRhythmer/jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/rhythmer/#companion).
+Built by [Jazzy Rhythmer](https://jazzyrhythmer.github.io/) on [JIANT](https://github.com/juanjiant-bit/JIANT)'s sequencing and project system. [JAZZY](https://github.com/jazzyrhythmer/jazzy) is the companion firmware for exploring a wider palette of individual sounds. [Watch them side by side](https://jazzyrhythmer.github.io/rhythmer/#companion).
 
 
 ## Explore the machines
@@ -52,7 +52,7 @@ Host-rendered firmware UI driven by note, envelope and preset input; silent prev
 
 The current public beta is **v0.1.2-dev1 · build 20261109.18 · FM-1_748023**. The installer and browser emulator run the same package. New browser sessions start in four-track mode with empty sequences and both factory Break banks ready. Existing emulator saves remain associated with their firmware hashes.
 
-**Back up before updating.** PHASE, LOFI and WHEEL were retired to make room for the two new synths. Projects containing those engines open with Analog on the affected tracks; retain a backup and use the [previous release](https://github.com/JazzyRhythmer/rhythmer/releases/tag/v0.1.1-beta3) if you need those sounds. Use official V15 when switching between firmware families. Installing restores the bundled Amen and Think banks; save your custom audio separately.
+**Back up before updating.** PHASE, LOFI and WHEEL were retired to make room for the two new synths. Projects containing those engines open with Analog on the affected tracks; retain a backup and use the [previous release](https://github.com/jazzyrhythmer/rhythmer/releases/tag/v0.1.1-beta3) if you need those sounds. Use official V15 when switching between firmware families. Installing restores the bundled Amen and Think banks; save your custom audio separately.
 
 See [exact build validation](RELEASE-VALIDATION.json) for emulator, editor and installer test scope. Dense arrangements can still exceed the device's audio budget. Mute tracks, reduce simultaneous notes or simplify FX if needed.
 

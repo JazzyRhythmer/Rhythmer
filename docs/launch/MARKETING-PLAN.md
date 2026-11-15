@@ -49,7 +49,7 @@ Thumbnail: real FM-1 with Rhythmer HOME, large legible `RHYTHMER`, small `SOUND 
 >
 > Try it in your browser: https://jazzyrhythmer.github.io/rhythmer/
 > Guide and installation: https://jazzyrhythmer.github.io/rhythmer/
-> Source and release notes: https://github.com/JazzyRhythmer/rhythmer
+> Source and release notes: https://github.com/jazzyrhythmer/rhythmer
 > Optional support: https://ko-fi.com/jazzyrhythmer
 >
 > Start from official V15 for a first installation and back up your music. Rhythmer is independent of M-VAVE. Read the release notes, risk notice and separate sample credits before installing; the firmware license does not clear third-party recording rights.
@@ -69,7 +69,7 @@ Thumbnail: real FM-1 with Rhythmer HOME, large legible `RHYTHMER`, small `SOUND 
 >
 > Here is a real-device demo and the project page: https://jazzyrhythmer.github.io/rhythmer/ (add the real-device video URL after it is published). It is an early beta; the release notes describe the tested build and known limits. Back up before installing, and use the recommended V15 starting point.
 >
-> I’d appreciate reproducible feedback, especially on saved patterns, different machine combinations and USB workflows. This builds on several FM-1 community projects; source and credits are available at https://github.com/JazzyRhythmer/rhythmer.
+> I’d appreciate reproducible feedback, especially on saved patterns, different machine combinations and USB workflows. This builds on several FM-1 community projects; source and credits are available at https://github.com/jazzyrhythmer/rhythmer.
 
 Use only communities where self-promotion and firmware announcements are permitted. A plan to announce does not authorize sending unsolicited private messages. Do not mass-post identical text or contact upstream maintainers as presumed endorsers.
 
