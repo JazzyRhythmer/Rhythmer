@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: GPL-3.0-only */
+/* Shared home/support presentation, scoped away from the instrument/editor UI. */
+.jr-support-panel{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(240px,.65fr);gap:48px;align-items:center;min-width:0;padding:40px;background:#141512;color:#ededdf;border:1px solid #45453e;}
+.launch-home .rhy-home-support{margin:0 0 48px;scroll-margin-top:108px;}
+.support-content .jr-support-panel{max-width:none;margin:0 0 40px;padding:36px;border:1px solid #45453e;grid-template-columns:minmax(0,1fr);gap:24px;}
+.jr-support-panel .jr-support-copy,.jr-support-panel .jr-support-links{min-width:0;max-width:none;}
+.jr-support-panel .eyebrow{color:#a2a29b;font:11px/1.7 Mono,monospace;letter-spacing:1px;}
+.jr-support-panel .jr-support-copy h2{margin:16px 0 20px;color:#ededdf;font-size:clamp(30px,3.6vw,46px);font-weight:500;line-height:1.1;letter-spacing:-1.5px;}
+.jr-support-panel .jr-support-copy p{margin:0 0 12px;max-width:42em;color:#c5c5bc;font-size:15px;line-height:1.8;}
+.jr-support-panel .jr-support-copy p:last-child{margin-bottom:0;}
+.jr-support-panel .jr-support-links{display:flex;flex-direction:column;gap:22px;align-items:stretch;}
+.jr-support-panel .jr-support-actions{margin:0;display:flex;flex-direction:column;gap:12px;}
+.jr-support-panel .jr-support-actions .btn{display:flex;align-items:center;justify-content:center;min-height:52px;box-sizing:border-box;width:100%;max-width:100%;padding:16px 18px;border:1px solid #ededdf;background:#ededdf;color:#101010;font:12px/1.5 Mono,monospace;letter-spacing:.4px;text-align:center;text-decoration:none;white-space:normal;transition:background .15s ease,border-color .15s ease;}
+.jr-support-panel .jr-support-actions .jr-support-secondary{border-color:#626259;background:transparent;color:#ededdf;}
+.jr-support-panel .jr-support-actions .btn:hover{border-color:#fff;background:#fff;}
+.jr-support-panel .jr-support-actions .jr-support-secondary:hover{background:#23251f;border-color:#ededdf;}
+.jr-support-panel .text-link{align-self:flex-start;margin:0;color:#c5c5bc;font:11px/1.7 Mono,monospace;letter-spacing:.25px;text-decoration:underline;text-underline-offset:4px;white-space:normal;}
+.jr-support-panel .jr-support-caption{color:#a2a29b;font:11px/1.7 Mono,monospace;}
+.jr-support-panel a:focus-visible{outline:2px solid #ededdf;outline-offset:5px;}
+@media(max-width:760px){.jr-support-panel{grid-template-columns:minmax(0,1fr);gap:28px;padding:26px 22px;}.launch-home .rhy-home-support{margin:0 0 28px;}.support-content .jr-support-panel{padding:26px 22px;}.jr-support-panel .jr-support-copy h2{font-size:32px;letter-spacing:-1px;}.jr-support-panel .jr-support-copy p{font-size:14px;}.jr-support-panel .jr-support-links{gap:20px;}}
+@media(prefers-reduced-motion:reduce){.jr-support-panel .btn{transition:none;}}
